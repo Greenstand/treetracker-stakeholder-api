@@ -69,6 +69,25 @@ describe('BaseRepository', () => {
       expect(result[0]).property('id').eq(1);
     });
 
+    it('getByFilter with offset', async () => {
+      tracker.uninstall();
+      tracker.install();
+      tracker.on('query', (query) => {
+        expect(query.sql).match(/select.*testTable.*offset.*/);
+        query.response([{ id: 1 }]);
+      });
+      const result = await baseRepository.getByFilter(
+        {
+          name: 'testName',
+        },
+        {
+          offset: 1,
+        },
+      );
+      expect(result).lengthOf(1);
+      expect(result[0]).property('id').eq(1);
+    });
+
     describe("'and' 'or' phrase", () => {
       it('{and: [{c:1}, {b:2}]}', async () => {
         tracker.uninstall();
