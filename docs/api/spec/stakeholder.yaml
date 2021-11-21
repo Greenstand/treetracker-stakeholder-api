@@ -1,0 +1,276 @@
+openapi: 3.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/gwynndp/Stakeholders/1.0.0
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/gwynndp/Stakeholder/1.0.0
+info:
+  description: Stakeholder microservice API
+  version: '1.0.0'
+  title: Greenstand Stakeholder API
+  contact:
+    email: admin@greenstand.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: admins
+    description: Secured Admin-only calls
+  - name: developers
+    description: Operations available to regular developers
+paths:
+  /stakeholder:
+    get:
+      tags:
+        - admins
+      summary: gets data for one stakeholder, id from user token (?)
+      operationId: getStakeholder
+      description: get data for stakeholder, their child orgs, the people connected to them, and the admin users
+      parameters:
+        - in: query
+          name: id
+          description: pass an optional id, required for looking up full data for child orgs
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: offset
+          description: number of records to skip for pagination
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+        - in: query
+          name: limit
+          description: maximum number of records to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 50
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Stakeholder'
+        '400':
+          description: bad input parameter
+    post:
+      tags:
+        - admins
+      summary: adds a new stakeholder
+      operationId: addStakeholder
+      description: Adds a stakeholder to the system
+      responses:
+        '201':
+          description: stakeholder created
+        '400':
+          description: 'invalid input, object invalid'
+        '409':
+          description: an existing item already exists
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Stakeholder'
+        description: Stakeholder item to add
+    patch:
+      tags:
+        - admins
+      summary: updates a new stakeholder
+      operationId: updateStakeholder
+      description: Updates a stakeholder
+      responses:
+        '200':
+          description: send back updated stakeholder
+        '400':
+          description: 'invalid input, object invalid'
+        '304':
+          description: error, stakeholder wasn't modified
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Stakeholder'
+        description: Stakeholder item to add
+components:
+  schemas:
+    Stakeholder:
+      type: object
+      required:
+        - id
+        - type
+        - org_name
+        - first_name
+        - last_name
+        - email
+        - phone
+        - website
+        - logo_url
+        - map_name
+        - stakeholder_uuid
+        - children
+        - parents
+        - users
+        - growers
+      properties:
+        id:
+          type: number
+          format: number
+          example: 1
+        type:
+          type: string
+          format: string
+          example: 'O'
+        org_name:
+          type: string
+          format: string
+          example: 'Greenstand'
+        first_name:
+          type: string
+          format: string
+          example: 'Don'
+        last_name:
+          type: string
+          format: string
+          example: 'Juan'
+        email:
+          type: string
+          format: email
+          example: 'hello@greenstand.org'
+        phone:
+          type: string
+          format: phon-number
+          example: '123-456-7890'
+        website:
+          type: string
+          format: url
+          example: 'http://greenstand.org'
+        logo_url:
+          type: string
+          format: url
+          example: './logo_192x192.png'
+        map_name:
+          type: string
+          format: string
+          example: '/greenstandMap'
+        stakeholder_uuid:
+          type: string
+          format: uuid
+          example: '792a4eee-8e18-4750-a56f-91bdec383aa6'
+        users:
+          type: array
+          format: json
+          items: {}
+          example:
+            [
+              {
+                id: 1,
+                user_id: '123anbfjo-fdafea214532-dsfd789df',
+                username: 'admin1',
+                first_name: 'Admin',
+                last_name: 'One',
+                pwd_hash: 'd20bad44a99286723895023268e9ab7ad57cdc0d29eb78e8ec68c9f61c82d73826703ab0058f8704f75ba15d4f5178e31067222bf911a0ba71d6806bef90980c',
+                salt: 'aafd',
+                email: 'test@greenstand.org',
+                active: true,
+                created_at: '2021-11-1',
+                stakeholder_id: '792a4eee-8e18-4750-a56f-91bdec383aa6',
+                pwd_reset_req: false,
+              },
+            ]
+        children:
+          type: array
+          format: json
+          items:
+            $ref: '#/components/schemas/Stakeholder'
+          example:
+            [
+              {
+                id: 1,
+                type: 'Organization',
+                org_name: 'Child One',
+                first_name: '',
+                last_name: '',
+                email: 'child@gmail.com',
+                phone: '123-123-1234',
+                website: 'childone.com',
+                logo_url: './logo_192x192.png',
+                map_name: '/childOne',
+                stakeholder_uuid: '1a05ec87-3c38-4395-b9f3-aa15becedc31',
+              },
+              {
+                id: 2,
+                type: 'Organization',
+                org_name: 'Child Two',
+                first_name: '',
+                last_name: '',
+                email: 'childtwo@gmail.com',
+                phone: '123-234-1234',
+                website: 'childtwo.com',
+                logo_url: './logo_192x192.png',
+                map_name: '/childtwo',
+                stakeholder_uuid: '1d2fb06e-e8f7-40de-8e13-ed3eba1abb3a',
+              },
+            ]
+        parents:
+          type: array
+          format: json
+          items:
+            $ref: '#/components/schemas/Stakeholder'
+          example:
+            [
+              {
+                id: '792a4eee-8e18-4750-a56f-91bdec383aa6',
+                type: 'org',
+                org_name: 'Greenstand',
+                first_name: '',
+                last_name: '',
+                email: 'hello@greenstand.com',
+                phone: '123-123-2122',
+                website: 'greenstand.org',
+                logo_url: './logo_192x192.png',
+                map_name: '/greenstandMap',
+                stakeholder_uuid: '792a4eee-8e18-4750-a56f-91bdec383aa6',
+              },
+            ]
+        growers:
+          type: array
+          format: json
+          items:
+            $ref: '#/components/schemas/Stakeholder'
+          example:
+            [
+              {
+                id: 1,
+                type: 'Person',
+                org_name: '',
+                first_name: 'Grower',
+                last_name: 'One',
+                email: 'growerOne@gmail.com',
+                phone: '123-123-1234',
+                website: '',
+                logo_url: './person_192x192.png',
+                map_name: '',
+                stakeholder_uuid: '35a23de8-f1ab-4409-be79-3c6a158d5bde',
+              },
+              {
+                id: 2,
+                type: 'Person',
+                org_name: '',
+                first_name: 'Grower',
+                last_name: 'Two',
+                email: 'growerTwo@gmail.com',
+                phone: '123-123-1235',
+                website: '',
+                logo_url: './person_192x192.png',
+                map_name: '',
+                stakeholder_uuid: '90eef52b-ad55-4953-ace9-6a324ae6cec2',
+              },
+            ]

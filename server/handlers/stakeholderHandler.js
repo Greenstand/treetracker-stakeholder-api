@@ -1,8 +1,31 @@
 const Joi = require('joi');
+const { v4: uuidv4 } = require('uuid');
+
+const {
+  createStakeholder,
+  getStakeholders,
+  getStakeholderById,
+  updateStakeholder,
+} = require('../models/Stakeholder');
+// const { dispatch } = require('../models/DomainEvent');
 
 const Session = require('../models/Session');
+// const { publishMessage } = require('../infra/messaging/RabbitMQMessaging');
+
+// const {
+//   StakeholderRepository,
+//   EventRepository,
+// } = require('../infra/database/PgRepositories');
+
 const StakeholderRepository = require('../repositories/StakeholderRepository');
-const { getStakeholders } = require('../models/Stakeholder');
+
+// const stakeholderGetQuerySchema = Joi.object({
+//   stakeholder_id: Joi.number().integer(),
+//   stakeholder_uuid: Joi.string().uuid(),
+//   organization_id: Joi.number().integer(),
+//   limit: Joi.number().integer().greater(0).less(101),
+//   offset: Joi.number().integer().greater(-1),
+// }).unknown(false);
 
 const stakeholderGetQuerySchema = Joi.object({
   stakeholder_id: Joi.number().integer(),
@@ -10,6 +33,18 @@ const stakeholderGetQuerySchema = Joi.object({
   organization_id: Joi.number().integer(),
   limit: Joi.number().integer().greater(0).less(101),
   offset: Joi.number().integer().greater(-1),
+  // id: Joi.string().uuid().required(),
+  type: Joi.string().required(),
+  logo: Joi.string(),
+  name: Joi.string().required(),
+  map: Joi.string(),
+  email: Joi.string().required(),
+  phone: Joi.string().required(),
+  website: Joi.string(),
+  children: Joi.array(),
+  parents: Joi.array(),
+  users: Joi.array().required(),
+  contracts: Joi.array().required(),
 }).unknown(false);
 
 const stakeholderGet = async (req, res) => {
@@ -27,6 +62,115 @@ const stakeholderGet = async (req, res) => {
   res.end();
 };
 
+// const stakeholderGet = async function (req, res) {
+//   // await stakeholderGetQuerySchema.validateAsync(req.query, {
+//   //   abortEarly: false,
+//   // });
+//   console.log('STAKEHOLDER HANDLER get', req.query);
+//   const session = new Session(false);
+//   const stakeholderRepo = new StakeholderRepository(session);
+//   const executeGetStakeholders = getStakeholders(stakeholderRepo);
+//   const result = await executeGetStakeholders(req.query);
+//   console.log('STAKEHOLDER HANDLER get result', result.length);
+//   res.send(result);
+//   res.end();
+// };
+
+const stakeholderGetById = async function (req, res) {
+  console.log('STAKEHOLDER HANDLER get by id', req.params);
+  const { id } = req.params;
+  const session = new Session(false);
+  const stakeholderRepo = new StakeholderRepository(session);
+  const executeGetStakeholder = getStakeholderById(stakeholderRepo, id);
+  const result = await executeGetStakeholder(id);
+  console.log('STAKEHOLDER HANDLER get by id result', result);
+  res.json(result);
+  res.end();
+};
+
+const stakeholderPost = async function (req, res) {
+  const session = new Session();
+  const stakeholderRepo = new StakeholderRepository(session);
+  // const eventRepository = new EventRepository(session);
+  const executeCreateStakeholder = createStakeholder(
+    stakeholderRepo,
+    // eventRepository,
+  );
+
+  // const eventDispatch = dispatch(eventRepository, publishMessage);
+
+  try {
+    console.log('STAKEHOLDER ROUTER post', req.body, stakeholder);
+    const newStakeholder = stakeholderFromRequest({ ...stakeholder });
+    await session.beginTransaction();
+    const { entity /*raisedEvents*/ } = await executeCreateStakeholder(
+      newStakeholder,
+    );
+    console.log(
+      'STAKEHOLDER ROUTER execute create capture',
+      entity,
+      // raisedEvents,
+    );
+    await session.commitTransaction();
+    // raisedEvents.forEach((domainEvent) =>
+    //   eventDispatch('stakeholder-created', domainEvent),
+    // );
+    res.status(201).json({
+      ...entity,
+    });
+  } catch (e) {
+    console.log(e);
+    if (session.isTransactionInProgress()) {
+      await session.rollbackTransaction();
+    }
+    let result = e;
+    res.status(422).json({ ...result });
+  }
+};
+
+const stakeholderPatch = async function (req, res, next) {
+  const { capture_id } = req.params;
+  const session = new Session();
+  const stakeholderRepo = new StakeholderRepository(session);
+  const executeUpdateStakeholder = updateStakeholder(stakeholderRepo);
+  const updateStakeholderSchema = Joi.object({
+    id: Joi.string().required(),
+    type: Joi.string().required(),
+    logo: Joi.number().integer().greater(0).less(101),
+    name: Joi.number().integer().greater(-1),
+    map: Joi.string().required(),
+    email: Joi.string().required(),
+    phone: Joi.string().required(),
+    website: Joi.string().required(),
+    children: Joi.array().required(),
+    parents: Joi.array().required(),
+    users: Joi.array().required(),
+    contracts: Joi.array().required(),
+  });
+  try {
+    const value = await updateStakeholderSchema
+      .unknown(true)
+      .validateAsync(req.body, {
+        abortEarly: false,
+      });
+    const result = await executeUpdateStakeholder({
+      id: capture_id,
+      ...req.body,
+    });
+    console.log('STAKEHOLDER ROUTER update result', result);
+    res.send(result);
+    res.end();
+  } catch (e) {
+    if (session.isTransactionInProgress()) {
+      await session.rollbackTransaction();
+    }
+    next(e);
+  }
+};
+
 module.exports = {
   stakeholderGet,
+  stakeholderGetById,
+  stakeholderPost,
+  stakeholderPatch,
 };

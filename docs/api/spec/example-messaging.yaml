@@ -1,0 +1,362 @@
+openapi: 3.1.0
+info:
+  title: Messages API
+  version: '1.0'
+servers: []
+paths:
+  /message:
+    parameters: []
+    get:
+      summary: Get messages for a planter or author
+      tags: []
+      operationId: get-users-userId
+      description: 'Retreive messages for a handle since a specified date, with pagination.  Includes both messages too and from the handle.'
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: author_handle
+          required: true
+        - schema:
+            type: integer
+          in: query
+          name: offset
+        - schema:
+            type: integer
+            maximum: 100
+            default: 100
+          in: query
+          name: limit
+        - schema:
+            type: string
+          in: query
+          name: since
+          description: IS0 8601 DateTime
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                x-examples:
+                  example-1:
+                    messages:
+                      - from: Sender
+                        subject: Subject
+                        body: Body
+                        sent_at: 123123
+                    links:
+                      prev: 'https://messages.treetracker.org?planter_identifier=998SDF89SDF&since=12312332&offset=0&limit=100'
+                      next: 'https://messages.treetracker.org?planter_identifier=998SDF89SDF&since=12312332&offset=200&limit=100'
+                properties:
+                  messages:
+                    type: array
+                    uniqueItems: true
+                    minItems: 1
+                    items:
+                      type: object
+                      properties:
+                        parent_message_id:
+                          type: string
+                          format: uuid
+                        from:
+                          type: string
+                          minLength: 1
+                        to:
+                          type: string
+                        subject:
+                          type: string
+                          minLength: 1
+                        body:
+                          type: string
+                          minLength: 1
+                        composed_at:
+                          type: string
+                          format: ISO 8601
+                        video_link:
+                          type: string
+                        survey:
+                          type:
+                            - object
+                            - 'null'
+                          properties:
+                            id:
+                              type: string
+                              format: uuid
+                            title:
+                              type: string
+                            response:
+                              type: boolean
+                            questions:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  prompt:
+                                    type: string
+                                  choices:
+                                    type: array
+                                    items:
+                                      type: string
+                            answers:
+                              type: array
+                              items:
+                                type: string
+                      required:
+                        - from
+                        - to
+                        - subject
+                        - body
+                        - composed_at
+                  links:
+                    type: object
+                    required:
+                      - prev
+                      - next
+                    properties:
+                      prev:
+                        type: string
+                        minLength: 1
+                        description: Complete link with query string to the next page of messages
+                      next:
+                        type: string
+                        minLength: 1
+                        description: Complete link with query string to the previous page of messages
+                required:
+                  - messages
+                  - links
+    post:
+      summary: Create a message resource
+      operationId: post-messages
+      responses:
+        '200':
+          description: OK
+      description: Create a message resource
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              x-examples:
+                example-1:
+                  planter_identifier: string
+                  organization_id: integer
+                  region: string
+                  from: string
+                  subject: string
+                  body: string
+              properties:
+                parent_message_id:
+                  type:
+                    - integer
+                    - 'null'
+                author_handle:
+                  type: string
+                  minLength: 1
+                receipient_handle:
+                  type: string
+                subject:
+                  type: string
+                  minLength: 1
+                body:
+                  type: string
+                  minLength: 1
+                composed_at:
+                  type: string
+                  format: ISO 8601
+                survey_id:
+                  type: string
+                  format: uuid
+                survey_response:
+                  type: string
+                video_link:
+                  type: string
+              required:
+                - author_handle
+                - subject
+                - body
+                - composed_at
+  /message/send:
+    post:
+      summary: Author a new message or group message.
+      operationId: post-message-send
+      responses:
+        '200':
+          description: OK
+      description: 'Create a new message or group message.  Only one of planter_identifier, organization_id, or region can be specified to direct a message to users.   This is a special API path to be used by the admin panel tool to queue messages for delivery'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              x-examples:
+                example-1:
+                  planter_identifier: string
+                  organization_id: integer
+                  region: string
+                  from: string
+                  subject: string
+                  body: string
+              properties:
+                parent_message_id:
+                  type:
+                    - integer
+                    - 'null'
+                recipient_handle:
+                  type: string
+                  minLength: 1
+                region_id:
+                  type: integer
+                organization_id:
+                  type: integer
+                author_handle:
+                  type: string
+                  minLength: 1
+                subject:
+                  type: string
+                  minLength: 1
+                body:
+                  type: string
+                  minLength: 1
+                survey:
+                  type: object
+                  properties:
+                    questions:
+                      type: array
+                      maxItems: 3
+                      description: A list of questions and multiple choice responses
+                      items:
+                        type: object
+                        properties:
+                          prompt:
+                            type: string
+                          choices:
+                            type: array
+                            items:
+                              type: string
+                    title:
+                      type: string
+              required:
+                - recipient_handle
+                - region_id
+                - organization_id
+                - author_handle
+                - subject
+                - body
+            examples:
+              simple-message-example:
+                value:
+                  parent_message_id: 0
+                  recipient_handle: '+13132324232'
+                  author_handle: string
+                  subject: string
+                  body: string
+              org-wide-message-with-survey:
+                value:
+                  parent_message_id: 0
+                  organization_id: 12
+                  author_handle: string
+                  subject: string
+                  body: string
+                  survey:
+                    questions:
+                      - question: Do you have appriopriate protective gear?
+                        choices:
+                          - 'yes'
+                          - 'no'
+                          - sometimes
+  /region:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  regions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        name:
+                          type: string
+                        description:
+                          type: string
+                        created_at:
+                          type: string
+                          format: IS0 8601 DateTime
+      operationId: get-regions
+      description: Get list of all region descriptions
+    parameters: []
+    post:
+      summary: ''
+      operationId: post-region
+      responses:
+        '200':
+          description: OK
+      description: Create a new region
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                shape:
+                  type: string
+                  format: GeoJSON
+                creator_user_id:
+                  type: integer
+                creator_organization_id:
+                  type: integer
+              required:
+                - name
+                - description
+  '/region/{region_id}':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: region_id
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses: {}
+      operationId: get-region-region_id
+      description: Get all details (including GeoJSON) of a region
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                shape:
+                  type: string
+                  format: GeoJSON
+                  description: GeoJSON that describes the shape of the region as stored in postGIS
+                created_at:
+                  type: string
+                  format: ISO 8601 DateTime
+components:
+  schemas: {}

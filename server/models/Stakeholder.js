@@ -1,3 +1,5 @@
+const { v4: uuid } = require('uuid');
+
 const Stakeholder = ({
   id,
   type,
@@ -17,6 +19,10 @@ const Stakeholder = ({
   logo_url,
   map_name,
   stakeholder_uuid,
+  children,
+  parents,
+  users,
+  contracts,
 }) => {
   return Object.freeze({
     id,
@@ -37,6 +43,105 @@ const Stakeholder = ({
     logo_url,
     map_name,
     stakeholder_uuid,
+    children,
+    parents,
+    users,
+    contracts,
+  });
+};
+
+// const Stakeholder = ({
+//   id,
+//   type,
+//   logo,
+//   name,
+//   map,
+//   email,
+//   phone,
+//   website,
+//   children,
+//   parents,
+//   users,
+//   contracts,
+// }) =>
+//   Object.freeze({
+//     type,
+//     logo,
+//     name,
+//     map,
+//     email,
+//     phone,
+//     website,
+//     children,
+//     parents,
+//     users,
+//     contracts,
+//   });
+
+const StakeholderObject = ({
+  id,
+  type,
+  logo,
+  name,
+  map,
+  email,
+  phone,
+  website,
+  children,
+  parents,
+  users,
+  contracts,
+}) =>
+  Object.freeze({
+    id,
+    type,
+    logo,
+    name,
+    map,
+    email,
+    phone,
+    website,
+    children,
+    parents,
+    users,
+    contracts,
+  });
+
+const StakeholderRequestObject = ({
+  id,
+  type,
+  logo,
+  name,
+  map,
+  email,
+  phone,
+  website,
+  children,
+  parents,
+  users,
+  contracts,
+}) =>
+  Object.freeze({
+    id: uuid(),
+    type,
+    logo,
+    name,
+    map,
+    email,
+    phone,
+    website,
+    children,
+    parents,
+    users,
+    contracts,
+  });
+
+const createStakeholder = async (stakeholderRepo, requestBody) => {
+  const stakeholderObj = StakeholderObject({ ...requestBody });
+  const stakeholder = await stakeholderRepo.create(stakeholderObj);
+
+  const stakeholderReqObj = StakeholderRequestObject({
+    ...requestBody,
   });
 };
 
@@ -55,7 +160,7 @@ const FilterCriteria = ({
       result[item[0]] = item[1];
       return result;
     }, {});
-};
+  }
 
 const QueryOptions = ({ limit = undefined, offset = undefined }) => {
   return Object.entries({ limit, offset })
@@ -126,8 +231,35 @@ const getStakeholders =
     };
   };
 
+  // const getStakeholders = (stakeholderRepo) =>
+  // async (filterCriteria = undefined) => {
+  //   console.log('STAKEHOLDER MODEL filterCriteria', filterCriteria);
+
+  //   let filter = {};
+  //   let options = { limit: 100, offset: 0 };
+
+  //   // filter = FilterCriteria({ ...filterCriteria });
+  //   // options = { ...options, ...QueryOptions({ ...filterCriteria }) };
+
+  //   const stakeholders = await stakeholderRepo.getStakeholders(filter, options);
+
+  //   return stakeholders.map((row) => {
+  //     return Stakeholder({ ...row });
+  //   });
+  // };
+
+const getStakeholderById = (stakeholderRepo) => async (id) => {
+  console.log('STAKEHOLDER MODEL id', id);
+
+  const stakeholder = await stakeholderRepo.getStakeholderById(id);
+  console.log('STAKEHOLDER', stakeholder);
+  return StakeholderObject(stakeholder);
+};
+
 module.exports = {
   getStakeholders,
   Stakeholder,
   FilterCriteria,
+  createStakeholder,
+  getStakeholderById,
 };

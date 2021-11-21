@@ -1,10 +1,11 @@
 const express = require('express');
 const Sentry = require('@sentry/node');
 const HttpError = require('./utils/HttpError');
-
-const router = require('./routes');
 const { sentryDSN } = require('../config/config');
-const { errorHandler, handlerWrapper } = require('./utils/utils');
+const { errorHandler } = require('./utils/utils');
+const log = require('loglevel');
+const helper = require('./utils/utils');
+const router = require('./routes');
 
 const app = express();
 
@@ -14,7 +15,7 @@ Sentry.init({ dsn: sentryDSN });
  * Check request
  */
 app.use(
-  handlerWrapper(async (req, _res, next) => {
+  helper.handlerWrapper(async (req, _res, next) => {
     if (
       req.method === 'POST' ||
       req.method === 'PATCH' ||

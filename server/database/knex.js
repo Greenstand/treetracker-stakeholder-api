@@ -1,3 +1,4 @@
+/* eslint-disable import/extensions */
 const expect = require('expect-runtime');
 const log = require('loglevel');
 
