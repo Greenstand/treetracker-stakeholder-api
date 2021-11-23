@@ -160,7 +160,7 @@ const FilterCriteria = ({
       result[item[0]] = item[1];
       return result;
     }, {});
-  }
+};
 
 const QueryOptions = ({ limit = undefined, offset = undefined }) => {
   return Object.entries({ limit, offset })
@@ -231,22 +231,22 @@ const getStakeholders =
     };
   };
 
-  // const getStakeholders = (stakeholderRepo) =>
-  // async (filterCriteria = undefined) => {
-  //   console.log('STAKEHOLDER MODEL filterCriteria', filterCriteria);
+// const getStakeholders = (stakeholderRepo) =>
+// async (filterCriteria = undefined) => {
+//   console.log('STAKEHOLDER MODEL filterCriteria', filterCriteria);
 
-  //   let filter = {};
-  //   let options = { limit: 100, offset: 0 };
+//   let filter = {};
+//   let options = { limit: 100, offset: 0 };
 
-  //   // filter = FilterCriteria({ ...filterCriteria });
-  //   // options = { ...options, ...QueryOptions({ ...filterCriteria }) };
+//   // filter = FilterCriteria({ ...filterCriteria });
+//   // options = { ...options, ...QueryOptions({ ...filterCriteria }) };
 
-  //   const stakeholders = await stakeholderRepo.getStakeholders(filter, options);
+//   const stakeholders = await stakeholderRepo.getStakeholders(filter, options);
 
-  //   return stakeholders.map((row) => {
-  //     return Stakeholder({ ...row });
-  //   });
-  // };
+//   return stakeholders.map((row) => {
+//     return Stakeholder({ ...row });
+//   });
+// };
 
 const getStakeholderById = (stakeholderRepo) => async (id) => {
   console.log('STAKEHOLDER MODEL id', id);

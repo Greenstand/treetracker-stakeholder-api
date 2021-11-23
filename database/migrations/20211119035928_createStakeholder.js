@@ -1,16 +1,16 @@
 exports.up = function (knex) {
   return knex.schema.createTable('stakeholder', (table) => {
-    table.uuid('id').primary();
+    table.number('id').primary().notNullable();
     table.string('type').notNullable();
-    table.string('logo').notNullable();
-    table.string('name');
-    table.string('map').notNullable();
+    table.string('logo');
+    table.string('org_name');
+    table.string('first_name');
+    table.string('last_name');
+    table.string('map');
     table.string('email');
     table.string('phone');
-    table.string('website').notNullable();
-    table.string('children').notNullable();
-    table.string('parents').notNullable();
-    table.string('users').notNullable();
+    table.string('website');
+    table.uuid('stakeholder_uuid').notNullable();
   });
 };
 

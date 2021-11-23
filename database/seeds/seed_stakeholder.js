@@ -21,7 +21,7 @@ exports.seed = function (knex) {
             '1a05ec87-3c38-4395-b9f3-aa15becedc31',
             '1d2fb06e-e8f7-40de-8e13-ed3eba1abb3a',
           ]),
-          parents: [],
+          parent: null,
           users: [],
         },
         {
@@ -37,7 +37,7 @@ exports.seed = function (knex) {
           phone: '123-123-1234',
           website: 'greenstance.com',
           children: [],
-          parents: [],
+          parent: null,
           users: [],
         },
         {
@@ -53,7 +53,7 @@ exports.seed = function (knex) {
           phone: '123-123-1324',
           website: 'greenspace.com',
           children: [],
-          parents: [],
+          parent: null,
           users: [],
         },
         {
@@ -69,7 +69,7 @@ exports.seed = function (knex) {
           phone: '123-123-1234',
           website: 'greenworld.com',
           children: [],
-          parents: [],
+          parent: null,
           users: [],
         },
         {
@@ -85,7 +85,7 @@ exports.seed = function (knex) {
           phone: '123-123-1234',
           website: 'childone.com',
           children: [],
-          parents: JSON.stringify(['792a4eee-8e18-4750-a56f-91bdec383aa6']),
+          parent: '792a4eee-8e18-4750-a56f-91bdec383aa6',
           users: JSON.stringify(['1234']),
         },
         {
@@ -101,7 +101,7 @@ exports.seed = function (knex) {
           phone: '123-234-1234',
           website: 'childtwo.com',
           children: [],
-          parents: JSON.stringify(['792a4eee-8e18-4750-a56f-91bdec383aa6']),
+          parent: '792a4eee-8e18-4750-a56f-91bdec383aa6',
           users: JSON.stringify(['1235']),
         },
       ]);

@@ -62,12 +62,45 @@ class StakeholderRepository extends BaseRepository {
     //   .offset(offset);
     // // .where((builder) => whereBuilder(filter, builder));
 
+    //-----------------
+
+    // return this._session
+    //   .getDB()('stakeholder as t1')
+    //   .select('*')
+    //   .innerJoin('stakeholder as t2', 't1.id', '=', 't2.parent')
+    //   .groupBy('t1.id', 't2.id');
+
+    //-----------------
+
+    // const subcolumn = this._session
+    //   .getDB()('stakeholder as s')
+    //   .select('*')
+    //   .where('id', '=', 's.parent')
+    //   .groupBy('id')
+    //   .as('parent');
+
+    // return this._session
+    //   .getDB()('stakeholder')
+    //   .select('*', subcolumn)
+    //   .where('id', '=', 's.parent');
+
+    //-----------------
+
     return this._session
-      .getDB()(this._tableName)
+      .getDB()
+      .withRecursive('stakeholders', (qb) => {
+        qb.select('*')
+          .from('stakeholder')
+          .where('stakeholder.id', '792a4eee-8e18-4750-a56f-91bdec383aa6')
+          .union((qb) => {
+            qb.select('*')
+              .from('stakeholder')
+              .join('stakeholders', 'stakeholders.parent', 'stakeholder.id');
+            // .where('stakeholder.type', 'child');
+          });
+      })
       .select('*')
-      .limit(limit)
-      .groupBy('stakeholder.id')
-      .offset(offset);
+      .from('stakeholders');
   }
 
   async getStakeholderById(id) {
