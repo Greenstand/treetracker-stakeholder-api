@@ -36,7 +36,7 @@ describe('Stakeholder API tests.', () => {
         });
     });
 
-    it(`Should raise validation error with error code 422 -- 'limit' query parameter should be less than 1001  `, function (done) {
+    it(`Should raise validation error with error code 422 -- 'limit' query parameter should be less than 101  `, function (done) {
       request(server)
         .get(`/stakeholder`)
         .query({
