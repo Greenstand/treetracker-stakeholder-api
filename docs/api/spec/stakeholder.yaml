@@ -25,7 +25,7 @@ paths:
     get:
       tags:
         - admins
-      summary: gets data for one stakeholder, id from user token (?)
+      summary: gets data for one stakeholder including parents, children, growers, and users, main stakeholder id can come from current user (?)
       operationId: getStakeholder
       description: get data for stakeholder, their child orgs, the people connected to them, and the admin users
       parameters:
@@ -64,7 +64,7 @@ paths:
     post:
       tags:
         - admins
-      summary: adds a new stakeholder
+      summary: adds a new stakeholder with basic info, not including users, children, parents, growers info
       operationId: addStakeholder
       description: Adds a stakeholder to the system
       responses:
@@ -83,9 +83,9 @@ paths:
     patch:
       tags:
         - admins
-      summary: updates a new stakeholder
+      summary: updates a new stakeholder, allows editing of basic info and linking of users, children, parents, growers
       operationId: updateStakeholder
-      description: Updates a stakeholder
+      description: Updates a stakeholder & associated info on other tables, like adding users, children, parents, growers
       responses:
         '200':
           description: send back updated stakeholder
@@ -98,7 +98,27 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Stakeholder'
-        description: Stakeholder item to add
+        description: Stakeholder item based on the schema with additional keys for users, children, parents, growers data to link
+    delete:
+      tags:
+        - admins
+      summary: removes/disables a stakeholder, un-linking of users, children, parents, growers
+      operationId: deleteStakeholder
+      description: Removes/disables a stakeholder & associated info on other tables, like adding users, children, parents, growers
+      parameters:
+        - in: query
+          name: id
+          description: pass an id, required for looking up the org and associated data to delete/disable
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: send back updated stakeholder
+        '400':
+          description: 'invalid input, id invalid'
+        '304':
+          description: error, stakeholder wasn't modified
 components:
   schemas:
     Stakeholder:
@@ -115,10 +135,10 @@ components:
         - logo_url
         - map_name
         - stakeholder_uuid
-        - children
-        - parents
-        - users
-        - growers
+        # - users
+        # - children
+        # - parents
+        # - growers
       properties:
         id:
           type: number
@@ -274,3 +294,67 @@ components:
                 stakeholder_uuid: '90eef52b-ad55-4953-ace9-6a324ae6cec2',
               },
             ]
+    User_Account:
+      type: object
+      required:
+        - id
+        - user_id
+        - username
+        - first_name
+        - last_name
+        - pwd_hash
+        - salt
+        - email
+        - active
+        - created_at
+        - stakeholder_id
+        - pwd_reset_req
+      properties:
+        id:
+          type: number
+          format: number
+          example: 1
+        user_id:
+          type: string
+          format: uuid
+          example: '123anbfjo-fdafea214532-dsfd789df'
+        username:
+          type: string
+          format: string
+          example: 'admin1'
+        first_name:
+          type: string
+          format: string
+          example: 'Admin'
+        last_name:
+          type: string
+          format: string
+          example: 'One'
+        pwd_hash:
+          type: string
+          format: string
+          example: 'd20bad44a99286723895023268e9ab7ad57cdc0d29eb78e8ec68c9f61c82d73826703ab0058f8704f75ba15d4f5178e31067222bf911a0ba71d6806bef90980c'
+        salt:
+          type: string
+          format: string
+          example: 'aafd'
+        email:
+          type: string
+          format: email
+          example: 'hello@goodbye.org'
+        active:
+          type: boolean
+          format: boolean
+          example: true
+        website:
+          type: string
+          format: url
+          example: 'http://greenstand.org'
+        stakeholder_uuid:
+          type: string
+          format: uuid
+          example: '792a4eee-8e18-4750-a56f-91bdec383aa6'
+        pwd_reset_req:
+          type: boolean
+          format: boolean
+          example: false

@@ -7,30 +7,16 @@ const validateRequest = (req, res, next) => {
 const {
   stakeholderPost,
   stakeholderGet,
-  stakeholderGetById,
   stakeholderPatch,
 } = require('./handlers/stakeholderHandler');
 const { handlerWrapper } = require('./utils/utils');
-
-// const {
-//   candidatePost,
-//   candidateGet,
-// } = require('./handlers/candidateHandler');
 
 router.get('/stakeholder', handlerWrapper(stakeholderGet));
 
 router
   .route('/stakeholders')
   .get(validateRequest, stakeholderGet)
-  .post(validateRequest, stakeholderPost);
-
-router
-  .route('/stakeholders/:id')
-  .get(validateRequest, stakeholderGetById)
+  .post(validateRequest, stakeholderPost)
   .patch(validateRequest, stakeholderPatch);
-
-// router('/candidates')
-//   .get('/candidates', validateRequest, candidateHandlerGet)
-//   .post(validateRequest, candidateHandlerPost);
 
 module.exports = router;

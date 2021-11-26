@@ -6,6 +6,9 @@ class StakeholderRepository extends BaseRepository {
     super('entity', session);
     this._tableName = 'entity';
     this._session = session;
+    // super('stakeholder', session);
+    // this._tableName = 'stakeholder';
+    // this._session = session;
   }
 
   async getStakeholderByOrganizationId(organization_id, options) {
@@ -24,10 +27,8 @@ class StakeholderRepository extends BaseRepository {
       );
 
     return { stakeholders: result.rows, count: +count.rows[0].count };
-    super('stakeholder', session);
-    this._tableName = 'stakeholder';
-    this._session = session;
   }
+
   async createStakeholder(object) {
     const result = await this._session
       .getDB()(this._tableName)

@@ -22,7 +22,6 @@ const Stakeholder = ({
   children,
   parents,
   users,
-  contracts,
 }) => {
   return Object.freeze({
     id,
@@ -46,104 +45,50 @@ const Stakeholder = ({
     children,
     parents,
     users,
-    contracts,
   });
 };
 
-// const Stakeholder = ({
+// const StakeholderObject = ({
 //   id,
 //   type,
-//   logo,
 //   name,
-//   map,
+//   first_name,
+//   last_name,
 //   email,
 //   phone,
 //   website,
+//   logo_url,
+//   map_name,
+//   stakeholder_uuid,
 //   children,
 //   parents,
 //   users,
-//   contracts,
 // }) =>
 //   Object.freeze({
+//     id,
 //     type,
-//     logo,
 //     name,
-//     map,
+//     first_name,
+//     last_name,
 //     email,
 //     phone,
 //     website,
+//     logo_url,
+//     map_name,
+//     stakeholder_uuid,
 //     children,
 //     parents,
 //     users,
-//     contracts,
 //   });
 
-const StakeholderObject = ({
-  id,
-  type,
-  logo,
-  name,
-  map,
-  email,
-  phone,
-  website,
-  children,
-  parents,
-  users,
-  contracts,
-}) =>
-  Object.freeze({
-    id,
-    type,
-    logo,
-    name,
-    map,
-    email,
-    phone,
-    website,
-    children,
-    parents,
-    users,
-    contracts,
-  });
+// const createStakeholder = async (stakeholderRepo, requestBody) => {
+//   const stakeholderObj = Stakeholder({ ...requestBody });
+//   const stakeholder = await stakeholderRepo.create(stakeholderObj);
 
-const StakeholderRequestObject = ({
-  id,
-  type,
-  logo,
-  name,
-  map,
-  email,
-  phone,
-  website,
-  children,
-  parents,
-  users,
-  contracts,
-}) =>
-  Object.freeze({
-    id: uuid(),
-    type,
-    logo,
-    name,
-    map,
-    email,
-    phone,
-    website,
-    children,
-    parents,
-    users,
-    contracts,
-  });
-
-const createStakeholder = async (stakeholderRepo, requestBody) => {
-  const stakeholderObj = StakeholderObject({ ...requestBody });
-  const stakeholder = await stakeholderRepo.create(stakeholderObj);
-
-  const stakeholderReqObj = StakeholderRequestObject({
-    ...requestBody,
-  });
-};
+//   const stakeholderReqObj = Stakeholder({
+//     ...stakeholder,
+//   });
+// };
 
 const FilterCriteria = ({
   stakeholder_id = undefined,
@@ -248,18 +193,17 @@ const getStakeholders =
 //   });
 // };
 
-const getStakeholderById = (stakeholderRepo) => async (id) => {
-  console.log('STAKEHOLDER MODEL id', id);
+// const getStakeholderById = (stakeholderRepo) => async (id) => {
+//   console.log('STAKEHOLDER MODEL id', id);
 
-  const stakeholder = await stakeholderRepo.getStakeholderById(id);
-  console.log('STAKEHOLDER', stakeholder);
-  return StakeholderObject(stakeholder);
-};
+//   const stakeholder = await stakeholderRepo.getStakeholderById(id);
+//   console.log('STAKEHOLDER', stakeholder);
+//   return StakeholderObject(stakeholder);
+// };
 
 module.exports = {
   getStakeholders,
   Stakeholder,
   FilterCriteria,
-  createStakeholder,
-  getStakeholderById,
+  // createStakeholder,
 };
