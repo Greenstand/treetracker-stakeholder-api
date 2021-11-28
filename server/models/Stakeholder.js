@@ -18,7 +18,46 @@ const Stakeholder = ({
   tree_validation_contract_id,
   logo_url,
   map_name,
-  stakeholder_uuid,
+}) => {
+  return Object.freeze({
+    id,
+    type,
+    org_name,
+    first_name,
+    last_name,
+    email,
+    phone,
+    pwd_reset_required,
+    website,
+    wallet,
+    password,
+    salt,
+    active_contract_id,
+    offering_pay_to_plant,
+    tree_validation_contract_id,
+    logo_url,
+    map_name,
+  });
+};
+
+const StakeholderRequestObject = ({
+  id,
+  type,
+  org_name,
+  first_name,
+  last_name,
+  email,
+  phone,
+  pwd_reset_required,
+  website,
+  wallet,
+  password,
+  salt,
+  active_contract_id,
+  offering_pay_to_plant,
+  tree_validation_contract_id,
+  logo_url,
+  map_name,
   children,
   parents,
   users,
@@ -41,7 +80,7 @@ const Stakeholder = ({
     tree_validation_contract_id,
     logo_url,
     map_name,
-    stakeholder_uuid,
+    id,
     children,
     parents,
     users,
@@ -57,14 +96,9 @@ const Stakeholder = ({
 //   });
 // };
 
-const FilterCriteria = ({
-  id = undefined,
-  stakeholder_uuid = undefined,
-  organization_id = undefined,
-}) => {
+const FilterCriteria = ({ id = undefined, organization_id = undefined }) => {
   return Object.entries({
-    id: Number(id) || undefined,
-    stakeholder_uuid,
+    id,
     organization_id,
   })
     .filter((entry) => entry[1] !== undefined)
@@ -86,6 +120,8 @@ const QueryOptions = ({ limit = undefined, offset = undefined }) => {
 const getStakeholders =
   (stakeholderRepo) =>
   async (filterCriteria = undefined, url) => {
+    console.log('model filterCriteria ----->', filterCriteria);
+
     let filter = {};
     filter = FilterCriteria({
       ...filterCriteria,
@@ -116,10 +152,15 @@ const getStakeholders =
     let stakeholders = [];
     let count = 0;
 
-    if (filter.stakeholder_uuid) {
+    if (filter.id) {
       const { stakeholders: dbStakeholders, count: dbCount } =
-        await stakeholderRepo.getStakeholderById(
-          filter.stakeholder_uuid,
+        await stakeholderRepo.getStakeholderById(filter.id, options);
+      stakeholders = dbStakeholders;
+      count = dbCount;
+    } else if (filter.organization_id) {
+      const { stakeholders: dbStakeholders, count: dbCount } =
+        await stakeholderRepo.getStakeholderByOrganizationId(
+          filter.organization_id,
           options,
         );
       stakeholders = dbStakeholders;
@@ -131,11 +172,13 @@ const getStakeholders =
       count = dbCount;
     }
 
+    // console.log('stakeholder2 ---> ', stakeholders);
+
     return {
       stakeholders:
         stakeholders &&
         stakeholders.map((row) => {
-          return Stakeholder({ ...row });
+          return StakeholderRequestObject({ ...row });
         }),
       totalCount: count,
       links: {

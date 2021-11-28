@@ -19,12 +19,10 @@ const Session = require('../models/Session');
 const StakeholderRepository = require('../repositories/StakeholderRepository');
 
 const stakeholderGetQuerySchema = Joi.object({
-  id: Joi.number().integer(),
-  stakeholder_uuid: Joi.string().uuid(),
+  id: Joi.string().uuid(),
   organization_id: Joi.number().integer(),
   limit: Joi.number().integer().greater(0).less(101),
-  offset: Joi.number().integer().greater(-1),
-  // id: Joi.string().uuid().required(),
+  skip: Joi.number().integer().greater(-1),
   type: Joi.string(),
   logo: Joi.string(),
   name: Joi.string(),
@@ -47,7 +45,7 @@ const stakeholderGet = async (req, res) => {
   const url = `${req.protocol}://${req.get('host')}/stakeholder`; // isn't url set on the repository? or is this to override the repository's default url?
 
   const executeGetStakeholders = getStakeholders(stakeholderRepo);
-  console.log('req.query, url -----> ', req.query, url);
+  console.log('stakeholderHanlder req.query, url -----> ', req.query, url);
   const result = await executeGetStakeholders(req.query, url);
   res.send(result);
   res.end();

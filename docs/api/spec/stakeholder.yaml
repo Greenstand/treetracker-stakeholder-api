@@ -294,16 +294,15 @@ components:
         - website
         - logo_url
         - map_name
-        - stakeholder_uuid
         # - users
         # - children
         # - parents
         # - growers
       properties:
         id:
-          type: number
-          format: number
-          example: 1
+          type: string
+          format: uuid
+          example: '792a4eee-8e18-4750-a56f-91bdec383aa6'
         type:
           type: string
           format: string
@@ -340,15 +339,12 @@ components:
           type: string
           format: string
           example: '/greenstandMap'
-        stakeholder_uuid:
-          type: string
-          format: uuid
-          example: '792a4eee-8e18-4750-a56f-91bdec383aa6'
         # The users, children, parents, growers should be added to the response json after additional queries are made
         users:
           type: array
           format: json
-          items: {}
+          items:
+            $ref: '#/components/schemas/Users'
           example:
             [
               {
@@ -362,7 +358,7 @@ components:
                 email: 'test@greenstand.org',
                 active: true,
                 created_at: '2021-11-1',
-                stakeholder_id: '792a4eee-8e18-4750-a56f-91bdec383aa6',
+                stakeholder_uuid: '792a4eee-8e18-4750-a56f-91bdec383aa6',
                 pwd_reset_req: false,
               },
             ]
@@ -374,7 +370,7 @@ components:
           example:
             [
               {
-                id: 1,
+                id: '1a05ec87-3c38-4395-b9f3-aa15becedc31',
                 type: 'Organization',
                 org_name: 'Child One',
                 first_name: '',
@@ -384,10 +380,9 @@ components:
                 website: 'childone.com',
                 logo_url: './logo_192x192.png',
                 map_name: '/childOne',
-                stakeholder_uuid: '1a05ec87-3c38-4395-b9f3-aa15becedc31',
               },
               {
-                id: 2,
+                id: '1d2fb06e-e8f7-40de-8e13-ed3eba1abb3a',
                 type: 'Organization',
                 org_name: 'Child Two',
                 first_name: '',
@@ -397,7 +392,6 @@ components:
                 website: 'childtwo.com',
                 logo_url: './logo_192x192.png',
                 map_name: '/childtwo',
-                stakeholder_uuid: '1d2fb06e-e8f7-40de-8e13-ed3eba1abb3a',
               },
             ]
         parents:
@@ -418,7 +412,6 @@ components:
                 website: 'greenstand.org',
                 logo_url: './logo_192x192.png',
                 map_name: '/greenstandMap',
-                stakeholder_uuid: '792a4eee-8e18-4750-a56f-91bdec383aa6',
               },
             ]
         growers:
@@ -429,7 +422,7 @@ components:
           example:
             [
               {
-                id: 1,
+                id: '35a23de8-f1ab-4409-be79-3c6a158d5bde',
                 type: 'Person',
                 org_name: '',
                 first_name: 'Grower',
@@ -439,10 +432,9 @@ components:
                 website: '',
                 logo_url: './person_192x192.png',
                 map_name: '',
-                stakeholder_uuid: '35a23de8-f1ab-4409-be79-3c6a158d5bde',
               },
               {
-                id: 2,
+                id: '90eef52b-ad55-4953-ace9-6a324ae6cec2',
                 type: 'Person',
                 org_name: '',
                 first_name: 'Grower',
@@ -452,7 +444,6 @@ components:
                 website: '',
                 logo_url: './person_192x192.png',
                 map_name: '',
-                stakeholder_uuid: '90eef52b-ad55-4953-ace9-6a324ae6cec2',
               },
             ]
     Users:

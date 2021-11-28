@@ -1,6 +1,6 @@
 exports.up = function (knex) {
   return knex.schema.createTable('stakeholder', (table) => {
-    table.increments('id').primary();
+    table.uuid('id').primary().notNullable();
     table.string('type').notNullable();
     table.string('logo_url').notNullable();
     table.string('org_name');
@@ -10,7 +10,6 @@ exports.up = function (knex) {
     table.string('email').notNullable();
     table.string('phone').notNullable();
     table.string('website').notNullable();
-    table.uuid('stakeholder_uuid').notNullable();
     table.timestamps(true, true);
   });
 };

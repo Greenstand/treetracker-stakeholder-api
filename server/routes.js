@@ -17,7 +17,7 @@ const { handlerWrapper } = require('./utils/utils');
 // });
 
 router
-  .get('/', handlerWrapper(stakeholderGet))
+  .get('/', validateRequest, handlerWrapper(stakeholderGet))
   .patch(validateRequest, handlerWrapper(stakeholderPatch));
 // .post(validateRequest, handlerWrapper(stakeholderPost))
 // .delete(validateRequest, handlerWrapper(stakeholderDelete));
