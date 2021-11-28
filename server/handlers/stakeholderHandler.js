@@ -18,16 +18,8 @@ const Session = require('../models/Session');
 
 const StakeholderRepository = require('../repositories/StakeholderRepository');
 
-// const stakeholderGetQuerySchema = Joi.object({
-//   stakeholder_id: Joi.number().integer(),
-//   stakeholder_uuid: Joi.string().uuid(),
-//   organization_id: Joi.number().integer(),
-//   limit: Joi.number().integer().greater(0).less(101),
-//   offset: Joi.number().integer().greater(-1),
-// }).unknown(false);
-
 const stakeholderGetQuerySchema = Joi.object({
-  stakeholder_id: Joi.number().integer(),
+  id: Joi.number().integer(),
   stakeholder_uuid: Joi.string().uuid(),
   organization_id: Joi.number().integer(),
   limit: Joi.number().integer().greater(0).less(101),

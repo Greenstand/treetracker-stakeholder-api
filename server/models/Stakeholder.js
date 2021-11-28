@@ -3,7 +3,7 @@ const { v4: uuid } = require('uuid');
 const Stakeholder = ({
   id,
   type,
-  name,
+  org_name,
   first_name,
   last_name,
   email,
@@ -26,7 +26,7 @@ const Stakeholder = ({
   return Object.freeze({
     id,
     type,
-    name,
+    org_name,
     first_name,
     last_name,
     email,
@@ -48,39 +48,6 @@ const Stakeholder = ({
   });
 };
 
-// const StakeholderObject = ({
-//   id,
-//   type,
-//   name,
-//   first_name,
-//   last_name,
-//   email,
-//   phone,
-//   website,
-//   logo_url,
-//   map_name,
-//   stakeholder_uuid,
-//   children,
-//   parents,
-//   users,
-// }) =>
-//   Object.freeze({
-//     id,
-//     type,
-//     name,
-//     first_name,
-//     last_name,
-//     email,
-//     phone,
-//     website,
-//     logo_url,
-//     map_name,
-//     stakeholder_uuid,
-//     children,
-//     parents,
-//     users,
-//   });
-
 // const createStakeholder = async (stakeholderRepo, requestBody) => {
 //   const stakeholderObj = Stakeholder({ ...requestBody });
 //   const stakeholder = await stakeholderRepo.create(stakeholderObj);
@@ -91,12 +58,12 @@ const Stakeholder = ({
 // };
 
 const FilterCriteria = ({
-  stakeholder_id = undefined,
+  id = undefined,
   stakeholder_uuid = undefined,
   organization_id = undefined,
 }) => {
   return Object.entries({
-    id: stakeholder_id,
+    id: Number(id) || undefined,
     stakeholder_uuid,
     organization_id,
   })
@@ -149,10 +116,10 @@ const getStakeholders =
     let stakeholders = [];
     let count = 0;
 
-    if (filter.organization_id) {
+    if (filter.stakeholder_uuid) {
       const { stakeholders: dbStakeholders, count: dbCount } =
-        await stakeholderRepo.getStakeholderByOrganizationId(
-          filter.organization_id,
+        await stakeholderRepo.getStakeholderById(
+          filter.stakeholder_uuid,
           options,
         );
       stakeholders = dbStakeholders;
@@ -165,9 +132,11 @@ const getStakeholders =
     }
 
     return {
-      stakeholders: stakeholders.map((row) => {
-        return Stakeholder({ ...row });
-      }),
+      stakeholders:
+        stakeholders &&
+        stakeholders.map((row) => {
+          return Stakeholder({ ...row });
+        }),
       totalCount: count,
       links: {
         prev,

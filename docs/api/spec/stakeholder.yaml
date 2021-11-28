@@ -21,35 +21,36 @@ tags:
   - name: developers
     description: Operations available to regular developers
 paths:
-  /stakeholder:
+  /:
     get:
       tags:
         - admins
-      summary: gets data for one stakeholder including parents, children, growers, and users, main stakeholder id can come from current user (?)
+      summary: gets data for one stakeholder including parents, children, and growers, main stakeholder id can come from current user (?)
       operationId: getStakeholder
-      description: get data for stakeholder, their child orgs, the people connected to them, and the admin users
+      description: get data for stakeholder, additional queries add fields and data to the response for the child orgs, the people connected to them, and the admin users of the current stakeholder
       parameters:
         - in: query
           name: id
-          description: pass an optional id, required for looking up full data for child orgs
-          required: false
+          description: pass an id, required for looking up the stakeholder data
+          required: true
           schema:
             type: string
-        - in: query
-          name: offset
-          description: number of records to skip for pagination
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-        - in: query
-          name: limit
-          description: maximum number of records to return
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-            maximum: 50
+        # DO WE NEED OFFSET AND LIMIT?
+        # - in: query
+        #   name: offset
+        #   description: number of records to skip for pagination
+        #   schema:
+        #     type: integer
+        #     format: int32
+        #     minimum: 0
+        # - in: query
+        #   name: limit
+        #   description: maximum number of records to return
+        #   schema:
+        #     type: integer
+        #     format: int32
+        #     minimum: 0
+        #     maximum: 50
       responses:
         '200':
           description: search results matching criteria
@@ -89,10 +90,10 @@ paths:
       responses:
         '200':
           description: send back updated stakeholder
-        '400':
-          description: 'invalid input, object invalid'
         '304':
           description: error, stakeholder wasn't modified
+        '400':
+          description: 'invalid input, object invalid'
       requestBody:
         content:
           application/json:
@@ -113,12 +114,171 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: send back updated stakeholder
+        '204':
+          description: no data, stakeholder deleted
         '400':
           description: 'invalid input, id invalid'
         '304':
           description: error, stakeholder wasn't modified
+  /stakeholders:
+    get:
+      tags:
+        - admins
+      summary: gets data for all stakeholders, without associated children, parents, or growers data
+      operationId: getStakeholders
+      description: get all Organization or Person entries that could possibly be linked to the stakeholder as children, parents, or growers
+      # ARE THERE ANY PERMISSION LIMITS FOR ONE STAKEHOLDER TO SEE ALL THE OTHER STAKEHOLDER DATA? OR CAN THEY ONLY SEE THE STAKEHOLDERS THEY'VE ADDED?
+      parameters:
+        - in: query
+          name: type
+          description: pass an optional type, required for looking up data by 'Organization' or 'Person'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: search
+          description: pass an optional search term for partial match on any part of a name field, phone number, email, etc.
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: filter
+          description: pass an optional search term for partial match on any part of a name field, phone number, email, etc.
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: offset
+          description: number of records to skip for pagination
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+        - in: query
+          name: limit
+          description: maximum number of records to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 50
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Stakeholder'
+        '400':
+          description: bad input parameter
+  /users:
+    get:
+      tags:
+        - admins
+      summary: gets data for a stakeholder's users
+      operationId: getUsers
+      description: get data for users associated with the current stakeholder
+      parameters:
+        - in: query
+          name: id
+          description: pass an id for the current stakeholder, required for looking up the stakeholder's current users
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: search
+          description: pass an optional search term for partial match on any part of a name field, phone number, email, user_id, etc.
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: filter
+          description: pass an optional filter by any name field, phone number, email, etc.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Users'
+        '400':
+          description: bad input parameter
+    post:
+      tags:
+        - admins
+      summary: adds a new user for a stakeholder
+      operationId: addUser
+      description: add data for a user
+      responses:
+        '201':
+          description: successfully added a user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Users'
+        '400':
+          description: bad input parameter
+    patch:
+      tags:
+        - admins
+      summary: update data for a user
+      operationId: updateUsers
+      description: update data for a user, link or unlink from stakeholder
+      parameters:
+        - in: query
+          name: id
+          description: pass an id for the user, required for looking up the user to update
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Users'
+        '304':
+          description: error, user wasn't modified
+        '400':
+          description: bad input parameter
+    delete:
+      tags:
+        - admins
+      summary: delete/disable a user, unlink from the stakeholder
+      operationId: deleteUser
+      description: delete/disable a user, unlink from the stakeholder
+      parameters:
+        - in: query
+          name: id
+          description: pass an id for the user, required for looking up the user to remove/disable, validate they're linked  to current stakeholder first
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: no data returned, user deleted
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Users'
+        '304':
+          description: error, user wasn't modified
+        '400':
+          description: bad input parameter
 components:
   schemas:
     Stakeholder:
@@ -184,6 +344,7 @@ components:
           type: string
           format: uuid
           example: '792a4eee-8e18-4750-a56f-91bdec383aa6'
+        # The users, children, parents, growers should be added to the response json after additional queries are made
         users:
           type: array
           format: json
@@ -294,7 +455,7 @@ components:
                 stakeholder_uuid: '90eef52b-ad55-4953-ace9-6a324ae6cec2',
               },
             ]
-    User_Account:
+    Users:
       type: object
       required:
         - id

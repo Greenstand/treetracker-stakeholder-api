@@ -3,11 +3,14 @@ const Sentry = require('@sentry/node');
 const HttpError = require('./utils/HttpError');
 const { sentryDSN } = require('../config/config');
 const { errorHandler } = require('./utils/utils');
+// const cors = require('cors');
 const log = require('loglevel');
 const helper = require('./utils/utils');
 const router = require('./routes');
 
 const app = express();
+
+// app.use(cors);
 
 Sentry.init({ dsn: sentryDSN });
 

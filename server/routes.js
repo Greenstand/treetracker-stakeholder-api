@@ -1,22 +1,33 @@
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router();
+const log = require('loglevel');
 const validateRequest = (req, res, next) => {
-  console.log('STAKEHOLDER ROUTER');
+  log.debug('STAKEHOLDER ROUTER');
   next();
 };
 const {
-  stakeholderPost,
+  // stakeholderPost,
   stakeholderGet,
   stakeholderPatch,
 } = require('./handlers/stakeholderHandler');
 const { handlerWrapper } = require('./utils/utils');
 
-router.get('/stakeholder', handlerWrapper(stakeholderGet));
+// router.route('/').get(validateRequest, (req, res) => {
+//   log.debug('REQUESTED ---->', req.url);
+//   res.send('request made');
+// });
 
 router
-  .route('/stakeholders')
-  .get(validateRequest, stakeholderGet)
-  .post(validateRequest, stakeholderPost)
-  .patch(validateRequest, stakeholderPatch);
+  .get('/', handlerWrapper(stakeholderGet))
+  .patch(validateRequest, handlerWrapper(stakeholderPatch));
+// .post(validateRequest, handlerWrapper(stakeholderPost))
+// .delete(validateRequest, handlerWrapper(stakeholderDelete));
+
+// router
+//   .route('/stakeholders')
+//   .get(validateRequest, stakeholdersGet)
+
+// router
+//   .route('/users')
+//   .get(validateRequest, usersGet)
 
 module.exports = router;
