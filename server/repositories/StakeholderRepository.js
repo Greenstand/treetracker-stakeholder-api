@@ -3,12 +3,12 @@ const BaseRepository = require('./BaseRepository');
 
 class StakeholderRepository extends BaseRepository {
   constructor(session) {
-    super('entity', session);
-    this._tableName = 'entity';
-    this._session = session;
-    // super('stakeholder', session);
-    // this._tableName = 'stakeholder';
+    // super('entity', session);
+    // this._tableName = 'entity';
     // this._session = session;
+    super('stakeholder', session);
+    this._tableName = 'stakeholder';
+    this._session = session;
   }
 
   // THIS IS FOR THE OLD DB SCHEMA: PUBLIC & ENTITY TABLES
@@ -35,72 +35,73 @@ class StakeholderRepository extends BaseRepository {
 
   // THIS IS FOR THE NEW DB SCHEMA: STAKEHOLDER
 
-  async getStakeholderById(id, options) {
-    // console.log('getStakeholderById id ---> ', id);
-    const stakeholder = await this._session
+  async getStakeholderById(id, stakeholder_uuid, options) {
+    console.log('getStakeholderById id ---> ', id, stakeholder_uuid);
+
+    let stakeholder = {};
+
+    stakeholder = await this._session
       .getDB()(this._tableName)
       .select('*')
-      .where('id', id)
+      .where('id', '=', id)
+      .orWhere('stakeholder_uuid', '=', stakeholder_uuid)
       .first();
 
-    stakeholder.children = await this.getChildren(stakeholder.id);
-    stakeholder.parents = await this.getParents(stakeholder.id);
+    stakeholder.parents = await this.getParents(stakeholder.stakeholder_uuid);
+    stakeholder.children = await this.getChildren(stakeholder.stakeholder_uuid);
 
     const count = await this._session
       .getDB()(this._tableName)
       .count('*')
-      .where('id', id);
-
-    // console.log('stakeholder1 ---> ', stakeholder);
+      .where('id', id)
+      .orWhere('stakeholder_uuid', stakeholder_uuid);
 
     return { stakeholders: [stakeholder], count: +count[0].count };
   }
 
-  async getParents(id) {
+  async getParents(uuid) {
     const parentIds = await this._session
       .getDB()(this._tableName)
-      .select('stakeholder_relations.relation_id')
+      .select('stakeholder_relations.parent_id')
       .join(
         'stakeholder_relations',
-        'stakeholder.id',
-        'stakeholder_relations.org_id',
+        'stakeholder_uuid',
+        'stakeholder_relations.child_id',
       )
-      .where('stakeholder_relations.org_id', id)
-      .andWhere('stakeholder_relations.relation_type', 'parent');
+      .where('stakeholder_uuid', uuid);
 
     // if parents are found, iterate to get their full data
     if (parentIds.length) {
-      const arr = parentIds.map((parent) => parent.relation_id);
+      const arr = parentIds.map((parent) => parent.parent_id);
 
       return this._session
         .getDB()(this._tableName)
         .select('*')
-        .where((builder) => builder.whereIn('id', arr));
+        .where((builder) => builder.whereIn('stakeholder_uuid', arr));
     }
 
     return [];
   }
 
-  async getChildren(id) {
+  async getChildren(uuid) {
     const childrenIds = await this._session
       .getDB()(this._tableName)
-      .select('stakeholder_relations.relation_id')
+      .select('stakeholder_relations.child_id')
       .join(
         'stakeholder_relations',
-        'stakeholder.id',
-        'stakeholder_relations.org_id',
+        'stakeholder_uuid',
+        'stakeholder_relations.parent_id',
       )
-      .where('stakeholder_relations.org_id', id)
-      .andWhere('stakeholder_relations.relation_type', 'child');
+      .where('stakeholder_uuid', uuid);
 
     // if children are found, iterate to get their full data
     if (childrenIds.length) {
-      const arr = childrenIds.map((child) => child.relation_id);
+      const arr = childrenIds.map((child) => child.child_id);
 
       return this._session
         .getDB()(this._tableName)
         .select('*')
-        .where((builder) => builder.whereIn('id', arr));
+        .where((builder) => builder.whereIn('stakeholder_uuid', arr));
     }
     return [];
   }

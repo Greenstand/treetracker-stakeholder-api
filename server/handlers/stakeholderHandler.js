@@ -19,7 +19,8 @@ const Session = require('../models/Session');
 const StakeholderRepository = require('../repositories/StakeholderRepository');
 
 const stakeholderGetQuerySchema = Joi.object({
-  id: Joi.string().uuid(),
+  id: Joi.number().integer(),
+  stakeholder_uuid: Joi.string().uuid(),
   organization_id: Joi.number().integer(),
   limit: Joi.number().integer().greater(0).less(101),
   skip: Joi.number().integer().greater(-1),

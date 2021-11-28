@@ -2,6 +2,7 @@ const { v4: uuid } = require('uuid');
 
 const Stakeholder = ({
   id,
+  stakeholder_uuid,
   type,
   org_name,
   first_name,
@@ -21,6 +22,7 @@ const Stakeholder = ({
 }) => {
   return Object.freeze({
     id,
+    stakeholder_uuid,
     type,
     org_name,
     first_name,
@@ -42,6 +44,7 @@ const Stakeholder = ({
 
 const StakeholderRequestObject = ({
   id,
+  stakeholder_uuid,
   type,
   org_name,
   first_name,
@@ -64,6 +67,7 @@ const StakeholderRequestObject = ({
 }) => {
   return Object.freeze({
     id,
+    stakeholder_uuid,
     type,
     org_name,
     first_name,
@@ -80,7 +84,6 @@ const StakeholderRequestObject = ({
     tree_validation_contract_id,
     logo_url,
     map_name,
-    id,
     children,
     parents,
     users,
@@ -96,9 +99,14 @@ const StakeholderRequestObject = ({
 //   });
 // };
 
-const FilterCriteria = ({ id = undefined, organization_id = undefined }) => {
+const FilterCriteria = ({
+  id = null,
+  stakeholder_uuid = null,
+  organization_id = null,
+}) => {
   return Object.entries({
     id,
+    stakeholder_uuid,
     organization_id,
   })
     .filter((entry) => entry[1] !== undefined)
@@ -152,9 +160,13 @@ const getStakeholders =
     let stakeholders = [];
     let count = 0;
 
-    if (filter.id) {
+    if (filter.id || filter.stakeholder_uuid) {
       const { stakeholders: dbStakeholders, count: dbCount } =
-        await stakeholderRepo.getStakeholderById(filter.id, options);
+        await stakeholderRepo.getStakeholderById(
+          filter.id,
+          filter.stakeholder_uuid,
+          options,
+        );
       stakeholders = dbStakeholders;
       count = dbCount;
     } else if (filter.organization_id) {
@@ -172,7 +184,7 @@ const getStakeholders =
       count = dbCount;
     }
 
-    // console.log('stakeholder2 ---> ', stakeholders);
+    console.log('stakeholder2 ---> ', stakeholders);
 
     return {
       stakeholders:
