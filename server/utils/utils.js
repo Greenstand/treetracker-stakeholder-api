@@ -66,3 +66,6 @@ exports.verifyJWTHandler = exports.handlerWrapper(async (req, res, next) => {
   res.locals.wallet_id = decode.id;
   next();
 });
+
+exports.camelToSnakeCase = (str) =>
+  str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);

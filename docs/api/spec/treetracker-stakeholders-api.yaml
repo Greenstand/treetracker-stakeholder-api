@@ -62,7 +62,7 @@ paths:
                         offering_pay_to_plant: false
                         tree_validation_contract_id: 1
                         logo_url: 'logo_url'
-                        map_name: 'map_name'
+                        map: 'map'
                         stakeholder_uuid: '2b601c87-539f-4fa8-831c-92200fa3aab2'
                     totalCount: 1
                     links:
@@ -111,7 +111,7 @@ paths:
                           format: integer
                         logo_url:
                           type: string
-                        map_name:
+                        map:
                           type: string
                         stakeholder_uuid:
                           type: string

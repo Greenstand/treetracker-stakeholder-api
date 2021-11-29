@@ -167,7 +167,7 @@ describe('Stakeholder API tests.', () => {
               'offering_pay_to_plant',
               'tree_validation_contract_id',
               'logo_url',
-              'map_name',
+              'map',
               'stakeholder_uuid',
             ]);
           }

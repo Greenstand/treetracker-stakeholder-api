@@ -12,7 +12,7 @@ describe('Stakeholder Model', () => {
     expect(stakeholder).to.have.keys([
       'id',
       'type',
-      'name',
+      'org_name',
       'first_name',
       'last_name',
       'email',
@@ -26,7 +26,7 @@ describe('Stakeholder Model', () => {
       'offering_pay_to_plant',
       'tree_validation_contract_id',
       'logo_url',
-      'map_name',
+      'map',
       'stakeholder_uuid',
     ]);
   });

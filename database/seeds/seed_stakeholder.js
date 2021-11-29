@@ -15,7 +15,7 @@ exports.seed = function (knex) {
           phone: '123-123-2122',
           website: 'greenstand.org',
           logo_url: './logo_192x192.png',
-          map_name: '/greenstandMap',
+          map: '/greenstandMap',
           stakeholder_uuid: '792a4eee-8e18-4750-a56f-91bdec383aa6',
         },
         {
@@ -28,7 +28,7 @@ exports.seed = function (knex) {
           phone: '123-123-1234',
           website: 'greenstance.com',
           logo_url: './logo_192x192.png',
-          map_name: '/greenstance',
+          map: '/greenstance',
           stakeholder_uuid: 'a8567323-88b1-4870-8c48-68d2da3ab356',
         },
         {
@@ -41,7 +41,7 @@ exports.seed = function (knex) {
           phone: '123-123-1324',
           website: 'greenspace.com',
           logo_url: './logo_192x192.png',
-          map_name: '/greenspace',
+          map: '/greenspace',
           stakeholder_uuid: 'c92189d2-2d55-44bc-a0b4-0dad25dc9f35',
         },
         {
@@ -54,7 +54,7 @@ exports.seed = function (knex) {
           phone: '123-123-1234',
           website: 'greenworld.com',
           logo_url: './logo_192x192.png',
-          map_name: '/greenworld',
+          map: '/greenworld',
           stakeholder_uuid: '344a6130-9094-4a05-8fd6-faf176593fbc',
         },
         {
@@ -67,7 +67,7 @@ exports.seed = function (knex) {
           phone: '123-123-1234',
           website: 'childone.com',
           logo_url: './logo_192x192.png',
-          map_name: '/childOne',
+          map: '/childOne',
           stakeholder_uuid: '1a05ec87-3c38-4395-b9f3-aa15becedc31',
         },
         {
@@ -80,7 +80,7 @@ exports.seed = function (knex) {
           phone: '123-234-1234',
           website: 'childtwo.com',
           logo_url: './logo_192x192.png',
-          map_name: '/childTwo',
+          map: '/childTwo',
           stakeholder_uuid: '1d2fb06e-e8f7-40de-8e13-ed3eba1abb3a',
         },
         {
@@ -93,7 +93,7 @@ exports.seed = function (knex) {
           phone: '123-123-1234',
           website: '',
           logo_url: './person_192x192.png',
-          map_name: '/childtwo',
+          map: '/childtwo',
           stakeholder_uuid: '35a23de8-f1ab-4409-be79-3c6a158d5bde',
         },
         {
@@ -106,7 +106,7 @@ exports.seed = function (knex) {
           phone: '123-123-1235',
           website: '',
           logo_url: './person_192x192.png',
-          map_name: '',
+          map: '',
           stakeholder_uuid: '90eef52b-ad55-4953-ace9-6a324ae6cec2',
         },
       ]);

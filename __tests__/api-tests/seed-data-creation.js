@@ -18,7 +18,7 @@ const stakeholderOne = Object.freeze({
   offering_pay_to_plant: true,
   tree_validation_contract_id: 11,
   logo_url: 'url',
-  map_name: 'ma,e',
+  map: 'ma,e',
   stakeholder_uuid: uuid(),
 });
 const stakeholderTwo = Object.freeze({
@@ -38,7 +38,7 @@ const stakeholderTwo = Object.freeze({
   offering_pay_to_plant: true,
   tree_validation_contract_id: 11,
   logo_url: 'url',
-  map_name: 'ma,e',
+  map: 'ma,e',
   stakeholder_uuid: uuid(),
 });
 
@@ -48,7 +48,6 @@ before(async () => {
 
 after(async () => {
   await knex.raw(`
-
     DELETE FROM entity
     WHERE password = '${stakeholderTwo.password}';
   `);
