@@ -167,10 +167,23 @@ class StakeholderRepository extends BaseRepository {
   }
 
   async getFilter(filter, options) {
+    console.log('GET FILTER', filter, options);
+    const { org_name, first_name, last_name, email, phone, ...otherFilters } =
+      filter;
+
     const results = await this._session
       .getDB()(this._tableName)
       .select('*')
       .where({ ...filter })
+      // .where((builder) =>
+      //   org_name && first_name && last_name
+      //     ? builder
+      //         .where({ ...otherFilters })
+      //         .orWhere('org_name', 'like', org_name)
+      //         .orWhere('first_name', 'like', first_name)
+      //         .orWhere('last_name', 'like', last_name)
+      //     : builder.where({ ...otherFilters }),
+      // )
       .orderBy('org_name', 'asc')
       .limit(options.limit)
       .offset(options.offset);
@@ -191,6 +204,15 @@ class StakeholderRepository extends BaseRepository {
       .getDB()(this._tableName)
       .count('*')
       .where({ ...filter });
+    // .where((builder) =>
+    //   org_name && first_name && last_name
+    //     ? builder
+    //         .where({ ...otherFilters })
+    //         .orWhere('org_name', 'like', org_name)
+    //         .orWhere('first_name', 'like', first_name)
+    //         .orWhere('last_name', 'like', last_name)
+    //     : builder.where({ ...otherFilters }),
+    // );
 
     return { stakeholders, count: +count[0].count };
   }
@@ -198,11 +220,13 @@ class StakeholderRepository extends BaseRepository {
   async getRelatedIds(id) {
     let stakeholder_uuid = null;
     let stakeholder_id = null;
-    if (Number.isInteger(id)) {
+    if (Number.isInteger(+id)) {
       stakeholder_id = id;
-    } else {
+    } else if (id !== 'null') {
       stakeholder_uuid = id;
     }
+
+    console.log('getRelatedIds', id, stakeholder_id, stakeholder_uuid);
 
     const relatedIds = await this._session
       .getDB()('stakeholder as s')
@@ -231,29 +255,41 @@ class StakeholderRepository extends BaseRepository {
       filter;
     const relatedIds = await this.getRelatedIds(id);
 
-    console.log(
-      'filter cols -------->',
-      org_name,
-      first_name,
-      last_name,
-      email,
-      phone,
-    );
+    // const searchFields = Object.entries({
+    //   org_name,
+    //   first_name,
+    //   last_name,
+    //   email,
+    //   phone,
+    // });
+
+    // console.log('filter cols -------->', searchFields);
     console.log('other filters -------->', otherFilters);
+
+    // const searchString = searchFields
+    //   .reduce((acc, [key, value]) => {
+    //     if (value) {
+    //       acc.push(`"${key}" like "${value}"`);
+    //     }
+    //     return acc;
+    //   }, [])
+    //   .join(' and ');
+
+    // console.log('searchString', searchString);
 
     const stakeholders = await this._session
       .getDB()(this._tableName)
       .select('*')
       .whereIn('stakeholder_uuid', relatedIds)
-      .andWhere({ ...otherFilters })
-      .andWhere(
-        (builder) =>
-          builder.where('org_name', 'like', org_name ? org_name.regexp : null),
-        // .orWhere('first_name', 'like', first_name.regexp)
-        // .orWhere('last_name', 'like', last_name.regexp)
-        // .orWhere('email', 'like', email.regexp)
-        // .orWhere('phone', 'like', phone.regexp),
-      )
+      .andWhere({ ...filter })
+      // .andWhere({ ...otherFilters })
+      // .andWhere((builder) =>
+      //   builder
+      //     .orWhere('org_name', 'like', org_name)
+      //     .orWhere('first_name', 'like', first_name)
+      //     .orWhere('last_name', 'like', last_name),
+      // )
+      // .andWhere(this._session.getDB().raw(searchString))
       .orderBy('org_name', 'asc')
       .limit(options.limit)
       .offset(options.offset);
@@ -264,14 +300,14 @@ class StakeholderRepository extends BaseRepository {
       .getDB()(this._tableName)
       .count('*')
       .whereIn('stakeholder_uuid', relatedIds)
-      .andWhere({ ...otherFilters })
-      .andWhere(
-        (builder) => builder.where('org_name', 'like', org_name.regexp),
-        // .orWhere('first_name', 'like', first_name.regexp)
-        // .orWhere('last_name', 'like', last_name.regexp)
-        // .orWhere('email', 'like', email.regexp)
-        // .orWhere('phone', 'like', phone.regexp),
-      );
+      .andWhere({ ...filter });
+    // .andWhere({ ...otherFilters })
+    // .andWhere((builder) =>
+    //   builder
+    //     .orWhere('org_name', 'like', org_name)
+    //     .orWhere('first_name', 'like', first_name)
+    //     .orWhere('last_name', 'like', last_name),
+    // );
 
     return { stakeholders, count: +count[0].count };
   }
@@ -285,13 +321,6 @@ class StakeholderRepository extends BaseRepository {
     expect(created).match([
       {
         id: expect.anything(),
-      },
-    ]);
-
-    const linked = this.linkStakeholder(id, object.id);
-    expect(linked).match([
-      {
-        id: expect.uuid(),
       },
     ]);
 
@@ -313,25 +342,92 @@ class StakeholderRepository extends BaseRepository {
     return updated[0];
   }
 
-  async linkStakeholder(id, relation, linkId) {
-    const relationObj = {};
-    relation.parent_id = relation === 'parent' ? linkId : id;
-    relation.child_id = relation === 'child' ? linkId : id;
+  async getUnlinkedStakeholders(id) {
+    const relatedIds = await this.getRelatedIds(id);
+    const ids = relatedIds || [];
 
-    console.log('relationObj', relationObj);
+    const stakeholders = await this._session
+      .getDB()(this._tableName)
+      .select('*')
+      // .whereNotIn('id', ids)
+      .whereNotIn('stakeholder_uuid', ids)
+      .orderBy('org_name', 'asc');
 
-    const linked = this._session
-      .getDB()('stakeholder_relations')
-      .insert(relationObj)
-      .returning('*');
+    // console.log('unlinked stakeholders', stakeholders.length);
 
-    expect(linked).match([
-      {
-        id: expect.uuid(),
-      },
-    ]);
+    const count = await this._session
+      .getDB()(this._tableName)
+      .count('*')
+      // .whereNotIn('id', ids)
+      .whereNotIn('stakeholder_uuid', ids);
 
-    return linked[0];
+    return { stakeholders, count: +count[0].count };
+  }
+
+  async updateLinkStakeholder(stakeholder_id, { type, linked, data }) {
+    console.log('updateLinkStakeholder', stakeholder_id, type, linked, data);
+
+    let linkedStakeholders;
+
+    if (linked) {
+      // to link
+      const insertObj = {};
+
+      if (type === 'parents' || type === 'children') {
+        // eslint-disable-next-line no-param-reassign
+        insertObj.parent_id =
+          type === 'parents' ? data.stakeholder_uuid : stakeholder_id;
+        // eslint-disable-next-line no-param-reassign
+        insertObj.child_id =
+          type === 'children' ? data.stakeholder_uuid : stakeholder_id;
+      }
+      // // eslint-disable-next-line no-param-reassign
+      // insertObj.grower_id = type === 'growers' ? id : null;
+      // // eslint-disable-next-line no-param-reassign
+      // insertObj.user_id = type === 'users' ? id : null;
+
+      console.log('insertObj', insertObj);
+
+      linkedStakeholders = await this._session
+        .getDB()('stakeholder_relations')
+        .insert(insertObj)
+        .returning('*');
+
+      console.log('linked', linkedStakeholders);
+
+      // expect(linked).match([
+      //   {
+      //     id: expect.uuid(),
+      //   },
+      // ]);
+    } else {
+      // to unlink
+      const removeObj = {};
+
+      if (type === 'parents' || type === 'children') {
+        // eslint-disable-next-line no-param-reassign
+        removeObj.parent_id = type === 'parents' ? id : stakeholder_id;
+        // eslint-disable-next-line no-param-reassign
+        removeObj.child_id = type === 'children' ? id : stakeholder_id;
+      }
+
+      console.log('removeObj', removeObj);
+
+      linkedStakeholders = await this._session
+        .getDB()('stakeholder_relations')
+        .delete(removeObj)
+        .returning('*');
+
+      console.log('linked', linkedStakeholders);
+
+      // expect(linked).match([
+      //   {
+      //     id: expect.uuid(),
+      //   },
+      // ]);
+    }
+
+    return linkedStakeholders[0];
   }
 }
 

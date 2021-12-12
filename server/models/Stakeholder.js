@@ -3,51 +3,48 @@
 const { v4: uuidv4 } = require('uuid');
 const { camelToSnakeCase } = require('../utils/utils');
 
-const StakeholderRequestObject = ({
-  id,
-  stakeholder_uuid,
+const StakeholderPostObject = ({
+  // id,
+  // stakeholder_uuid,
   type,
   org_name,
   first_name,
   last_name,
   email,
   phone,
-  pwd_reset_required,
+  // pwd_reset_required,
   website,
-  wallet,
-  password,
-  salt,
-  active_contract_id,
-  offering_pay_to_plant,
-  tree_validation_contract_id,
+  // wallet,
+  // password,
+  // salt,
+  // active_contract_id,
+  // offering_pay_to_plant,
+  // tree_validation_contract_id,
   logo_url,
   map,
-  filter,
 }) => {
   return Object.freeze({
-    id: id || uuidv4,
-    stakeholder_uuid,
+    stakeholder_uuid: uuidv4(), // give it a uuid,
     type,
     org_name,
     first_name,
     last_name,
     email,
     phone,
-    pwd_reset_required,
+    // pwd_reset_required,
     website,
-    wallet,
-    password,
-    salt,
-    active_contract_id,
-    offering_pay_to_plant,
-    tree_validation_contract_id,
+    // wallet,
+    // password,
+    // salt,
+    // active_contract_id,
+    // offering_pay_to_plant,
+    // tree_validation_contract_id,
     logo_url,
     map,
-    filter,
   });
 };
 
-const Stakeholder = ({
+const StakeholderTree = ({
   id,
   stakeholder_uuid,
   type,
@@ -56,14 +53,14 @@ const Stakeholder = ({
   last_name,
   email,
   phone,
-  pwd_reset_required,
+  // pwd_reset_required,
   website,
-  wallet,
-  password,
-  salt,
-  active_contract_id,
-  offering_pay_to_plant,
-  tree_validation_contract_id,
+  // wallet,
+  // password,
+  // salt,
+  // active_contract_id,
+  // offering_pay_to_plant,
+  // tree_validation_contract_id,
   logo_url,
   map,
   children = [],
@@ -78,18 +75,46 @@ const Stakeholder = ({
     last_name,
     email,
     phone,
-    pwd_reset_required,
+    // pwd_reset_required,
     website,
-    wallet,
-    password,
-    salt,
-    active_contract_id,
-    offering_pay_to_plant,
-    tree_validation_contract_id,
+    // wallet,
+    // password,
+    // salt,
+    // active_contract_id,
+    // offering_pay_to_plant,
+    // tree_validation_contract_id,
     logo_url,
     map,
     children,
     parents,
+  });
+};
+
+const Stakeholder = ({
+  id,
+  stakeholder_uuid,
+  type,
+  org_name,
+  first_name,
+  last_name,
+  email,
+  phone,
+  website,
+  logo_url,
+  map,
+}) => {
+  return Object.freeze({
+    id,
+    stakeholder_uuid,
+    type,
+    org_name,
+    first_name,
+    last_name,
+    email,
+    phone,
+    website,
+    logo_url,
+    map,
   });
 };
 
@@ -167,7 +192,7 @@ const getAllStakeholders =
   async ({ filter: { where, order }, ...idFilters } = undefined, url) => {
     let filter = {};
     filter = FilterCriteria({ ...idFilters, ...where });
-
+    console.log('getAllStakeholders --> WHERE, FILTER ------> ', where, filter);
     // use default limit and offset values until there is more info on whether used & how updated
     let options = { limit: 100, offset: 0 };
     options = {
@@ -198,7 +223,7 @@ const getAllStakeholders =
       stakeholders:
         stakeholders &&
         stakeholders.map((row) => {
-          return Stakeholder({ ...row });
+          return StakeholderTree({ ...row });
         }),
       totalCount: count,
       links: {
@@ -213,7 +238,7 @@ const getStakeholders =
   async ({ filter: { where, order }, ...idFilters } = undefined, url) => {
     let filter = {};
     filter = FilterCriteria({ ...idFilters, ...where });
-    console.log('------> WHERE, FILTER ------> ', where, filter);
+    console.log('getStakeholders --> WHERE, FILTER ------> ', where, filter);
     // use default limit and offset values until there is more info on whether used & how updated
     let options = { limit: 100, offset: 0 };
     options = {
@@ -254,7 +279,7 @@ const getStakeholders =
       stakeholders:
         stakeholders &&
         stakeholders.map((row) => {
-          return Stakeholder({ ...row });
+          return StakeholderTree({ ...row });
         }),
       totalCount: count,
       links: {
@@ -264,20 +289,65 @@ const getStakeholders =
     };
   };
 
-const updateStakeholder =
+const getUnlinkedStakeholders =
+  (stakeholderRepo, acctStakeholder_id) => async () => {
+    const { stakeholders, count } =
+      await stakeholderRepo.getUnlinkedStakeholders(acctStakeholder_id);
+
+    return {
+      stakeholders:
+        stakeholders &&
+        stakeholders.map((row) => {
+          return Stakeholder({ ...row });
+        }),
+      totalCount: count,
+    };
+  };
+
+const updateLinkStakeholder =
   (stakeholderRepo, acctStakeholder_id = null) =>
   async (object) => {
-    // const relatedStakeholders = await stakeholderRepo.getRelatedIds(
-    //   acctStakeholder_id,
-    // );
+    // const object = Stakeholder({ ...requestBody });
+
+    const acctStakeholder = await stakeholderRepo.getStakeholderById(
+      acctStakeholder_id,
+    );
 
     const foundStakeholder = await stakeholderRepo.getStakeholderById(
       object.id,
     );
 
-    // confirm stakeholder is related (if id provided is allowed to edit) OR just that it exists (if no id provided) before updating
+    // confirm stakeholder is related (it is allowed to edit) OR just that it exists (if no id provided) before updating
+    if (foundStakeholder.stakeholder.email) {
+      const stakeholderRelation = await stakeholderRepo.updateLinkStakeholder(
+        acctStakeholder.stakeholder.stakeholder_uuid,
+        object,
+      );
+
+      console.log('updated link -------> ', stakeholderRelation);
+
+      return stakeholderRelation;
+    }
+
+    return { error: { message: "Whoops! That stakeholder doesn't exist" } };
+  };
+
+const updateStakeholder =
+  (stakeholderRepo, acctStakeholder_id = null) =>
+  async (requestBody) => {
+    const object = StakeholderTree({ ...requestBody });
+
+    const relatedStakeholders = await stakeholderRepo.getRelatedIds(
+      acctStakeholder_id,
+    );
+
+    const foundStakeholder = await stakeholderRepo.getStakeholderById(
+      object.id,
+    );
+
+    // confirm stakeholder is related (it is allowed to edit) OR just that it exists (if no id provided) before updating
     if (
-      // (acctStakeholder_id && relatedStakeholders.includes(object.id)) ||
+      (acctStakeholder_id && relatedStakeholders.includes(object.id)) ||
       foundStakeholder.stakeholder.email
     ) {
       // remove children and parents
@@ -287,38 +357,46 @@ const updateStakeholder =
         updateObj,
       );
 
-      console.log('updated stakeholder -------> ', stakeholder);
+      // console.log('updated stakeholder -------> ', stakeholder);
 
-      return Stakeholder({ ...stakeholder, children, parents });
+      return StakeholderTree({ ...stakeholder, children, parents });
     }
 
     return { error: { message: "Whoops! That stakeholder doesn't exist" } };
   };
 
 const createStakeholder =
-  async (stakeholderRepo, acctStakeholder_id) => async (requestBody) => {
-    const { relation = null, ...obj } = requestBody;
-    const stakeholderObj = StakeholderRequestObject({ ...obj });
+  (stakeholderRepo, acctStakeholder_id = null) =>
+  async (requestBody) => {
+    // const { relation = null, ...obj } = requestBody;
+    const stakeholderObj = StakeholderPostObject({ ...requestBody });
 
-    console.log('STAKEHOLDER MODEL requestBody', requestBody, stakeholderObj);
+    console.log('stakeholderObj ---->', stakeholderObj);
 
-    const stakeholder = await stakeholderRepo.createStakeholder(stakeholderObj);
-
-    const linked = await stakeholderRepo.linkStakeholder(
+    const stakeholder = await stakeholderRepo.createStakeholder(
       acctStakeholder_id,
-      relation,
-      stakeholder.id,
+      stakeholderObj,
     );
 
-    console.log('linked', linked);
+    console.log('created ---->', stakeholder);
 
-    return { stakeholder: Stakeholder({ ...stakeholder }) };
+    // const linked = await stakeholderRepo.linkStakeholder(
+    //   acctStakeholder_id,
+    //   relation,
+    //   stakeholder.id,
+    // );
+
+    // console.log('linked', linked);
+
+    return { stakeholder: StakeholderTree({ ...stakeholder }) };
   };
 
 module.exports = {
   getStakeholders,
   getAllStakeholders,
-  Stakeholder,
+  getUnlinkedStakeholders,
+  updateLinkStakeholder,
+  StakeholderTree,
   FilterCriteria,
   createStakeholder,
   updateStakeholder,

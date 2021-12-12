@@ -2,10 +2,12 @@ const Joi = require('joi');
 const log = require('loglevel');
 
 const {
-  createStakeholder,
   getStakeholders,
   getAllStakeholders,
+  getUnlinkedStakeholders,
+  updateLinkStakeholder,
   updateStakeholder,
+  createStakeholder,
 } = require('../models/Stakeholder');
 // const { dispatch } = require('../models/DomainEvent');
 
@@ -53,7 +55,6 @@ const stakeholderGetAll = async (req, res) => {
 
 const stakeholderGet = async function (req, res) {
   const filter = req.query.filter ? JSON.parse(req.query.filter) : {};
-  // console.log('filter', filter);
   const query = { ...req.query, filter };
   await stakeholderGetQuerySchema.validateAsync(query, {
     abortEarly: false,
@@ -71,29 +72,90 @@ const stakeholderGet = async function (req, res) {
   res.end();
 };
 
-const stakeholderPost = async function (req, res) {
+const stakeholderGetUnlinked = async function (req, res) {
+  const { stakeholder_id } = req.params;
+  const session = new Session(false);
+  const stakeholderRepo = new StakeholderRepository(session);
+  const executeGetStakeholder = getUnlinkedStakeholders(
+    stakeholderRepo,
+    Number(stakeholder_id),
+  );
+  const result = await executeGetStakeholder();
+  console.log('result', result.stakeholders.length);
+  res.send(result);
+  res.end();
+};
+
+const stakeholderUpdateLink = async function (req, res, next) {
+  const { stakeholder_id } = req.params;
+  const session = new Session();
+  const stakeholderRepo = new StakeholderRepository(session);
+  const executeUpdateLink = updateLinkStakeholder(
+    stakeholderRepo,
+    Number(stakeholder_id),
+  );
+
+  // only fields that are required to have a value
+  const updateStakeholderSchema = Joi.object({
+    id: Joi.number().required(),
+    type: Joi.string().required(),
+    linked: Joi.boolean().required(),
+  });
+
+  console.log('req.body', req.body);
+
+  try {
+    // const value = await updateStakeholderSchema
+    //   .unknown(true)
+    //   .validateAsync(req.body, {
+    //     abortEarly: false,
+    //   });
+
+    const result = await executeUpdateLink(req.body);
+
+    res.send(result);
+    res.end();
+  } catch (e) {
+    // if (session.isTransactionInProgress()) {
+    //   await session.rollbackTransaction();
+    // }
+    next(e);
+  }
+};
+
+const stakeholderPost = async function (req, res, next) {
+  const { stakeholder_id } = req.params;
   const session = new Session();
   const stakeholderRepo = new StakeholderRepository(session);
   // const eventRepository = new EventRepository(session);
   const executeCreateStakeholder = createStakeholder(
     stakeholderRepo,
-    id,
+    stakeholder_id,
     // eventRepository,
   );
 
   // const eventDispatch = dispatch(eventRepository, publishMessage);
 
+  // only fields that are required to have a value
+  const stakeholderPostSchema = Joi.object({
+    type: Joi.string(),
+    email: Joi.string(),
+    phone: Joi.string(),
+  }).unknown();
+
   try {
-    console.log('STAKEHOLDER ROUTER post', req.body);
-    const stakeholderObj = stakeholderFromRequest({ ...req.body });
-    await session.beginTransaction();
-    const { newStakeholder /*raisedEvents*/ } = await executeCreateStakeholder(
-      stakeholderObj,
-    );
+    const value = await stakeholderPostSchema.validateAsync(req.body, {
+      abortEarly: false,
+    });
 
-    console.log('STAKEHOLDER ROUTER newStakeholder', newStakeholder);
+    // await session.beginTransaction();
+    const { newStakeholder /*raisedEvents*/ } = await executeCreateStakeholder({
+      ...value,
+    });
 
-    await session.commitTransaction();
+    console.log('STAKEHOLDER ROUTER newStakeholder', value, newStakeholder);
+
+    // await session.commitTransaction();
     // raisedEvents.forEach((domainEvent) =>
     //   eventDispatch('stakeholder-created', domainEvent),
     // );
@@ -102,11 +164,10 @@ const stakeholderPost = async function (req, res) {
     });
   } catch (e) {
     log.error(e);
-    if (session.isTransactionInProgress()) {
-      await session.rollbackTransaction();
-    }
-    let result = e;
-    res.status(422).json({ ...result });
+    // if (session.isTransactionInProgress()) {
+    //   await session.rollbackTransaction();
+    // }
+    res.status(422).json({ ...e });
   }
 };
 
@@ -119,7 +180,7 @@ const stakeholderPatch = async function (req, res, next) {
     stakeholder_id,
   );
 
-  // remove fields that aren't required to have a value
+  // only fields that are required to have a value
   const updateStakeholderSchema = Joi.object({
     id: Joi.number().required(),
     stakeholder_uuid: Joi.string().required(),
@@ -152,6 +213,8 @@ const stakeholderPatch = async function (req, res, next) {
 module.exports = {
   stakeholderGet,
   stakeholderGetAll,
+  stakeholderGetUnlinked,
+  stakeholderUpdateLink,
   stakeholderPost,
   stakeholderPatch,
 };
