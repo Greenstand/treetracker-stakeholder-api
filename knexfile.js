@@ -1,13 +1,11 @@
 const path = require('path');
 const connection = require('./config/config').connectionString;
 
-console.log('connection', connection);
-
 module.exports = {
   development: {
     client: 'postgresql',
     connection,
-    searchPath: [process.env.DATABASE_SCHEMA],
+    searchPath: [process.env.DATABASE_SCHEMA, 'public'],
     pool: {
       min: 1,
       max: 10,
@@ -23,7 +21,7 @@ module.exports = {
   staging: {
     client: 'postgresql',
     connection,
-    searchPath: [process.env.DATABASE_SCHEMA],
+    searchPath: [process.env.DATABASE_SCHEMA, 'public'],
     pool: {
       min: 1,
       max: 10,
@@ -39,7 +37,7 @@ module.exports = {
   production: {
     client: 'postgresql',
     connection,
-    searchPath: [process.env.DATABASE_SCHEMA],
+    searchPath: [process.env.DATABASE_SCHEMA, 'public'],
     pool: {
       min: 1,
       max: 10,

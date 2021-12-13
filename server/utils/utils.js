@@ -2,11 +2,11 @@
  * Some utils for router/express
  */
 const log = require('loglevel');
+const { ValidationError } = require('joi');
 const HttpError = require('./HttpError');
 // const ApiKeyService = require("../services/ApiKeyService");
 // const JWTService = require('../services/JWTService.js');
-const { ValidationError } = require('joi');
-const Session = require('../models/Session');
+// const Session = require('../models/Session');
 
 /*
  * This is from the library https://github.com/Abazhenov/express-async-handler
@@ -32,7 +32,7 @@ exports.handlerWrapper = (fn) =>
     });
   };
 
-exports.errorHandler = (err, req, res, next) => {
+exports.errorHandler = (err, req, res) => {
   log.debug('catch error:', err);
   if (err instanceof HttpError) {
     res.status(err.code).send({
@@ -52,20 +52,20 @@ exports.errorHandler = (err, req, res, next) => {
   }
 };
 
-exports.apiKeyHandler = exports.handlerWrapper(async (req, res, next) => {
-  const session = new Session();
-  const apiKey = new ApiKeyService(session);
-  await apiKey.check(req.headers['treetracker-api-key']);
-  log.debug('Valid Access');
-  next();
-});
+// exports.apiKeyHandler = exports.handlerWrapper(async (req, res, next) => {
+//   const session = new Session();
+//   const apiKey = new ApiKeyService(session);
+//   await apiKey.check(req.headers['treetracker-api-key']);
+//   log.debug('Valid Access');
+//   next();
+// });
 
-exports.verifyJWTHandler = exports.handlerWrapper(async (req, res, next) => {
-  const jwtService = new JWTService();
-  const decode = jwtService.verify(req.headers.authorization);
-  res.locals.wallet_id = decode.id;
-  next();
-});
+// exports.verifyJWTHandler = exports.handlerWrapper(async (req, res, next) => {
+//   const jwtService = new JWTService();
+//   const decode = jwtService.verify(req.headers.authorization);
+//   res.locals.wallet_id = decode.id;
+//   next();
+// });
 
 exports.camelToSnakeCase = (str) =>
   str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);

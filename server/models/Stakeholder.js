@@ -192,7 +192,6 @@ const getAllStakeholders =
   async ({ filter: { where, order }, ...idFilters } = undefined, url) => {
     let filter = {};
     filter = FilterCriteria({ ...idFilters, ...where });
-    console.log('getAllStakeholders --> WHERE, FILTER ------> ', where, filter);
     // use default limit and offset values until there is more info on whether used & how updated
     let options = { limit: 100, offset: 0 };
     options = {
@@ -238,7 +237,6 @@ const getStakeholders =
   async ({ filter: { where, order }, ...idFilters } = undefined, url) => {
     let filter = {};
     filter = FilterCriteria({ ...idFilters, ...where });
-    console.log('getStakeholders --> WHERE, FILTER ------> ', where, filter);
     // use default limit and offset values until there is more info on whether used & how updated
     let options = { limit: 100, offset: 0 };
     options = {
@@ -314,17 +312,15 @@ const updateLinkStakeholder =
     );
 
     const foundStakeholder = await stakeholderRepo.getStakeholderById(
-      object.id,
+      object.data.id,
     );
 
-    // confirm stakeholder is related (it is allowed to edit) OR just that it exists (if no id provided) before updating
+    // confirm stakeholder exists before updating
     if (foundStakeholder.stakeholder.email) {
       const stakeholderRelation = await stakeholderRepo.updateLinkStakeholder(
         acctStakeholder.stakeholder.stakeholder_uuid,
         object,
       );
-
-      console.log('updated link -------> ', stakeholderRelation);
 
       return stakeholderRelation;
     }
@@ -357,8 +353,6 @@ const updateStakeholder =
         updateObj,
       );
 
-      // console.log('updated stakeholder -------> ', stakeholder);
-
       return StakeholderTree({ ...stakeholder, children, parents });
     }
 
@@ -371,14 +365,10 @@ const createStakeholder =
     // const { relation = null, ...obj } = requestBody;
     const stakeholderObj = StakeholderPostObject({ ...requestBody });
 
-    console.log('stakeholderObj ---->', stakeholderObj);
-
     const stakeholder = await stakeholderRepo.createStakeholder(
       acctStakeholder_id,
       stakeholderObj,
     );
-
-    console.log('created ---->', stakeholder);
 
     // const linked = await stakeholderRepo.linkStakeholder(
     //   acctStakeholder_id,

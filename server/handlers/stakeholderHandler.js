@@ -81,7 +81,6 @@ const stakeholderGetUnlinked = async function (req, res) {
     Number(stakeholder_id),
   );
   const result = await executeGetStakeholder();
-  console.log('result', result.stakeholders.length);
   res.send(result);
   res.end();
 };
@@ -97,21 +96,18 @@ const stakeholderUpdateLink = async function (req, res, next) {
 
   // only fields that are required to have a value
   const updateStakeholderSchema = Joi.object({
-    id: Joi.number().required(),
     type: Joi.string().required(),
     linked: Joi.boolean().required(),
   });
 
-  console.log('req.body', req.body);
-
   try {
-    // const value = await updateStakeholderSchema
-    //   .unknown(true)
-    //   .validateAsync(req.body, {
-    //     abortEarly: false,
-    //   });
+    const value = await updateStakeholderSchema
+      .unknown(true)
+      .validateAsync(req.body, {
+        abortEarly: false,
+      });
 
-    const result = await executeUpdateLink(req.body);
+    const result = await executeUpdateLink(value);
 
     res.send(result);
     res.end();
@@ -123,7 +119,7 @@ const stakeholderUpdateLink = async function (req, res, next) {
   }
 };
 
-const stakeholderPost = async function (req, res, next) {
+const stakeholderPost = async function (req, res) {
   const { stakeholder_id } = req.params;
   const session = new Session();
   const stakeholderRepo = new StakeholderRepository(session);
@@ -149,11 +145,10 @@ const stakeholderPost = async function (req, res, next) {
     });
 
     // await session.beginTransaction();
-    const { newStakeholder /*raisedEvents*/ } = await executeCreateStakeholder({
-      ...value,
-    });
-
-    console.log('STAKEHOLDER ROUTER newStakeholder', value, newStakeholder);
+    const { newStakeholder /* raisedEvents */ } =
+      await executeCreateStakeholder({
+        ...value,
+      });
 
     // await session.commitTransaction();
     // raisedEvents.forEach((domainEvent) =>

@@ -1,5 +1,5 @@
 const { v4: uuid } = require('uuid');
-const knex = require('../../server/database/knex');
+const knex = require('../../database/connection');
 
 const stakeholderOne = Object.freeze({
   id: 5000000,

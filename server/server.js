@@ -4,6 +4,7 @@ const log = require('loglevel');
 require('./setup');
 const app = require('./app');
 const knex = require('../database/connection');
+
 const PORT = process.env.NODE_PORT || 3006;
 
 knex.migrate

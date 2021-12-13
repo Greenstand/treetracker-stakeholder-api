@@ -74,7 +74,6 @@ class StakeholderRepository extends BaseRepository {
   }
 
   async getStakeholderTreeById(id, options) {
-    console.log('GET STAKEHOLDER BY ID', id, options);
     let stakeholder_uuid = null;
     let stakeholder_id = null;
     if (Number.isInteger(id)) {
@@ -167,9 +166,8 @@ class StakeholderRepository extends BaseRepository {
   }
 
   async getFilter(filter, options) {
-    console.log('GET FILTER', filter, options);
-    const { org_name, first_name, last_name, email, phone, ...otherFilters } =
-      filter;
+    // const { org_name, first_name, last_name, email, phone, ...otherFilters } =
+    //   filter;
 
     const results = await this._session
       .getDB()(this._tableName)
@@ -226,8 +224,6 @@ class StakeholderRepository extends BaseRepository {
       stakeholder_uuid = id;
     }
 
-    console.log('getRelatedIds', id, stakeholder_id, stakeholder_uuid);
-
     const relatedIds = await this._session
       .getDB()('stakeholder as s')
       .select('sr.child_id', 'sr.parent_id')
@@ -250,9 +246,13 @@ class StakeholderRepository extends BaseRepository {
   }
 
   async getFilterById(id, filter, options) {
-    console.log('GET BY ID FILTER', id, filter, options);
-    const { org_name, first_name, last_name, email, phone, ...otherFilters } =
-      filter;
+    // const {
+    //   org_name,
+    //   first_name,
+    //   last_name,
+    //   email,
+    //   phone, ...otherFilters,
+    // } = filter;
     const relatedIds = await this.getRelatedIds(id);
 
     // const searchFields = Object.entries({
@@ -264,7 +264,7 @@ class StakeholderRepository extends BaseRepository {
     // });
 
     // console.log('filter cols -------->', searchFields);
-    console.log('other filters -------->', otherFilters);
+    // console.log('other filters -------->', otherFilters);
 
     // const searchString = searchFields
     //   .reduce((acc, [key, value]) => {
@@ -293,8 +293,6 @@ class StakeholderRepository extends BaseRepository {
       .orderBy('org_name', 'asc')
       .limit(options.limit)
       .offset(options.offset);
-
-    console.log('stakeholders -------->', stakeholders);
 
     const count = await this._session
       .getDB()(this._tableName)
@@ -349,24 +347,18 @@ class StakeholderRepository extends BaseRepository {
     const stakeholders = await this._session
       .getDB()(this._tableName)
       .select('*')
-      // .whereNotIn('id', ids)
       .whereNotIn('stakeholder_uuid', ids)
       .orderBy('org_name', 'asc');
-
-    // console.log('unlinked stakeholders', stakeholders.length);
 
     const count = await this._session
       .getDB()(this._tableName)
       .count('*')
-      // .whereNotIn('id', ids)
       .whereNotIn('stakeholder_uuid', ids);
 
     return { stakeholders, count: +count[0].count };
   }
 
   async updateLinkStakeholder(stakeholder_id, { type, linked, data }) {
-    console.log('updateLinkStakeholder', stakeholder_id, type, linked, data);
-
     let linkedStakeholders;
 
     if (linked) {
@@ -374,26 +366,18 @@ class StakeholderRepository extends BaseRepository {
       const insertObj = {};
 
       if (type === 'parents' || type === 'children') {
-        // eslint-disable-next-line no-param-reassign
         insertObj.parent_id =
           type === 'parents' ? data.stakeholder_uuid : stakeholder_id;
-        // eslint-disable-next-line no-param-reassign
         insertObj.child_id =
           type === 'children' ? data.stakeholder_uuid : stakeholder_id;
       }
-      // // eslint-disable-next-line no-param-reassign
       // insertObj.grower_id = type === 'growers' ? id : null;
-      // // eslint-disable-next-line no-param-reassign
       // insertObj.user_id = type === 'users' ? id : null;
-
-      console.log('insertObj', insertObj);
 
       linkedStakeholders = await this._session
         .getDB()('stakeholder_relations')
         .insert(insertObj)
         .returning('*');
-
-      console.log('linked', linkedStakeholders);
 
       // expect(linked).match([
       //   {
@@ -405,20 +389,17 @@ class StakeholderRepository extends BaseRepository {
       const removeObj = {};
 
       if (type === 'parents' || type === 'children') {
-        // eslint-disable-next-line no-param-reassign
-        removeObj.parent_id = type === 'parents' ? id : stakeholder_id;
-        // eslint-disable-next-line no-param-reassign
-        removeObj.child_id = type === 'children' ? id : stakeholder_id;
+        removeObj.parent_id =
+          type === 'parents' ? data.stakeholder_uuid : stakeholder_id;
+        removeObj.child_id =
+          type === 'children' ? data.stakeholder_uuid : stakeholder_id;
       }
-
-      console.log('removeObj', removeObj);
 
       linkedStakeholders = await this._session
         .getDB()('stakeholder_relations')
-        .delete(removeObj)
+        .where(removeObj)
+        .del()
         .returning('*');
-
-      console.log('linked', linkedStakeholders);
 
       // expect(linked).match([
       //   {
