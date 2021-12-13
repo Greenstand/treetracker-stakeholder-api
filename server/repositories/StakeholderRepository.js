@@ -89,6 +89,7 @@ class StakeholderRepository extends BaseRepository {
       .orWhere('stakeholder_uuid', '=', stakeholder_uuid)
       .first();
 
+    // only get one step generation difference, no recursion
     stakeholder.parents = await this.getParents(stakeholder.stakeholder_uuid);
     stakeholder.children = await this.getChildren(stakeholder, options);
 
@@ -246,6 +247,8 @@ class StakeholderRepository extends BaseRepository {
   }
 
   async getFilterById(id, filter, options) {
+    // PARTIAL SEARCH IN PROGRESS
+
     // const {
     //   org_name,
     //   first_name,
@@ -253,6 +256,7 @@ class StakeholderRepository extends BaseRepository {
     //   email,
     //   phone, ...otherFilters,
     // } = filter;
+
     const relatedIds = await this.getRelatedIds(id);
 
     // const searchFields = Object.entries({
@@ -282,13 +286,6 @@ class StakeholderRepository extends BaseRepository {
       .select('*')
       .whereIn('stakeholder_uuid', relatedIds)
       .andWhere({ ...filter })
-      // .andWhere({ ...otherFilters })
-      // .andWhere((builder) =>
-      //   builder
-      //     .orWhere('org_name', 'like', org_name)
-      //     .orWhere('first_name', 'like', first_name)
-      //     .orWhere('last_name', 'like', last_name),
-      // )
       // .andWhere(this._session.getDB().raw(searchString))
       .orderBy('org_name', 'asc')
       .limit(options.limit)
@@ -299,13 +296,6 @@ class StakeholderRepository extends BaseRepository {
       .count('*')
       .whereIn('stakeholder_uuid', relatedIds)
       .andWhere({ ...filter });
-    // .andWhere({ ...otherFilters })
-    // .andWhere((builder) =>
-    //   builder
-    //     .orWhere('org_name', 'like', org_name)
-    //     .orWhere('first_name', 'like', first_name)
-    //     .orWhere('last_name', 'like', last_name),
-    // );
 
     return { stakeholders, count: +count[0].count };
   }
@@ -371,6 +361,7 @@ class StakeholderRepository extends BaseRepository {
         insertObj.child_id =
           type === 'children' ? data.stakeholder_uuid : stakeholder_id;
       }
+      // need to update db relation table before implementing
       // insertObj.grower_id = type === 'growers' ? id : null;
       // insertObj.user_id = type === 'users' ? id : null;
 
@@ -379,11 +370,7 @@ class StakeholderRepository extends BaseRepository {
         .insert(insertObj)
         .returning('*');
 
-      // expect(linked).match([
-      //   {
-      //     id: expect.uuid(),
-      //   },
-      // ]);
+      expect(linkedStakeholders[0]).to.have.property('parent_id');
     } else {
       // to unlink
       const removeObj = {};
@@ -401,11 +388,11 @@ class StakeholderRepository extends BaseRepository {
         .del()
         .returning('*');
 
-      // expect(linked).match([
-      //   {
-      //     id: expect.uuid(),
-      //   },
-      // ]);
+      expect(linkedStakeholders).to.match([
+        {
+          id: expect.anything(),
+        },
+      ]);
     }
 
     return linkedStakeholders[0];

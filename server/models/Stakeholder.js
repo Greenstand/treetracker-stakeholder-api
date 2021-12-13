@@ -387,6 +387,7 @@ module.exports = {
   getUnlinkedStakeholders,
   updateLinkStakeholder,
   StakeholderTree,
+  Stakeholder,
   FilterCriteria,
   createStakeholder,
   updateStakeholder,

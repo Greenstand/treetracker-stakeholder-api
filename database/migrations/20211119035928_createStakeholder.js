@@ -18,7 +18,7 @@ exports.up = function (knex) {
 // exports.up = function (knex) {
 //   return knex.schema.createTable('stakeholder', (table) => {
 //     table.uuid('id').primary(); // stakeholder_uuid
-//     table.number('org_id');
+//     table.number('organization_id');
 //     table.string('type').notNullable();
 //     table.string('name'); //org_name, combined first & last
 //     table.string('first_name');

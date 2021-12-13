@@ -21,7 +21,24 @@ describe('StakeholderRepository', () => {
     mockKnex.unmock(knex);
   });
 
-  it('getStakeholderByOrganizationId', async () => {
+  it('getStakeholderById', async () => {
+    tracker.uninstall();
+    tracker.install();
+    tracker.on('query', (query) => {
+      let bool = query.sql.match(/select.*.*id.*.*stakeholder_uuid.*/);
+      if (!bool)
+        bool = query.sql.match(
+          /select.*stakeholder.*id.*or.*stakeholder_uuid.*limit.*offset/,
+        );
+      expect(bool);
+      const stakeholder = { id: 1 };
+      query.response(stakeholder);
+    });
+    const { stakeholder } = await stakeholderRepository.getStakeholderById(1);
+    expect(stakeholder).property('id').eq(1);
+  });
+
+  it.skip('getStakeholderByOrganizationId', async () => {
     tracker.uninstall();
     tracker.install();
     tracker.on('query', (query) => {

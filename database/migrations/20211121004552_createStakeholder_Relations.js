@@ -9,6 +9,8 @@ exports.up = function (knex) {
   });
 };
 
+// Possible update to table
+
 // exports.up = function (knex) {
 //   return knex.schema.createTable('stakeholder_relations', (table) => {
 //     table.uuid('stakeholder_id').primary(); // main

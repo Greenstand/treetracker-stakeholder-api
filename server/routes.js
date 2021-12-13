@@ -34,6 +34,5 @@ router
   .get(handlerWrapper(stakeholderGetAll))
   .patch(handlerWrapper(stakeholderPatch))
   .post(handlerWrapper(stakeholderPost));
-// .delete(handlerWrapper(stakeholderDelete));
 
 module.exports = router;
