@@ -25,7 +25,7 @@
     "db-migrate-ci": "cd database; db-migrate up",
     "migrate": "knex migrate:latest",
     "rollback": "knex migrate:rollback",
-    "seed": "knex",
+    "seed": "knex seed:run",
     "proxy": "http://localhost:3001/",
     "prepare": "husky install"
   },

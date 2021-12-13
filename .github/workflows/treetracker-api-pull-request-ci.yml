@@ -47,8 +47,8 @@ jobs:
         run: npm run lint
         working-directory: ${{ env.project-directory }}
 
-      - name: run db-migrate
-        run: npm run db-migrate-ci
+      - name: run migrate
+        run: npm run migrate
         working-directory: ${{ env.project-directory }}
         env:
           DATABASE_URL: postgresql://postgres:postgres@postgres/postgres
