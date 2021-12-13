@@ -3,7 +3,7 @@ const connection = require('./config/config').connectionString;
 
 module.exports = {
   development: {
-    client: 'postgresql',
+    client: 'pg',
     connection,
     searchPath: [process.env.DATABASE_SCHEMA, 'public'],
     pool: {
@@ -18,8 +18,8 @@ module.exports = {
     },
   },
 
-  staging: {
-    client: 'postgresql',
+  test: {
+    client: 'pg',
     connection,
     searchPath: [process.env.DATABASE_SCHEMA, 'public'],
     pool: {
@@ -35,7 +35,7 @@ module.exports = {
   },
 
   production: {
-    client: 'postgresql',
+    client: 'pg',
     connection,
     searchPath: [process.env.DATABASE_SCHEMA, 'public'],
     pool: {
