@@ -2,7 +2,7 @@ const path = require('path');
 const expect = require('expect-runtime');
 const connection = require('./config/config').connectionString;
 
-expect(connection).to.match(/^postgresql:\//);
+// expect(connection).to.match(/^postgresql:\//);
 
 module.exports = {
   development: {
@@ -11,7 +11,7 @@ module.exports = {
     searchPath: [process.env.DATABASE_SCHEMA, 'public'],
     pool: {
       min: 1,
-      max: 10,
+      max: 100,
     },
     migrations: {
       directory: path.join(__dirname, 'database', 'migrations'),
@@ -27,7 +27,7 @@ module.exports = {
     searchPath: [process.env.DATABASE_SCHEMA, 'public'],
     pool: {
       min: 1,
-      max: 10,
+      max: 100,
     },
     migrations: {
       directory: path.join(__dirname, 'database', 'migrations'),
@@ -43,7 +43,7 @@ module.exports = {
     searchPath: [process.env.DATABASE_SCHEMA, 'public'],
     pool: {
       min: 1,
-      max: 10,
+      max: 100,
     },
     migrations: {
       directory: path.join(__dirname, 'database', 'migrations'),
