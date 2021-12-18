@@ -17,8 +17,9 @@ const Session = require('../models/Session');
 const StakeholderRepository = require('../repositories/StakeholderRepository');
 
 const stakeholderGetQuerySchema = Joi.object({
-  id: Joi.number().integer(),
-  stakeholder_uuid: Joi.string().uuid(),
+  id: Joi.string().uuid(),
+  organization_id: Joi.number().integer(),
+  owner_id: Joi.string().uuid(),
   limit: Joi.number().integer().greater(0).less(101),
   offset: Joi.number().integer().greater(-1),
   type: Joi.string(),
@@ -76,11 +77,11 @@ const stakeholderGetUnlinked = async function (req, res) {
   const { stakeholder_id } = req.params;
   const session = new Session(false);
   const stakeholderRepo = new StakeholderRepository(session);
-  const executeGetStakeholder = getUnlinkedStakeholders(
+  const executeGetUnlinked = getUnlinkedStakeholders(
     stakeholderRepo,
-    Number(stakeholder_id),
+    stakeholder_id,
   );
-  const result = await executeGetStakeholder();
+  const result = await executeGetUnlinked();
   res.send(result);
   res.end();
 };
@@ -91,7 +92,7 @@ const stakeholderUpdateLink = async function (req, res, next) {
   const stakeholderRepo = new StakeholderRepository(session);
   const executeUpdateLink = updateLinkStakeholder(
     stakeholderRepo,
-    Number(stakeholder_id),
+    stakeholder_id,
   );
 
   // only fields that are required to have a value
@@ -123,6 +124,7 @@ const stakeholderPost = async function (req, res) {
   const { stakeholder_id } = req.params;
   const session = new Session();
   const stakeholderRepo = new StakeholderRepository(session);
+
   // const eventRepository = new EventRepository(session);
   const executeCreateStakeholder = createStakeholder(
     stakeholderRepo,
@@ -177,8 +179,7 @@ const stakeholderPatch = async function (req, res, next) {
 
   // only fields that are required to have a value
   const updateStakeholderSchema = Joi.object({
-    id: Joi.number().required(),
-    stakeholder_uuid: Joi.string().required(),
+    id: Joi.string().uuid().required(),
     type: Joi.string().required(),
     email: Joi.string().required(),
     phone: Joi.string().required(),

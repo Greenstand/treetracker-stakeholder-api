@@ -4,63 +4,66 @@ const { v4: uuidv4 } = require('uuid');
 const { camelToSnakeCase } = require('../utils/utils');
 
 const StakeholderPostObject = ({
-  // id,
-  // stakeholder_uuid,
   type,
   org_name,
   first_name,
   last_name,
   email,
   phone,
-  // pwd_reset_required,
+  pwd_reset_required,
+  password,
+  wallet,
+  salt,
+  active_contract_id,
+  offering_pay_to_plant,
+  tree_validation_contract_id,
   website,
-  // wallet,
-  // password,
-  // salt,
-  // active_contract_id,
-  // offering_pay_to_plant,
-  // tree_validation_contract_id,
   logo_url,
   map,
+  organization_id,
+  owner_id,
 }) => {
   return Object.freeze({
-    stakeholder_uuid: uuidv4(), // give it a uuid,
+    id: uuidv4(), // give it a uuid,
     type,
     org_name,
     first_name,
     last_name,
     email,
     phone,
-    // pwd_reset_required,
+    pwd_reset_required,
+    password,
+    wallet,
+    salt,
+    active_contract_id,
+    offering_pay_to_plant,
+    tree_validation_contract_id,
     website,
-    // wallet,
-    // password,
-    // salt,
-    // active_contract_id,
-    // offering_pay_to_plant,
-    // tree_validation_contract_id,
     logo_url,
     map,
+    organization_id,
+    owner_id,
   });
 };
 
 const StakeholderTree = ({
   id,
-  stakeholder_uuid,
+  organization_id,
+  owner_id,
   type,
   org_name,
   first_name,
   last_name,
   email,
   phone,
-  // pwd_reset_required,
+  pwd_reset_required,
+  password,
+  wallet,
+  salt,
+  active_contract_id,
+  offering_pay_to_plant,
+  tree_validation_contract_id,
   website,
-  // wallet,
-  // password,
-  // salt,
-  // active_contract_id,
-  // offering_pay_to_plant,
-  // tree_validation_contract_id,
   logo_url,
   map,
   children = [],
@@ -68,21 +71,22 @@ const StakeholderTree = ({
 }) => {
   return Object.freeze({
     id,
-    stakeholder_uuid,
+    organization_id,
+    owner_id,
     type,
     org_name,
     first_name,
     last_name,
     email,
     phone,
-    // pwd_reset_required,
+    pwd_reset_required,
+    password,
+    wallet,
+    salt,
+    active_contract_id,
+    offering_pay_to_plant,
+    tree_validation_contract_id,
     website,
-    // wallet,
-    // password,
-    // salt,
-    // active_contract_id,
-    // offering_pay_to_plant,
-    // tree_validation_contract_id,
     logo_url,
     map,
     children,
@@ -92,26 +96,42 @@ const StakeholderTree = ({
 
 const Stakeholder = ({
   id,
-  stakeholder_uuid,
+  organization_id,
+  owner_id,
   type,
   org_name,
   first_name,
   last_name,
   email,
   phone,
+  pwd_reset_required,
+  password,
+  wallet,
+  salt,
+  active_contract_id,
+  offering_pay_to_plant,
+  tree_validation_contract_id,
   website,
   logo_url,
   map,
 }) => {
   return Object.freeze({
     id,
-    stakeholder_uuid,
+    organization_id,
+    owner_id,
     type,
     org_name,
     first_name,
     last_name,
     email,
     phone,
+    pwd_reset_required,
+    password,
+    wallet,
+    salt,
+    active_contract_id,
+    offering_pay_to_plant,
+    tree_validation_contract_id,
     website,
     logo_url,
     map,
@@ -120,7 +140,6 @@ const Stakeholder = ({
 
 const FilterCriteria = ({
   id = null,
-  stakeholder_uuid = null,
   organization_id = null,
   type = null,
   orgName = null,
@@ -135,7 +154,6 @@ const FilterCriteria = ({
 }) => {
   return Object.entries({
     id,
-    stakeholder_uuid,
     organization_id,
     type,
     orgName,
@@ -187,6 +205,25 @@ function makeNextPrevUrls(url, filter, options) {
   return { next, prev };
 }
 
+async function getUUID(
+  stakeholderRepo,
+  id,
+  options = { limit: 100, offset: 0 },
+) {
+  // get organization from old entity table
+  // const org = await stakeholderRepo.getStakeholderByOrganizationId(id, options);
+
+  // console.log('get by organization id ------> ', org.stakeholders[0]);
+
+  // const entity = org.stakeholders[0];
+
+  // return entity.stakeholder_uuid;
+
+  return id && Number.isInteger(id)
+    ? stakeholderRepo.getUUIDbyId(id).then((res) => res.id)
+    : id;
+}
+
 const getAllStakeholders =
   (stakeholderRepo) =>
   async ({ filter: { where, order }, ...idFilters } = undefined, url) => {
@@ -213,7 +250,7 @@ const getAllStakeholders =
       count = dbCount;
     } else {
       const { stakeholders: dbStakeholders, count: dbCount } =
-        await stakeholderRepo.getAllStakeholderTrees(options);
+        await stakeholderRepo.getAllStakeholderTrees(null, options);
       stakeholders = dbStakeholders;
       count = dbCount;
     }
@@ -251,24 +288,25 @@ const getStakeholders =
       options,
     );
 
+    const orgId = Number(acctStakeholder_id);
+    // get organization from old entity table
+    const id = Number.isNaN(orgId)
+      ? acctStakeholder_id
+      : await getUUID(stakeholderRepo, orgId);
+
+    console.log('getStakeholders', orgId, id);
+
     let stakeholders = [];
     let count = 0;
 
     if (Object.keys(filter).length > 0) {
       const { stakeholders: dbStakeholders, count: dbCount } =
-        await stakeholderRepo.getFilterById(
-          acctStakeholder_id,
-          filter,
-          options,
-        );
+        await stakeholderRepo.getFilterById(id, filter, options);
       stakeholders = dbStakeholders;
       count = dbCount;
     } else {
       const { stakeholders: dbStakeholders, count: dbCount } =
-        await stakeholderRepo.getStakeholderTreeById(
-          acctStakeholder_id,
-          options,
-        );
+        await stakeholderRepo.getAllStakeholderTrees(id, options);
       stakeholders = dbStakeholders;
       count = dbCount;
     }
@@ -279,6 +317,7 @@ const getStakeholders =
         stakeholders.map((row) => {
           return StakeholderTree({ ...row });
         }),
+      // entities: org,
       totalCount: count,
       links: {
         prev,
@@ -289,8 +328,15 @@ const getStakeholders =
 
 const getUnlinkedStakeholders =
   (stakeholderRepo, acctStakeholder_id) => async () => {
-    const { stakeholders, count } =
-      await stakeholderRepo.getUnlinkedStakeholders(acctStakeholder_id);
+    const orgId = Number(acctStakeholder_id);
+    // get organization from old entity table
+    const id = Number.isNaN(orgId)
+      ? acctStakeholder_id
+      : await getUUID(stakeholderRepo, orgId);
+
+    console.log('getUnlinkedStakeholders', orgId, id);
+
+    const { stakeholders, count } = await stakeholderRepo.getUnlinked(id);
 
     return {
       stakeholders:
@@ -305,11 +351,13 @@ const getUnlinkedStakeholders =
 const updateLinkStakeholder =
   (stakeholderRepo, acctStakeholder_id = null) =>
   async (object) => {
-    // const object = Stakeholder({ ...requestBody });
+    const orgId = Number(acctStakeholder_id);
+    // get organization from old entity table
+    const id = Number.isNaN(orgId)
+      ? acctStakeholder_id
+      : await getUUID(stakeholderRepo, orgId);
 
-    const acctStakeholder = await stakeholderRepo.getStakeholderById(
-      acctStakeholder_id,
-    );
+    console.log('updateLinkStakeholders', orgId, id);
 
     const foundStakeholder = await stakeholderRepo.getStakeholderById(
       object.data.id,
@@ -317,10 +365,7 @@ const updateLinkStakeholder =
 
     // confirm stakeholder exists before updating
     if (foundStakeholder.stakeholder.email) {
-      const stakeholderRelation = await stakeholderRepo.updateLinkStakeholder(
-        acctStakeholder.stakeholder.stakeholder_uuid,
-        object,
-      );
+      const stakeholderRelation = await stakeholderRepo.updateLink(id, object);
 
       return stakeholderRelation;
     }
@@ -331,22 +376,28 @@ const updateLinkStakeholder =
 const updateStakeholder =
   (stakeholderRepo, acctStakeholder_id = null) =>
   async (requestBody) => {
+    const orgId = Number(acctStakeholder_id);
+    // get organization from old entity table
+    const id = Number.isNaN(orgId)
+      ? acctStakeholder_id
+      : await getUUID(stakeholderRepo, orgId);
+
     const object = StakeholderTree({ ...requestBody });
 
-    const relatedStakeholders = await stakeholderRepo.getRelatedIds(
-      acctStakeholder_id,
-    );
+    console.log('updateStakeholder', orgId, id);
+
+    const relatedStakeholders = await stakeholderRepo.getRelatedIds(id);
 
     const foundStakeholder = await stakeholderRepo.getStakeholderById(
       object.id,
     );
 
-    // confirm stakeholder is related (it is allowed to edit) OR just that it exists (if no id provided) before updating
+    // confirm stakeholder is related (can be edited) if there's an orgId OR just that it exists (if no orgId) before updating
     if (
-      (acctStakeholder_id && relatedStakeholders.includes(object.id)) ||
+      (orgId && relatedStakeholders.includes(object.id)) ||
       foundStakeholder.stakeholder.email
     ) {
-      // remove children and parents
+      // remove children and parents temporarily
       const { children, parents, ...updateObj } = object;
       const stakeholder = await stakeholderRepo.updateStakeholder(
         acctStakeholder_id,
@@ -362,21 +413,19 @@ const updateStakeholder =
 const createStakeholder =
   (stakeholderRepo, acctStakeholder_id = null) =>
   async (requestBody) => {
-    // const { relation = null, ...obj } = requestBody;
-    const stakeholderObj = StakeholderPostObject({ ...requestBody });
+    const orgId = Number(acctStakeholder_id);
+    // get organization from old entity table
+    const id = Number.isNaN(orgId)
+      ? acctStakeholder_id
+      : await getUUID(stakeholderRepo, orgId);
 
-    const stakeholder = await stakeholderRepo.createStakeholder(
-      acctStakeholder_id,
-      stakeholderObj,
-    );
+    const stakeholderObj = StakeholderPostObject({
+      ...requestBody,
+      organization_id: orgId,
+      owner_id: id,
+    });
 
-    // const linked = await stakeholderRepo.linkStakeholder(
-    //   acctStakeholder_id,
-    //   relation,
-    //   stakeholder.id,
-    // );
-
-    // console.log('linked', linked);
+    const stakeholder = await stakeholderRepo.createStakeholder(stakeholderObj);
 
     return { stakeholder: StakeholderTree({ ...stakeholder }) };
   };
