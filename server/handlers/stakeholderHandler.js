@@ -37,7 +37,7 @@ const stakeholderGetQuerySchema = Joi.object({
   filter: Joi.object(),
 }).unknown(false);
 
-const stakeholderGetAll = async (req, res) => {
+const stakeholderGetAll = async (req, res, next) => {
   const filter = req.query.filter ? JSON.parse(req.query.filter) : {};
   const query = { ...req.query, filter };
   await stakeholderGetQuerySchema.validateAsync(query, {
@@ -49,12 +49,16 @@ const stakeholderGetAll = async (req, res) => {
   const url = `${req.protocol}://${req.get('host')}/stakeholder`;
 
   const executeGetAllStakeholders = getAllStakeholders(stakeholderRepo);
-  const result = await executeGetAllStakeholders(query, url);
-  res.send(result);
-  res.end();
+  try {
+    const result = await executeGetAllStakeholders(query, url);
+    res.send(result);
+    res.end();
+  } catch (e) {
+    next(e);
+  }
 };
 
-const stakeholderGet = async function (req, res) {
+const stakeholderGet = async function (req, res, next) {
   const filter = req.query.filter ? JSON.parse(req.query.filter) : {};
   const query = { ...req.query, filter };
   await stakeholderGetQuerySchema.validateAsync(query, {
@@ -68,22 +72,30 @@ const stakeholderGet = async function (req, res) {
     stakeholderRepo,
     Number(stakeholder_id),
   );
-  const result = await executeGetStakeholder(query, url);
-  res.send(result);
-  res.end();
+  try {
+    const result = await executeGetStakeholder(query, url);
+    res.send(result);
+    res.end();
+  } catch (e) {
+    next(e);
+  }
 };
 
-const stakeholderGetUnlinked = async function (req, res) {
-  const { stakeholder_id } = req.params;
+const stakeholderGetUnlinked = async function (req, res, next) {
+  const { acctStakeholder_id, stakeholder_id } = req.params;
   const session = new Session(false);
   const stakeholderRepo = new StakeholderRepository(session);
   const executeGetUnlinked = getUnlinkedStakeholders(
     stakeholderRepo,
-    stakeholder_id,
+    acctStakeholder_id,
   );
-  const result = await executeGetUnlinked();
-  res.send(result);
-  res.end();
+  try {
+    const result = await executeGetUnlinked(stakeholder_id);
+    res.send(result);
+    res.end();
+  } catch (e) {
+    next(e);
+  }
 };
 
 const stakeholderUpdateLink = async function (req, res, next) {
@@ -109,7 +121,6 @@ const stakeholderUpdateLink = async function (req, res, next) {
       });
 
     const result = await executeUpdateLink(value);
-
     res.send(result);
     res.end();
   } catch (e) {
@@ -120,7 +131,7 @@ const stakeholderUpdateLink = async function (req, res, next) {
   }
 };
 
-const stakeholderPost = async function (req, res) {
+const stakeholderPost = async function (req, res, next) {
   const { stakeholder_id } = req.params;
   const session = new Session();
   const stakeholderRepo = new StakeholderRepository(session);
@@ -147,24 +158,22 @@ const stakeholderPost = async function (req, res) {
     });
 
     // await session.beginTransaction();
-    const { newStakeholder /* raisedEvents */ } =
-      await executeCreateStakeholder({
-        ...value,
-      });
+    const result = await executeCreateStakeholder({
+      ...value,
+    });
 
     // await session.commitTransaction();
     // raisedEvents.forEach((domainEvent) =>
     //   eventDispatch('stakeholder-created', domainEvent),
     // );
-    res.status(201).json({
-      ...newStakeholder,
-    });
+    res.status(201).json(result);
   } catch (e) {
     log.error(e);
     // if (session.isTransactionInProgress()) {
     //   await session.rollbackTransaction();
     // }
-    res.status(422).json({ ...e });
+    // res.status(422).json({ ...e });
+    next(e);
   }
 };
 
@@ -199,9 +208,9 @@ const stakeholderPatch = async function (req, res, next) {
     res.send(result);
     res.end();
   } catch (e) {
-    if (session.isTransactionInProgress()) {
-      await session.rollbackTransaction();
-    }
+    // if (session.isTransactionInProgress()) {
+    //   await session.rollbackTransaction();
+    // }
     next(e);
   }
 };
