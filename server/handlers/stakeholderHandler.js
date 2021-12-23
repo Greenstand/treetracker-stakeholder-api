@@ -82,7 +82,7 @@ const stakeholderGet = async function (req, res, next) {
 };
 
 const stakeholderGetUnlinked = async function (req, res, next) {
-  const { acctStakeholder_id, stakeholder_id } = req.params;
+  const { acctStakeholder_id = null, stakeholder_id = null } = req.params;
   const session = new Session(false);
   const stakeholderRepo = new StakeholderRepository(session);
   const executeGetUnlinked = getUnlinkedStakeholders(

@@ -31,13 +31,13 @@ const StakeholderPostObject = ({
     last_name,
     email,
     phone,
-    pwd_reset_required,
+    pwd_reset_required: pwd_reset_required || false,
     password,
     wallet,
     salt,
-    active_contract_id,
+    active_contract_id: active_contract_id || null,
     offering_pay_to_plant,
-    tree_validation_contract_id,
+    tree_validation_contract_id: tree_validation_contract_id || null,
     website,
     logo_url,
     map,
@@ -226,11 +226,14 @@ async function getUUID(
 
 const getAllStakeholders =
   (stakeholderRepo) =>
-  async ({ filter: { where, order }, ...idFilters } = undefined, url) => {
+  async (
+    { filter: { where, order, limit, offset }, ...idFilters } = undefined,
+    url,
+  ) => {
     let filter = {};
     filter = FilterCriteria({ ...idFilters, ...where });
     // use default limit and offset values until there is more info on whether used & how updated
-    let options = { limit: 100, offset: 0 };
+    let options = { limit, offset };
     options = {
       ...options,
       ...QueryOptions({ ...order }),
@@ -250,7 +253,7 @@ const getAllStakeholders =
       count = dbCount;
     } else {
       const { stakeholders: dbStakeholders, count: dbCount } =
-        await stakeholderRepo.getAllStakeholderTrees(null, options);
+        await stakeholderRepo.getAllStakeholderTrees(options);
       stakeholders = dbStakeholders;
       count = dbCount;
     }
@@ -306,7 +309,7 @@ const getStakeholders =
       count = dbCount;
     } else {
       const { stakeholders: dbStakeholders, count: dbCount } =
-        await stakeholderRepo.getAllStakeholderTrees(id, options);
+        await stakeholderRepo.getAllStakeholderTreesById(id, options);
       stakeholders = dbStakeholders;
       count = dbCount;
     }
@@ -327,16 +330,25 @@ const getStakeholders =
   };
 
 const getUnlinkedStakeholders =
-  (stakeholderRepo, acctStakeholder_id) => async () => {
+  (stakeholderRepo, acctStakeholder_id) => async (stakeholder_id) => {
     const orgId = Number(acctStakeholder_id);
     // get organization from old entity table
-    const id = Number.isNaN(orgId)
-      ? acctStakeholder_id
-      : await getUUID(stakeholderRepo, orgId);
+    const id =
+      acctStakeholder_id === null || Number.isNaN(orgId)
+        ? acctStakeholder_id
+        : await getUUID(stakeholderRepo, orgId);
 
-    console.log('getUnlinkedStakeholders', orgId, id);
+    console.log(
+      'getUnlinkedStakeholders',
+      acctStakeholder_id,
+      id,
+      stakeholder_id,
+    );
 
-    const { stakeholders, count } = await stakeholderRepo.getUnlinked(id);
+    const { stakeholders, count } = await stakeholderRepo.getUnlinked(
+      id,
+      stakeholder_id,
+    );
 
     return {
       stakeholders:
@@ -349,28 +361,37 @@ const getUnlinkedStakeholders =
   };
 
 const updateLinkStakeholder =
-  (stakeholderRepo, acctStakeholder_id = null) =>
+  (stakeholderRepo, stakeholder_id = null) =>
   async (object) => {
-    const orgId = Number(acctStakeholder_id);
+    const orgId = Number(stakeholder_id);
     // get organization from old entity table
     const id = Number.isNaN(orgId)
-      ? acctStakeholder_id
+      ? stakeholder_id
       : await getUUID(stakeholderRepo, orgId);
 
     console.log('updateLinkStakeholders', orgId, id);
 
-    const foundStakeholder = await stakeholderRepo.getStakeholderById(
-      object.data.id,
-    );
+    try {
+      const foundStakeholder = await stakeholderRepo.verifyById(
+        id,
+        object.data.id,
+      );
 
-    // confirm stakeholder exists before updating
-    if (foundStakeholder.stakeholder.email) {
-      const stakeholderRelation = await stakeholderRepo.updateLink(id, object);
+      // confirm stakeholder link can be updated
+      if (foundStakeholder && foundStakeholder.stakeholder.email) {
+        const stakeholderRelation = await stakeholderRepo.updateLink(
+          id,
+          object,
+        );
 
-      return stakeholderRelation;
+        return stakeholderRelation;
+      }
+      throw new Error({
+        message: "Whoops! That stakeholder link can't be updated",
+      });
+    } catch (e) {
+      return { error: e };
     }
-
-    return { error: { message: "Whoops! That stakeholder doesn't exist" } };
   };
 
 const updateStakeholder =
@@ -382,32 +403,36 @@ const updateStakeholder =
       ? acctStakeholder_id
       : await getUUID(stakeholderRepo, orgId);
 
-    const object = StakeholderTree({ ...requestBody });
+    try {
+      const object = StakeholderTree({ ...requestBody });
 
-    console.log('updateStakeholder', orgId, id);
+      console.log('updateStakeholder', orgId, id);
 
-    const relatedStakeholders = await stakeholderRepo.getRelatedIds(id);
+      const relatedStakeholders = await stakeholderRepo.getRelatedIds(id);
 
-    const foundStakeholder = await stakeholderRepo.getStakeholderById(
-      object.id,
-    );
+      const foundStakeholder = await stakeholderRepo.verifyById(id, object.id);
 
-    // confirm stakeholder is related (can be edited) if there's an orgId OR just that it exists (if no orgId) before updating
-    if (
-      (orgId && relatedStakeholders.includes(object.id)) ||
-      foundStakeholder.stakeholder.email
-    ) {
-      // remove children and parents temporarily
-      const { children, parents, ...updateObj } = object;
-      const stakeholder = await stakeholderRepo.updateStakeholder(
-        acctStakeholder_id,
-        updateObj,
-      );
+      // confirm stakeholder is related (can be edited) if there's an orgId OR just that it exists (if no orgId) before updating
+      if (
+        (orgId && relatedStakeholders.includes(object.id)) ||
+        foundStakeholder.stakeholder.email ||
+        foundStakeholder.stakeholder.email
+      ) {
+        // remove children and parents temporarily
+        const { children, parents, ...updateObj } = object;
+        const stakeholder = await stakeholderRepo.updateStakeholder(
+          acctStakeholder_id,
+          updateObj,
+        );
 
-      return StakeholderTree({ ...stakeholder, children, parents });
+        return StakeholderTree({ ...stakeholder, children, parents });
+      }
+      throw new Error({
+        message: "Whoops! That stakeholder can't be edited",
+      });
+    } catch (e) {
+      return { error: e };
     }
-
-    return { error: { message: "Whoops! That stakeholder doesn't exist" } };
   };
 
 const createStakeholder =
@@ -419,15 +444,21 @@ const createStakeholder =
       ? acctStakeholder_id
       : await getUUID(stakeholderRepo, orgId);
 
-    const stakeholderObj = StakeholderPostObject({
-      ...requestBody,
-      organization_id: orgId,
-      owner_id: id,
-    });
+    try {
+      const stakeholderObj = StakeholderPostObject({
+        ...requestBody,
+        organization_id: orgId,
+        owner_id: id,
+      });
 
-    const stakeholder = await stakeholderRepo.createStakeholder(stakeholderObj);
+      const stakeholder = await stakeholderRepo.createStakeholder(
+        stakeholderObj,
+      );
 
-    return { stakeholder: StakeholderTree({ ...stakeholder }) };
+      return StakeholderTree({ ...stakeholder });
+    } catch (e) {
+      return { error: e };
+    }
   };
 
 module.exports = {

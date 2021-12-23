@@ -39,19 +39,48 @@ class StakeholderRepository extends BaseRepository {
     return stakeholder_id;
   }
 
-  async getStakeholderById(id) {
+  async verifyById(orgId, id) {
     const stakeholder = await this._session
       .getDB()(this._tableName)
       .select('*')
       .where('id', id)
-      // .andWhere('organization_id', orgId)
+      .andWhere('owner_id', orgId)
+      .orWhere('owner_id', null)
       .first();
 
     return { stakeholder };
   }
 
-  async getAllStakeholderTrees(id, options) {
-    // get only non-child to start building trees
+  async getAllStakeholderTrees(options) {
+    // get only non-children to start building trees
+    const results = await this._session
+      .getDB()('stakeholder as s')
+      .select('s.*')
+      .leftJoin('stakeholder_relations as sr', 's.id', 'sr.child_id')
+      .whereNull('sr.child_id')
+      .orderBy('s.org_name', 'asc')
+      .limit(options.limit)
+      .offset(options.offset);
+
+    const stakeholders = await Promise.all(
+      results.map(async (stakeholder) => {
+        // eslint-disable-next-line no-param-reassign
+        stakeholder.parents = await this.getParents(stakeholder.id);
+        // eslint-disable-next-line no-param-reassign
+        stakeholder.children = await this.getChildren(stakeholder, options);
+        return stakeholder;
+      }),
+    );
+
+    const count = await this._session.getDB()('stakeholder as s').count('*');
+    // .leftJoin('stakeholder_relations as sr', 's.id', 'sr.child_id')
+    // .whereNull('sr.child_id');
+
+    return { stakeholders, count: +count[0].count };
+  }
+
+  async getAllStakeholderTreesById(id = null, options) {
+    // get only non-children to start building trees
     const results = await this._session
       .getDB()('stakeholder as s')
       .select('s.*')
@@ -266,7 +295,7 @@ class StakeholderRepository extends BaseRepository {
 
     // console.log('searchString', searchString);
 
-    const stakeholders = await this._session
+    const results = await this._session
       .getDB()(this._tableName)
       .select('*')
       .where((builder) =>
@@ -279,6 +308,16 @@ class StakeholderRepository extends BaseRepository {
       .orderBy('org_name', 'asc')
       .limit(options.limit)
       .offset(options.offset);
+
+    const stakeholders = await Promise.all(
+      results.map(async (stakeholder) => {
+        // eslint-disable-next-line no-param-reassign
+        stakeholder.parents = await this.getParents(stakeholder.id);
+        // eslint-disable-next-line no-param-reassign
+        stakeholder.children = await this.getChildren(stakeholder, options);
+        return stakeholder;
+      }),
+    );
 
     const count = await this._session
       .getDB()(this._tableName)
@@ -323,22 +362,26 @@ class StakeholderRepository extends BaseRepository {
     return updated[0];
   }
 
-  async getUnlinked(id) {
-    const relatedIds = await this.getRelatedIds(id);
+  async getUnlinked(id, stakeholder_id) {
+    const relatedIds = await this.getRelatedIds(stakeholder_id);
     const ids = relatedIds || [];
 
     const stakeholders = await this._session
       .getDB()(this._tableName)
       .select('*')
-      .whereNotIn('id', ids)
+      .whereNotIn('id', [...ids, stakeholder_id])
       .andWhere('owner_id', id)
+      // .orWhere('id', id) // include the owner in results
+      // .orWhere('owner_id', null) // include admin-created stakeholders in results
       .orderBy('org_name', 'asc');
 
     const count = await this._session
       .getDB()(this._tableName)
       .count('*')
-      .whereNotIn('id', ids)
+      .whereNotIn('id', [...ids, stakeholder_id])
       .andWhere('owner_id', id);
+    // .orWhere('id', id);
+    // .orWhere('owner_id', null);
 
     return { stakeholders, count: +count[0].count };
   }

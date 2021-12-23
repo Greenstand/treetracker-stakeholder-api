@@ -14,12 +14,12 @@ const {
 const { handlerWrapper } = require('./utils/utils');
 
 router
-  .route('/links/:stakeholder_id')
+  .route('/links/:stakeholder_id/:acctStakeholder_id')
   .get(handlerWrapper(stakeholderGetUnlinked))
   .patch(handlerWrapper(stakeholderUpdateLink));
 
 router
-  .route('/links')
+  .route('/links/:stakeholder_id')
   .get(handlerWrapper(stakeholderGetUnlinked))
   .patch(handlerWrapper(stakeholderUpdateLink));
 
