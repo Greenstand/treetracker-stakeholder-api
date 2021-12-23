@@ -45,7 +45,7 @@ class StakeholderRepository extends BaseRepository {
       .select('*')
       .where('id', id)
       .andWhere('owner_id', orgId)
-      .orWhere('owner_id', null)
+      .orWhereNull('owner_id')
       .first();
 
     return { stakeholder };
@@ -58,6 +58,7 @@ class StakeholderRepository extends BaseRepository {
       .select('s.*')
       .leftJoin('stakeholder_relations as sr', 's.id', 'sr.child_id')
       .whereNull('sr.child_id')
+      // .orWhereNull('s.owner_id')
       .orderBy('s.org_name', 'asc')
       .limit(options.limit)
       .offset(options.offset);
