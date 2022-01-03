@@ -2,44 +2,46 @@ const { v4: uuid } = require('uuid');
 const knex = require('../../database/connection');
 
 const stakeholderOne = Object.freeze({
-  id: 5000000,
+  id: uuid(),
   type: 'type',
   org_name: 'name',
   first_name: 'first_name',
   last_name: 'last_name',
   email: 'email',
   phone: 'phone',
-  // pwd_reset_required: true,
+  pwd_reset_required: true,
   website: 'website',
-  // wallet: 'wallet@@#',
-  // password: 'password',
-  // salt: 'salt',
-  // active_contract_id: 10,
-  // offering_pay_to_plant: true,
-  // tree_validation_contract_id: 11,
+  wallet: 'wallet@@#',
+  password: 'password',
+  salt: 'salt',
+  active_contract_id: uuid(),
+  offering_pay_to_plant: true,
+  tree_validation_contract_id: uuid(),
   logo_url: 'url',
   map: 'ma,e',
-  stakeholder_uuid: uuid(),
+  owner_id: uuid(),
+  organization_id: 5000000,
 });
 const stakeholderTwo = Object.freeze({
-  id: 5000001,
+  id: uuid(),
   type: 'type',
   org_name: 'name',
   first_name: 'first_name',
   last_name: 'last_name',
   email: 'email',
   phone: 'phone',
-  // pwd_reset_required: true,
+  pwd_reset_required: true,
   website: 'website',
-  // wallet: 'wallet@!#',
-  // password: 'password',
-  // salt: 'salt',
-  // active_contract_id: 10,
-  // offering_pay_to_plant: true,
-  // tree_validation_contract_id: 11,
+  wallet: 'wallet@!#',
+  password: 'password',
+  salt: 'salt',
+  active_contract_id: uuid(),
+  offering_pay_to_plant: true,
+  tree_validation_contract_id: uuid(),
   logo_url: 'url',
   map: 'ma,e',
-  stakeholder_uuid: uuid(),
+  owner_id: uuid(),
+  organization_id: 5000001,
 });
 
 before(async () => {
@@ -56,7 +58,7 @@ before(async () => {
 after(async () => {
   await knex.raw(`
     DELETE FROM stakeholder
-    WHERE id = '${5000000}' OR id = '${5000001}';
+    WHERE organization_id = '${5000000}' OR organization_id = '${5000001}';
   `);
 });
 

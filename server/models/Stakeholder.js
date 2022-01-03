@@ -140,6 +140,7 @@ const Stakeholder = ({
 
 const FilterCriteria = ({
   id = null,
+  owner_id = null,
   organization_id = null,
   type = null,
   orgName = null,
@@ -154,6 +155,7 @@ const FilterCriteria = ({
 }) => {
   return Object.entries({
     id,
+    owner_id,
     organization_id,
     type,
     orgName,

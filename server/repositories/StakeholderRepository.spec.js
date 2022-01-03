@@ -21,24 +21,46 @@ describe('StakeholderRepository', () => {
     mockKnex.unmock(knex);
   });
 
-  it('getStakeholderById', async () => {
+  it('getStakeholderTreeById', async () => {
     tracker.uninstall();
     tracker.install();
-    tracker.on('query', (query) => {
-      let bool = query.sql.match(/select.*.*id.*.*stakeholder_uuid.*/);
-      if (!bool)
-        bool = query.sql.match(
-          /select.*stakeholder.*id.*or.*stakeholder_uuid.*limit.*offset/,
-        );
-      expect(bool);
+    tracker.on('query', (query, step) => {
       const stakeholder = { id: 1 };
-      query.response(stakeholder);
+      const count = { count: 1 };
+      [
+        function firstQuery() {
+          const bool = query.sql.match(/select.*.*id.*/);
+          expect(bool);
+          query.response(stakeholder);
+        },
+        function firstQuery() {
+          const bool = query.sql.match(/select.*.*id.*/);
+          expect(bool);
+          query.response([]);
+        },
+        function firstQuery() {
+          const bool = query.sql.match(/select.*.*id.*/);
+          expect(bool);
+          query.response([]);
+        },
+        function secondQuery() {
+          const bool = query.sql.match(/count.*.*id.*/);
+          expect(bool);
+          query.response([count]);
+        },
+        function finalQuery() {
+          query.response({ stakeholders: [stakeholder], count });
+        },
+      ][step - 1]();
     });
-    const { stakeholder } = await stakeholderRepository.getStakeholderById(1);
-    expect(stakeholder).property('id').eq(1);
+
+    const { stakeholders, count } =
+      await stakeholderRepository.getStakeholderTreeById(1);
+    expect(stakeholders[0]).property('id').eq(1);
+    expect(count).eq(1);
   });
 
-  it.skip('getStakeholderByOrganizationId', async () => {
+  it('getStakeholderByOrganizationId', async () => {
     tracker.uninstall();
     tracker.install();
     tracker.on('query', (query) => {

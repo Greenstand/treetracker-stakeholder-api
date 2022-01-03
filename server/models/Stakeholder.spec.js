@@ -17,23 +17,23 @@ describe('Stakeholder Model', () => {
       'last_name',
       'email',
       'phone',
-      // 'pwd_reset_required',
+      'pwd_reset_required',
       'website',
-      // 'wallet',
-      // 'password',
-      // 'salt',
-      // 'active_contract_id',
-      // 'offering_pay_to_plant',
-      // 'tree_validation_contract_id',
+      'wallet',
+      'password',
+      'salt',
+      'active_contract_id',
+      'offering_pay_to_plant',
+      'tree_validation_contract_id',
       'logo_url',
       'map',
-      'stakeholder_uuid',
-      // 'organization_id',
+      'owner_id',
+      'organization_id',
     ]);
   });
 
   describe('FilterCriteria', () => {
-    it('filterCriteria should not return results other than id, stakeholder_uuid, organization_id, type, orgName, firstName, lastName, imageUrl, email, phone, website, logoUrl, map', () => {
+    it('filterCriteria should not return results other than id, owner_id, organization_id, type, orgName, firstName, lastName, imageUrl, email, phone, website, logoUrl, map', () => {
       const filter = FilterCriteria({ check: true });
       expect(filter).to.be.empty;
     });
@@ -41,19 +41,19 @@ describe('Stakeholder Model', () => {
     it('filterCriteria should not return undefined fields', () => {
       const filter = FilterCriteria({
         id: undefined,
-        stakeholder_uuid: undefined,
+        owner_id: undefined,
         organization_id: undefined,
       });
       expect(filter).to.be.empty;
     });
 
-    it('filterCriteria should return id, stakeholder_uuid', () => {
+    it('filterCriteria should return id, owner_id', () => {
       const filter = FilterCriteria({
         id: 'undefined',
-        stakeholder_uuid: 'undefined',
+        owner_id: 'undefined',
         organization_id: undefined,
       });
-      expect(filter).to.have.keys(['id', 'stakeholder_uuid']);
+      expect(filter).to.have.keys(['id', 'owner_id']);
     });
   });
 

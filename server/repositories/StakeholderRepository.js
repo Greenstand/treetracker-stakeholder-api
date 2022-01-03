@@ -130,17 +130,20 @@ class StakeholderRepository extends BaseRepository {
       .count('*')
       .where('id', id);
 
-    return { stakeholders: [stakeholder], count: +count[0].count };
+    return {
+      stakeholders: [stakeholder],
+      count: count ? +count[0].count : 0,
+    };
   }
 
   async getParentIds(id) {
     const parents = await this._session
       .getDB()('stakeholder as s')
       .select('stakeholder_relations.parent_id')
-      .join('stakeholder_relations', 's.id', 'stakeholder_relations.child_id')
+      .join('stakeholder_relations as sr', 's.id', 'sr.child_id')
       .where('s.id', id);
 
-    return parents ? parents.map((parent) => parent.parent_id) : [];
+    return parents.length ? parents.map((parent) => parent.parent_id) : [];
   }
 
   async getParents(id) {
@@ -160,10 +163,10 @@ class StakeholderRepository extends BaseRepository {
     const children = await this._session
       .getDB()('stakeholder as s')
       .select('stakeholder_relations.child_id')
-      .join('stakeholder_relations', 's.id', 'stakeholder_relations.parent_id')
+      .join('stakeholder_relations as sr', 's.id', 'sr.parent_id')
       .where('s.id', id);
 
-    return children ? children.map((child) => child.child_id) : [];
+    return children.length ? children.map((child) => child.child_id) : [];
   }
 
   async getChildren(parent, options) {
