@@ -1,7 +1,6 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable prefer-destructuring */
 const { v4: uuidv4 } = require('uuid');
-const { camelToSnakeCase } = require('../utils/utils');
 
 const StakeholderPostObject = ({
   type,
@@ -143,14 +142,14 @@ const FilterCriteria = ({
   owner_id = null,
   organization_id = null,
   type = null,
-  orgName = null,
-  firstName = null,
-  lastName = null,
-  imageUrl = null,
+  org_name = null,
+  first_name = null,
+  last_name = null,
+  image_url = null,
   email = null,
   phone = null,
   website = null,
-  logoUrl = null,
+  logo_url = null,
   map = null,
 }) => {
   return Object.entries({
@@ -158,21 +157,21 @@ const FilterCriteria = ({
     owner_id,
     organization_id,
     type,
-    orgName,
-    firstName,
-    lastName,
-    imageUrl,
+    org_name,
+    first_name,
+    last_name,
+    image_url,
     email,
     phone,
     website,
-    logoUrl,
+    logo_url,
     map,
   })
     .filter(
       (entry) => entry[1] !== undefined && entry[1] !== null && entry[1] !== '',
     )
     .reduce((result, item) => {
-      result[camelToSnakeCase(item[0])] = item[1];
+      result[item[0]] = item[1];
       return result;
     }, {});
 };
@@ -212,19 +211,13 @@ async function getUUID(
   id,
   options = { limit: 100, offset: 0 },
 ) {
-  console.log('getUUID', id);
-
   // check for id in current table first
   const stakeholderFound = await stakeholderRepo.getUUIDbyId(id);
-
-  console.log('stakeholderFound', stakeholderFound);
 
   if (!stakeholderFound) {
     // get organization from old entity table
     const { stakeholders } =
       await stakeholderRepo.getStakeholderByOrganizationId(id, options);
-
-    console.log('from entity table ------> ', stakeholders.length);
 
     const owner_id = stakeholders[0].stakeholder_uuid;
 
@@ -405,7 +398,9 @@ const getUnlinkedStakeholders =
         stakeholders:
           stakeholders &&
           stakeholders.map((row) => {
-            return Stakeholder({ ...row });
+            row.children = [];
+            row.parents = [];
+            return StakeholderTree({ ...row });
           }),
         totalCount: count,
       };
@@ -425,13 +420,21 @@ const updateLinkStakeholder =
         : await getUUID(stakeholderRepo, orgId);
 
     try {
+      const parentStakeholder = await stakeholderRepo.verifyById(id, id);
+      const relatedStakeholders = await stakeholderRepo.getRelatedIds(id); // linked
       const foundStakeholder = await stakeholderRepo.verifyById(
         id,
         object.data.id,
       );
 
       // confirm stakeholder link can be updated
-      if (foundStakeholder && foundStakeholder.stakeholder.email) {
+      if (
+        (id && relatedStakeholders.includes(foundStakeholder.id)) ||
+        foundStakeholder.owner_id === id ||
+        parentStakeholder.owner_id === foundStakeholder.owner_id ||
+        id === null ||
+        foundStakeholder.owner_id === null
+      ) {
         const stakeholderRelation = await stakeholderRepo.updateLink(
           id,
           object,
@@ -465,10 +468,11 @@ const updateStakeholder =
       const foundStakeholder = await stakeholderRepo.verifyById(id, object.id);
 
       // confirm stakeholder is related (can be edited) if there's an orgId OR just that it exists (if no orgId) before updating
+
       if (
-        (orgId && relatedStakeholders.includes(object.id)) ||
-        foundStakeholder.stakeholder.email ||
-        foundStakeholder.stakeholder.email
+        (id && relatedStakeholders.includes(object.id)) ||
+        foundStakeholder.owner_id === id ||
+        id === null
       ) {
         // remove children and parents temporarily
         const { children, parents, ...updateObj } = object;
