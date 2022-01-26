@@ -39,7 +39,7 @@ class StakeholderRepository extends BaseRepository {
     return stakeholder_id;
   }
 
-  async verifyById(orgId, id) {
+  async verifyById(id) {
     const stakeholder = await this._session
       .getDB()(this._tableName)
       .select('*')
@@ -49,36 +49,27 @@ class StakeholderRepository extends BaseRepository {
     return stakeholder;
   }
 
-  async getAllStakeholderTrees(options) {
+  async getAllStakeholders(options) {
     // get only non-children to start building trees
     const results = await this._session
       .getDB()('stakeholder as s')
       .select('s.*')
       .leftJoin('stakeholder_relations as sr', 's.id', 'sr.child_id')
       .whereNull('sr.child_id')
-      // .orWhereNull('s.owner_id')
       .orderBy('s.org_name', 'asc')
       .limit(options.limit)
       .offset(options.offset);
 
-    const stakeholders = await Promise.all(
-      results.map(async (stakeholder) => {
-        // eslint-disable-next-line no-param-reassign
-        stakeholder.parents = await this.getParents(stakeholder, options);
-        // eslint-disable-next-line no-param-reassign
-        stakeholder.children = await this.getChildren(stakeholder, options);
-        return stakeholder;
-      }),
-    );
-
     const count = await this._session.getDB()('stakeholder as s').count('*');
+
+    // // add these lines to count only the parents and not the children:
     // .leftJoin('stakeholder_relations as sr', 's.id', 'sr.child_id')
     // .whereNull('sr.child_id');
 
-    return { stakeholders, count: +count[0].count };
+    return { stakeholders: results, count: +count[0].count };
   }
 
-  async getAllStakeholderTreesById(id = null, options) {
+  async getAllStakeholdersById(id = null, options) {
     // get only non-children to start building trees
     const results = await this._session
       .getDB()('stakeholder as s')
@@ -91,27 +82,17 @@ class StakeholderRepository extends BaseRepository {
       .limit(options.limit)
       .offset(options.offset);
 
-    const stakeholders = await Promise.all(
-      results.map(async (stakeholder) => {
-        // eslint-disable-next-line no-param-reassign
-        stakeholder.parents = await this.getParents(stakeholder, options);
-        // eslint-disable-next-line no-param-reassign
-        stakeholder.children = await this.getChildren(stakeholder, options);
-        return stakeholder;
-      }),
-    );
-
-    // count all the stakeholder whether parent or child?
+    // count all the stakeholders, regardless of nesting
     const count = await this._session
       .getDB()(this._tableName)
       .count('*')
       .where('id', id)
       .orWhere('owner_id', id);
 
-    return { stakeholders, count: +count[0].count };
+    return { stakeholders: results, count: +count[0].count };
   }
 
-  // currently unused
+  // not currently being used
   async getStakeholderTreeById(id, options) {
     const stakeholder = await this._session
       .getDB()(this._tableName)
@@ -144,27 +125,15 @@ class StakeholderRepository extends BaseRepository {
     return parents.length ? parents.map((parent) => parent.parent_id) : [];
   }
 
-  async getParents(child, options) {
+  async getParents(child) {
     const parentIds = await this.getParentIds(child.id);
 
     if (parentIds.length) {
-      const parents = await this._session
+      return this._session
         .getDB()(this._tableName)
         .select('*')
         .whereIn('id', parentIds)
-        .orderBy('org_name', 'asc')
-        .limit(options.limit)
-        .offset(options.offset);
-
-      // don't want to keep getting all of the parents and children recursively, but do want to
-      // include the current stakeholder as child
-      return parents.map((parent) => {
-        // eslint-disable-next-line no-param-reassign
-        parent.parents = [];
-        // eslint-disable-next-line no-param-reassign
-        parent.children = [{ ...child }];
-        return parent;
-      });
+        .orderBy('org_name', 'asc');
     }
     return [];
   }
@@ -179,62 +148,28 @@ class StakeholderRepository extends BaseRepository {
     return children.length ? children.map((child) => child.child_id) : [];
   }
 
-  async getChildren(parent, options) {
+  async getChildren(parent) {
     const childrenIds = await this.getChildrenIds(parent.id);
     const childrenFound = [...new Set(childrenIds)];
 
     if (childrenIds.length) {
-      const children = await this._session
+      return this._session
         .getDB()(this._tableName)
         .select('*')
         .whereIn('id', childrenFound)
-        .orderBy('org_name', 'asc')
-        .limit(options.limit)
-        .offset(options.offset);
-
-      // don't want to keep getting all of the parents and children recursively, but do want to
-      // include the current stakeholder as parent
-      return children.map((child) => {
-        // eslint-disable-next-line no-param-reassign
-        child.parents = [{ ...parent }];
-        // eslint-disable-next-line no-param-reassign
-        child.children = [];
-        return child;
-      });
+        .orderBy('org_name', 'asc');
     }
     return [];
   }
 
   async getFilter(filter, options) {
-    // const { org_name, first_name, last_name, email, phone, ...otherFilters } =
-    //   filter;
-
-    const results = await this._session
+    const stakeholders = await this._session
       .getDB()(this._tableName)
       .select('*')
       .where({ ...filter })
-      // .where((builder) =>
-      //   org_name || first_name || last_name
-      //     ? builder
-      //         .where({ ...otherFilters })
-      //         .orWhere('org_name', 'like', org_name)
-      //         .orWhere('first_name', 'like', first_name)
-      //         .orWhere('last_name', 'like', last_name)
-      //     : builder.where({ ...otherFilters }),
-      // )
       .orderBy('org_name', 'asc')
       .limit(options.limit)
       .offset(options.offset);
-
-    const stakeholders = await Promise.all(
-      results.map(async (stakeholder) => {
-        // eslint-disable-next-line no-param-reassign
-        stakeholder.parents = await this.getParents(stakeholder, options);
-        // eslint-disable-next-line no-param-reassign
-        stakeholder.children = await this.getChildren(stakeholder, options);
-        return stakeholder;
-      }),
-    );
 
     const count = await this._session
       .getDB()(this._tableName)
@@ -244,31 +179,10 @@ class StakeholderRepository extends BaseRepository {
     return { stakeholders, count: +count[0].count };
   }
 
-  async getRelatedIds(id) {
-    const relatedIds = await this._session
-      .getDB()('stakeholder as s')
-      .select('sr.child_id', 'sr.parent_id')
-      .join('stakeholder_relations as sr', function () {
-        this.on(function () {
-          this.on('s.id', 'sr.child_id');
-          this.orOn('s.id', 'sr.parent_id');
-        });
-      })
-      .where('s.id', id);
-
-    const ids = new Set();
-    relatedIds.forEach((stakeholder) => {
-      ids.add(stakeholder.parent_id);
-      ids.add(stakeholder.child_id);
-    });
-
-    return Array.from(ids);
-  }
-
   async getFilterById(id, filter, options) {
     const relatedIds = await this.getRelatedIds(id);
 
-    const results = await this._session
+    const stakeholders = await this._session
       .getDB()(this._tableName)
       .select('*')
       .where((builder) =>
@@ -279,16 +193,6 @@ class StakeholderRepository extends BaseRepository {
       .limit(options.limit)
       .offset(options.offset);
 
-    const stakeholders = await Promise.all(
-      results.map(async (stakeholder) => {
-        // eslint-disable-next-line no-param-reassign
-        stakeholder.parents = await this.getParents(stakeholder.id);
-        // eslint-disable-next-line no-param-reassign
-        stakeholder.children = await this.getChildren(stakeholder, options);
-        return stakeholder;
-      }),
-    );
-
     const count = await this._session
       .getDB()(this._tableName)
       .count('*')
@@ -296,6 +200,31 @@ class StakeholderRepository extends BaseRepository {
         builder.whereIn('id', relatedIds).orWhere('owner_id', id),
       )
       .andWhere({ ...filter });
+
+    return { stakeholders, count: +count[0].count };
+  }
+
+  // in progress
+  async getSearch(value, options) {
+    const stakeholders = await this._session
+      .getDB()(this._tableName)
+      .select('*')
+      .whereILike('org_name', value)
+      .orWhereILike('first_name', value)
+      .orWhereILike('last_name', value)
+      .orWhereILike('email', value)
+      .orWhereILike('phone', value)
+      .limit(options.limit)
+      .offset(options.offset);
+
+    const count = await this._session
+      .getDB()(this._tableName)
+      .count('*')
+      .whereILike('org_name', value)
+      .orWhereILike('first_name', value)
+      .orWhereILike('last_name', value)
+      .orWhereILike('email', value)
+      .orWhereILike('phone', value);
 
     return { stakeholders, count: +count[0].count };
   }
@@ -315,7 +244,7 @@ class StakeholderRepository extends BaseRepository {
     return created[0];
   }
 
-  async updateStakeholder(id, object) {
+  async updateStakeholder(object) {
     const updated = await this._session
       .getDB()(this._tableName)
       .where('id', object.id)
@@ -330,70 +259,91 @@ class StakeholderRepository extends BaseRepository {
     return updated[0];
   }
 
-  async getUnlinked(id, stakeholder_id) {
-    const relatedIds = await this.getRelatedIds(stakeholder_id);
+  async getRelatedIds(id) {
+    const relatedIds = await this._session
+      .getDB()('stakeholder as s')
+      .select('sr.child_id', 'sr.parent_id')
+      .join('stakeholder_relations as sr', function () {
+        this.on(function () {
+          this.on('s.id', 'sr.child_id');
+          this.orOn('s.id', 'sr.parent_id');
+        });
+      })
+      .where('s.id', id);
+
+    // get rid of duplicates
+    const ids = new Set();
+    relatedIds.forEach((stakeholder) => {
+      ids.add(stakeholder.parent_id);
+      ids.add(stakeholder.child_id);
+    });
+
+    return Array.from(ids);
+  }
+
+  async getRelations(id, owner_id) {
+    const relatedIds = await this.getRelatedIds(id);
     const ids = relatedIds || [];
 
     const stakeholders = await this._session
       .getDB()(this._tableName)
       .select('*')
-      // .where('owner_id', id) // include all w/ same owner
-      // .orWhere('owner_id', stakeholder_id) // include their own children
-      .whereNotIn('id', [...ids, stakeholder_id]) // exclude already linked
+      .whereIn('owner_id', [id, owner_id])
+      .orWhereNull('owner_id')
+      .whereIn('id', [...ids, id])
       .orderBy('org_name', 'asc');
 
     const count = await this._session
       .getDB()(this._tableName)
       .count('*')
-      // .where('owner_id', id)
-      // .orWhere('owner_id', stakeholder_id)
-      .whereNotIn('id', [...ids, stakeholder_id]);
+      .whereIn('id', [...ids, id]);
 
     return { stakeholders, count: +count[0].count };
   }
 
-  async updateLink(stakeholder_id, { type, linked, data }) {
-    let linkedStakeholders;
+  async getNonRelations(id, owner_id) {
+    const relatedIds = await this.getRelatedIds(id);
+    const ids = relatedIds || [];
 
-    if (linked) {
-      // to link
-      const insertObj = {};
+    const stakeholders = await this._session
+      .getDB()(this._tableName)
+      .select('*')
+      .whereIn('owner_id', [id, owner_id])
+      .orWhereNull('owner_id')
+      .whereNotIn('id', [...ids, id])
+      .orderBy('org_name', 'asc');
 
-      if (type === 'parents' || type === 'children') {
-        insertObj.parent_id = type === 'parents' ? data.id : stakeholder_id;
-        insertObj.child_id = type === 'children' ? data.id : stakeholder_id;
-      }
-      // need to update db relation table before implementing
-      // insertObj.grower_id = type === 'growers' ? id : null;
-      // insertObj.user_id = type === 'users' ? id : null;
+    const count = await this._session
+      .getDB()(this._tableName)
+      .count('*')
+      .whereNotIn('id', [...ids, id]);
 
-      linkedStakeholders = await this._session
-        .getDB()('stakeholder_relations')
-        .insert(insertObj)
-        .returning('*');
+    return { stakeholders, count: +count[0].count };
+  }
 
-      expect(linkedStakeholders[0]).to.have.property('parent_id');
-    } else {
-      // to unlink
-      const removeObj = {};
+  async createRelation(stakeholder) {
+    const linkedStakeholders = await this._session
+      .getDB()('stakeholder_relations')
+      .insert(stakeholder)
+      .returning('*');
 
-      if (type === 'parents' || type === 'children') {
-        removeObj.parent_id = type === 'parents' ? data.id : stakeholder_id;
-        removeObj.child_id = type === 'children' ? data.id : stakeholder_id;
-      }
+    expect(linkedStakeholders[0]).to.have.property('parent_id');
 
-      linkedStakeholders = await this._session
-        .getDB()('stakeholder_relations')
-        .where(removeObj)
-        .del()
-        .returning('*');
+    return linkedStakeholders[0];
+  }
 
-      expect(linkedStakeholders).to.match([
-        {
-          parent_id: expect.anything(),
-        },
-      ]);
-    }
+  async deleteRelation(stakeholder) {
+    const linkedStakeholders = await this._session
+      .getDB()('stakeholder_relations')
+      .where(stakeholder)
+      .del()
+      .returning('*');
+
+    expect(linkedStakeholders).to.match([
+      {
+        parent_id: expect.anything(),
+      },
+    ]);
 
     return linkedStakeholders[0];
   }

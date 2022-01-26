@@ -4,35 +4,32 @@ const router = require('express').Router();
 //   next();
 // };
 const {
-  stakeholderGet,
+  stakeholderGetAllById,
   stakeholderGetAll,
-  stakeholderGetUnlinked,
-  stakeholderUpdateLink,
-  stakeholderPatch,
-  stakeholderPost,
+  stakeholderGetRelations,
+  stakeholderCreateRelation,
+  stakeholderDeleteRelation,
+  stakeholderUpdate,
+  stakeholderCreate,
 } = require('./handlers/stakeholderHandler');
 const { handlerWrapper } = require('./utils/utils');
 
 router
-  .route('/links/:stakeholder_id/:acctStakeholder_id')
-  .get(handlerWrapper(stakeholderGetUnlinked))
-  .patch(handlerWrapper(stakeholderUpdateLink));
+  .route('/stakeholders/relations/:id')
+  .get(handlerWrapper(stakeholderGetRelations))
+  .post(handlerWrapper(stakeholderCreateRelation))
+  .delete(handlerWrapper(stakeholderDeleteRelation));
 
 router
-  .route('/links/:stakeholder_id')
-  .get(handlerWrapper(stakeholderGetUnlinked))
-  .patch(handlerWrapper(stakeholderUpdateLink));
+  .route('/stakeholders/:id')
+  .get(handlerWrapper(stakeholderGetAllById))
+  .post(handlerWrapper(stakeholderCreate))
+  .patch(handlerWrapper(stakeholderUpdate));
 
 router
-  .route('/:stakeholder_id')
-  .get(handlerWrapper(stakeholderGet))
-  .patch(handlerWrapper(stakeholderPatch))
-  .post(handlerWrapper(stakeholderPost)); // for account sign-ons
-
-router
-  .route('/')
+  .route('/stakeholders')
   .get(handlerWrapper(stakeholderGetAll))
-  .patch(handlerWrapper(stakeholderPatch))
-  .post(handlerWrapper(stakeholderPost));
+  .post(handlerWrapper(stakeholderCreate))
+  .patch(handlerWrapper(stakeholderUpdate));
 
 module.exports = router;
