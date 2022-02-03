@@ -92,7 +92,7 @@ class StakeholderRepository extends BaseRepository {
     return { stakeholders: results, count: +count[0].count };
   }
 
-  // not currently being used
+  // not currently being used but may be useful later
   async getStakeholderTreeById(id, options) {
     const stakeholder = await this._session
       .getDB()(this._tableName)

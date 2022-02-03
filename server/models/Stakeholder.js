@@ -596,4 +596,6 @@ module.exports = {
   getNonRelations,
   createRelation,
   deleteRelation,
+  StakeholderTree,
+  FilterCriteria
 };

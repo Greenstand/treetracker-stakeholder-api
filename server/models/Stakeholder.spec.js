@@ -1,14 +1,14 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const {
-  getStakeholders,
-  Stakeholder,
+  getAllStakeholders,
+  StakeholderTree,
   FilterCriteria,
 } = require('./Stakeholder');
 
 describe('Stakeholder Model', () => {
   it('Stakeholder Model should return defined fields', () => {
-    const stakeholder = Stakeholder({});
+    const stakeholder = StakeholderTree({});
     expect(stakeholder).to.have.keys([
       'id',
       'type',
@@ -29,6 +29,8 @@ describe('Stakeholder Model', () => {
       'map',
       'owner_id',
       'organization_id',
+      'parents',
+      'children'
     ]);
   });
 
@@ -57,11 +59,11 @@ describe('Stakeholder Model', () => {
     });
   });
 
-  describe('getStakeholders', () => {
+  describe('getAllStakeholders', () => {
     it('should get stakeholders with filter --id', async () => {
       const getFilterById = sinon.mock();
       const getStakeholderByOrganizationId = sinon.mock();
-      const executeGetStakeholders = getStakeholders({
+      const executeGetStakeholders = getAllStakeholders({
         getFilterById,
         getStakeholderByOrganizationId,
       });
@@ -86,7 +88,7 @@ describe('Stakeholder Model', () => {
     it('should get stakeholders with filter --organization_id', async () => {
       const getStakeholderByOrganizationId = sinon.mock();
       const getFilterById = sinon.mock();
-      const executeGetStakeholders = getStakeholders({
+      const executeGetStakeholders = getAllStakeholders({
         getStakeholderByOrganizationId,
         getFilterById,
       });
