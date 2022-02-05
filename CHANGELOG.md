@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.0.1...v1.0.2) (2022-02-05)
+
+
+### Bug Fixes
+
+* seal secrets with correct namespace ([e40820c](https://github.com/Greenstand/treetracker-stakeholder-api/commit/e40820c68b445d621e8db133d2625aed1d681162))
+
 ## [1.0.1](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.0.0...v1.0.1) (2022-02-05)
 
 
