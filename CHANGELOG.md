@@ -1,3 +1,10 @@
+## [1.0.5](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.0.4...v1.0.5) (2022-02-05)
+
+
+### Bug Fixes
+
+* add database migration resources ([85e17d3](https://github.com/Greenstand/treetracker-stakeholder-api/commit/85e17d38ee931a9e8d54658142bf99c32a9faf87))
+
 ## [1.0.4](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.0.3...v1.0.4) (2022-02-05)
 
 
