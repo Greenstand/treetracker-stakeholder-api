@@ -1,3 +1,11 @@
+## [1.0.1](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.0.0...v1.0.1) (2022-02-05)
+
+
+### Bug Fixes
+
+* add database migration sealed secret ([9e5db76](https://github.com/Greenstand/treetracker-stakeholder-api/commit/9e5db7627428484c0f854b36d5f897d5d12fb41b))
+* add service to mapping ([e5316de](https://github.com/Greenstand/treetracker-stakeholder-api/commit/e5316de06b6c0062b73ab3c0a0104ccd9ff9a256))
+
 # 1.0.0 (2022-02-05)
 
 
