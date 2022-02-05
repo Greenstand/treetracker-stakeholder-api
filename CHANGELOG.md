@@ -1,3 +1,10 @@
+## [1.0.6](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.0.5...v1.0.6) (2022-02-05)
+
+
+### Bug Fixes
+
+* reset database passwords ([b24f8d7](https://github.com/Greenstand/treetracker-stakeholder-api/commit/b24f8d7dc0fd89f15b8dca78d1ce997b92093711))
+
 ## [1.0.5](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.0.4...v1.0.5) (2022-02-05)
 
 
