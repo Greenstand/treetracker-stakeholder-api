@@ -22,6 +22,7 @@ const stakeholderOne = Object.freeze({
   owner_id: uuid(),
   organization_id: 5000000,
 });
+
 const stakeholderTwo = Object.freeze({
   id: uuid(),
   type: 'type',

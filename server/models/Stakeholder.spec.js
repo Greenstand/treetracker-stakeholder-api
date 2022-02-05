@@ -61,24 +61,33 @@ describe('Stakeholder Model', () => {
 
   describe('getAllStakeholders', () => {
     it('should get stakeholders with filter --id', async () => {
-      const getFilterById = sinon.mock();
+      const getFilter = sinon.mock();
+      const getParents = sinon.mock();
+      const getChildren = sinon.mock();
       const getStakeholderByOrganizationId = sinon.mock();
       const executeGetStakeholders = getAllStakeholders({
-        getFilterById,
-        getStakeholderByOrganizationId,
+        getFilter,
+        getParents,
+        getChildren,
       });
-      getFilterById.resolves({ count: 1, stakeholders: [{ id: 1 }] });
-      const result = await executeGetStakeholders({
-        filter: {
-          where: { id: 1 },
+      getFilter.resolves({ count: 1, stakeholders: [{ id: 1 }] });
+      getParents.resolves([]);
+      getChildren.resolves([]);
+      const result = await executeGetStakeholders(
+        {
+          filter: {
+            where: { id: 1 },
+          },
         },
-      });
+        '/stakeholder',
+      );
       expect(
-        getFilterById.calledWith(1, {
+        getFilter.calledWith(1, {
           filter: 100,
           offset: 0,
         }),
       );
+
       sinon.assert.notCalled(getStakeholderByOrganizationId);
       expect(result.stakeholders).to.have.length(1);
       expect(result.totalCount).to.eql(1);
@@ -87,25 +96,33 @@ describe('Stakeholder Model', () => {
 
     it('should get stakeholders with filter --organization_id', async () => {
       const getStakeholderByOrganizationId = sinon.mock();
-      const getFilterById = sinon.mock();
+      const getFilter = sinon.mock();
+      const getParents = sinon.mock();
+      const getChildren = sinon.mock();
       const executeGetStakeholders = getAllStakeholders({
+        getFilter,
+        getParents,
+        getChildren,
         getStakeholderByOrganizationId,
-        getFilterById,
       });
 
+      getFilter.resolves({ count: 1, stakeholders: [{ id: 1 }] });
+      getParents.resolves([]);
+      getChildren.resolves([]);
       getStakeholderByOrganizationId.resolves({
         totalCount: 1,
         stakeholders: [{ id: 1 }],
         links: {},
       });
 
-      getFilterById.resolves({ count: 1, stakeholders: [{ id: 1 }] });
-
-      const result = await executeGetStakeholders({
-        filter: {
-          where: { organization_id: 1 },
+      const result = await executeGetStakeholders(
+        {
+          filter: {
+            where: { organization_id: 1 },
+          },
         },
-      });
+        '/stakeholder',
+      );
 
       expect(
         getStakeholderByOrganizationId.calledWith(1, {
@@ -114,7 +131,7 @@ describe('Stakeholder Model', () => {
         }),
       );
       expect(
-        getFilterById.calledWith(1, {
+        getFilter.calledWith(1, {
           filter: 100,
           offset: 0,
         }),

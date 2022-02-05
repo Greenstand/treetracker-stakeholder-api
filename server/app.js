@@ -4,8 +4,7 @@ const cors = require('cors');
 const log = require('loglevel');
 const HttpError = require('./utils/HttpError');
 const { sentryDSN } = require('../config/config');
-const { errorHandler } = require('./utils/utils');
-const helper = require('./utils/utils');
+const { handlerWrapper, errorHandler } = require('./utils/utils');
 const router = require('./routes');
 
 const app = express();
@@ -21,7 +20,7 @@ Sentry.init({ dsn: sentryDSN });
  * Check request
  */
 app.use(
-  helper.handlerWrapper(async (req, _res, next) => {
+  handlerWrapper(async (req, _res, next) => {
     if (
       req.method === 'POST' ||
       req.method === 'PATCH' ||
