@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: SERVICE
+  name: treetracker-stakeholder-api
   labels:
-    app: SERVICE 
+    app: treetracker-stakeholder-api 
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: SERVICE
+      app: treetracker-stakeholder-api
   template:
     metadata:
       labels:
-        app: SERVICE
+        app: treetracker-stakeholder-api
     spec:
       affinity:
         nodeAffinity:
@@ -24,8 +24,8 @@ spec:
                 values:
                 - microservices-node-pool
       containers:
-      - name: SERVICE
-        image: greenstand/SERVICE:TAG
+      - name: treetracker-stakeholder-api
+        image: greenstand/treetracker-stakeholder-api:TAG
         ports:
         - containerPort: 80
         env:
@@ -35,4 +35,4 @@ spec:
                 name: treetracker-database-connection
                 key: db
           - name: DATABASE_SCHEMA
-            value: messaging
+            value: stakeholder
