@@ -1,10 +1,38 @@
-const express = require('express');
-
-const router = express.Router();
-const { stakeholderGet } = require('./handlers/stakeholderHandler');
-
+const router = require('express').Router();
+// const log = require('loglevel');
+// const validateRequest = (req, res, next) => {
+//   next();
+// };
+const {
+  stakeholderGet,
+  stakeholderGetAll,
+  stakeholderGetUnlinked,
+  stakeholderUpdateLink,
+  stakeholderPatch,
+  stakeholderPost,
+} = require('./handlers/stakeholderHandler');
 const { handlerWrapper } = require('./utils/utils');
 
-router.get('/stakeholder', handlerWrapper(stakeholderGet));
+router
+  .route('/links/:stakeholder_id/:acctStakeholder_id')
+  .get(handlerWrapper(stakeholderGetUnlinked))
+  .patch(handlerWrapper(stakeholderUpdateLink));
+
+router
+  .route('/links/:stakeholder_id')
+  .get(handlerWrapper(stakeholderGetUnlinked))
+  .patch(handlerWrapper(stakeholderUpdateLink));
+
+router
+  .route('/:stakeholder_id')
+  .get(handlerWrapper(stakeholderGet))
+  .patch(handlerWrapper(stakeholderPatch))
+  .post(handlerWrapper(stakeholderPost)); // for account sign-ons
+
+router
+  .route('/')
+  .get(handlerWrapper(stakeholderGetAll))
+  .patch(handlerWrapper(stakeholderPatch))
+  .post(handlerWrapper(stakeholderPost));
 
 module.exports = router;

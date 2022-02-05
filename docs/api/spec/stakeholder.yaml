@@ -1,0 +1,522 @@
+openapi: 3.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/gwynndp/Stakeholders/1.0.0
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/gwynndp/Stakeholder/1.0.0
+info:
+  description: Stakeholder microservice API
+  version: '1.0.0'
+  title: Greenstand Stakeholder API
+  contact:
+    email: admin@greenstand.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: admins
+    description: Secured Admin-only calls
+  - name: developers
+    description: Operations available to regular developers
+paths:
+  /:
+    get:
+      tags:
+        - admins
+      summary: gets data for one stakeholder including parents, children, and growers, main stakeholder id can come from current user (?)
+      operationId: getStakeholder
+      description: get data for stakeholder, additional queries add fields and data to the response for the child orgs, the people connected to them, and the admin users of the current stakeholder
+      parameters:
+        - in: query
+          name: id
+          description: pass an id, required for looking up the stakeholder data
+          required: true
+          schema:
+            type: string
+        # DO WE NEED OFFSET AND LIMIT?
+        # - in: query
+        #   name: offset
+        #   description: number of records to skip for pagination
+        #   schema:
+        #     type: integer
+        #     format: int32
+        #     minimum: 0
+        # - in: query
+        #   name: limit
+        #   description: maximum number of records to return
+        #   schema:
+        #     type: integer
+        #     format: int32
+        #     minimum: 0
+        #     maximum: 50
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Stakeholder'
+        '400':
+          description: bad input parameter
+    post:
+      tags:
+        - admins
+      summary: adds a new stakeholder with basic info, not including users, children, parents, growers info
+      operationId: addStakeholder
+      description: Adds a stakeholder to the system
+      responses:
+        '201':
+          description: stakeholder created
+        '400':
+          description: 'invalid input, object invalid'
+        '409':
+          description: an existing item already exists
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Stakeholder'
+        description: Stakeholder item to add
+    patch:
+      tags:
+        - admins
+      summary: updates a new stakeholder, allows editing of basic info and linking of users, children, parents, growers
+      operationId: updateStakeholder
+      description: Updates a stakeholder & associated info on other tables, like adding users, children, parents, growers
+      responses:
+        '200':
+          description: send back updated stakeholder
+        '304':
+          description: error, stakeholder wasn't modified
+        '400':
+          description: 'invalid input, object invalid'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Stakeholder'
+        description: Stakeholder item based on the schema with additional keys for users, children, parents, growers data to link
+    delete:
+      tags:
+        - admins
+      summary: removes/disables a stakeholder, un-linking of users, children, parents, growers
+      operationId: deleteStakeholder
+      description: Removes/disables a stakeholder & associated info on other tables, like adding users, children, parents, growers
+      parameters:
+        - in: query
+          name: id
+          description: pass an id, required for looking up the org and associated data to delete/disable
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: no data, stakeholder deleted
+        '400':
+          description: 'invalid input, id invalid'
+        '304':
+          description: error, stakeholder wasn't modified
+  /stakeholders:
+    get:
+      tags:
+        - admins
+      summary: gets data for all stakeholders, without associated children, parents, or growers data
+      operationId: getStakeholders
+      description: get all Organization or Person entries that could possibly be linked to the stakeholder as children, parents, or growers
+      # ARE THERE ANY PERMISSION LIMITS FOR ONE STAKEHOLDER TO SEE ALL THE OTHER STAKEHOLDER DATA? OR CAN THEY ONLY SEE THE STAKEHOLDERS THEY'VE ADDED?
+      parameters:
+        - in: query
+          name: type
+          description: pass an optional type, required for looking up data by 'Organization' or 'Person'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: search
+          description: pass an optional search term for partial match on any part of a name field, phone number, email, etc.
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: filter
+          description: pass an optional search term for partial match on any part of a name field, phone number, email, etc.
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: offset
+          description: number of records to skip for pagination
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+        - in: query
+          name: limit
+          description: maximum number of records to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 50
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Stakeholder'
+        '400':
+          description: bad input parameter
+  /users:
+    get:
+      tags:
+        - admins
+      summary: gets data for a stakeholder's users
+      operationId: getUsers
+      description: get data for users associated with the current stakeholder
+      parameters:
+        - in: query
+          name: id
+          description: pass an id for the current stakeholder, required for looking up the stakeholder's current users
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: search
+          description: pass an optional search term for partial match on any part of a name field, phone number, email, user_id, etc.
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: filter
+          description: pass an optional filter by any name field, phone number, email, etc.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Users'
+        '400':
+          description: bad input parameter
+    post:
+      tags:
+        - admins
+      summary: adds a new user for a stakeholder
+      operationId: addUser
+      description: add data for a user
+      responses:
+        '201':
+          description: successfully added a user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Users'
+        '400':
+          description: bad input parameter
+    patch:
+      tags:
+        - admins
+      summary: update data for a user
+      operationId: updateUsers
+      description: update data for a user, link or unlink from stakeholder
+      parameters:
+        - in: query
+          name: id
+          description: pass an id for the user, required for looking up the user to update
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Users'
+        '304':
+          description: error, user wasn't modified
+        '400':
+          description: bad input parameter
+    delete:
+      tags:
+        - admins
+      summary: delete/disable a user, unlink from the stakeholder
+      operationId: deleteUser
+      description: delete/disable a user, unlink from the stakeholder
+      parameters:
+        - in: query
+          name: id
+          description: pass an id for the user, required for looking up the user to remove/disable, validate they're linked  to current stakeholder first
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: no data returned, user deleted
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Users'
+        '304':
+          description: error, user wasn't modified
+        '400':
+          description: bad input parameter
+components:
+  schemas:
+    Stakeholder:
+      type: object
+      required:
+        - id
+        - type
+        - org_name
+        - first_name
+        - last_name
+        - email
+        - phone
+        - website
+        - logo_url
+        - map
+        - stakeholder_uuid
+        # - users
+        # - children
+        # - parents
+        # - growers
+      properties:
+        id:
+          type: number
+          format: number
+          example: 1
+        type:
+          type: string
+          format: string
+          example: 'O'
+        org_name:
+          type: string
+          format: string
+          example: 'Greenstand'
+        first_name:
+          type: string
+          format: string
+          example: 'Don'
+        last_name:
+          type: string
+          format: string
+          example: 'Juan'
+        email:
+          type: string
+          format: email
+          example: 'hello@greenstand.org'
+        phone:
+          type: string
+          format: phon-number
+          example: '123-456-7890'
+        website:
+          type: string
+          format: url
+          example: 'http://greenstand.org'
+        logo_url:
+          type: string
+          format: url
+          example: './logo_192x192.png'
+        map:
+          type: string
+          format: string
+          example: '/greenstandMap'
+        stakeholder_uuid:
+          type: string
+          format: uuid
+          example: '792a4eee-8e18-4750-a56f-91bdec383aa6'
+        # The users, children, parents, growers should be added to the response json after additional queries are made
+        users:
+          type: array
+          format: json
+          items:
+            $ref: '#/components/schemas/Users'
+          example:
+            [
+              {
+                id: 1,
+                user_id: '123anbfjo-fdafea214532-dsfd789df',
+                username: 'admin1',
+                first_name: 'Admin',
+                last_name: 'One',
+                pwd_hash: 'd20bad44a99286723895023268e9ab7ad57cdc0d29eb78e8ec68c9f61c82d73826703ab0058f8704f75ba15d4f5178e31067222bf911a0ba71d6806bef90980c',
+                salt: 'aafd',
+                email: 'test@greenstand.org',
+                active: true,
+                created_at: '2021-11-1',
+                stakeholder_id: '792a4eee-8e18-4750-a56f-91bdec383aa6',
+                pwd_reset_req: false,
+              },
+            ]
+        children:
+          type: array
+          format: json
+          items:
+            $ref: '#/components/schemas/Stakeholder'
+          example:
+            [
+              {
+                id: 1,
+                type: 'Organization',
+                org_name: 'Child One',
+                first_name: '',
+                last_name: '',
+                email: 'child@gmail.com',
+                phone: '123-123-1234',
+                website: 'childone.com',
+                logo_url: './logo_192x192.png',
+                map: '/childOne',
+                stakeholder_uuid: '1a05ec87-3c38-4395-b9f3-aa15becedc31',
+              },
+              {
+                id: 2,
+                type: 'Organization',
+                org_name: 'Child Two',
+                first_name: '',
+                last_name: '',
+                email: 'childtwo@gmail.com',
+                phone: '123-234-1234',
+                website: 'childtwo.com',
+                logo_url: './logo_192x192.png',
+                map: '/childtwo',
+                stakeholder_uuid: '1d2fb06e-e8f7-40de-8e13-ed3eba1abb3a',
+              },
+            ]
+        parents:
+          type: array
+          format: json
+          items:
+            $ref: '#/components/schemas/Stakeholder'
+          example:
+            [
+              {
+                id: '792a4eee-8e18-4750-a56f-91bdec383aa6',
+                type: 'org',
+                org_name: 'Greenstand',
+                first_name: '',
+                last_name: '',
+                email: 'hello@greenstand.com',
+                phone: '123-123-2122',
+                website: 'greenstand.org',
+                logo_url: './logo_192x192.png',
+                map: '/greenstandMap',
+                stakeholder_uuid: '792a4eee-8e18-4750-a56f-91bdec383aa6',
+              },
+            ]
+        growers:
+          type: array
+          format: json
+          items:
+            $ref: '#/components/schemas/Stakeholder'
+          example:
+            [
+              {
+                id: 1,
+                type: 'Person',
+                org_name: '',
+                first_name: 'Grower',
+                last_name: 'One',
+                email: 'growerOne@gmail.com',
+                phone: '123-123-1234',
+                website: '',
+                logo_url: './person_192x192.png',
+                map: '',
+                stakeholder_uuid: '35a23de8-f1ab-4409-be79-3c6a158d5bde',
+              },
+              {
+                id: 2,
+                type: 'Person',
+                org_name: '',
+                first_name: 'Grower',
+                last_name: 'Two',
+                email: 'growerTwo@gmail.com',
+                phone: '123-123-1235',
+                website: '',
+                logo_url: './person_192x192.png',
+                map: '',
+                stakeholder_uuid: '90eef52b-ad55-4953-ace9-6a324ae6cec2',
+              },
+            ]
+    Users:
+      type: object
+      required:
+        - id
+        - user_id
+        - username
+        - first_name
+        - last_name
+        - pwd_hash
+        - salt
+        - email
+        - active
+        - created_at
+        - stakeholder_id
+        - pwd_reset_req
+      properties:
+        id:
+          type: number
+          format: number
+          example: 1
+        user_id:
+          type: string
+          format: uuid
+          example: '123anbfjo-fdafea214532-dsfd789df'
+        username:
+          type: string
+          format: string
+          example: 'admin1'
+        first_name:
+          type: string
+          format: string
+          example: 'Admin'
+        last_name:
+          type: string
+          format: string
+          example: 'One'
+        pwd_hash:
+          type: string
+          format: string
+          example: 'd20bad44a99286723895023268e9ab7ad57cdc0d29eb78e8ec68c9f61c82d73826703ab0058f8704f75ba15d4f5178e31067222bf911a0ba71d6806bef90980c'
+        salt:
+          type: string
+          format: string
+          example: 'aafd'
+        email:
+          type: string
+          format: email
+          example: 'hello@goodbye.org'
+        active:
+          type: boolean
+          format: boolean
+          example: true
+        website:
+          type: string
+          format: url
+          example: 'http://greenstand.org'
+        stakeholder_uuid:
+          type: string
+          format: uuid
+          example: '792a4eee-8e18-4750-a56f-91bdec383aa6'
+        pwd_reset_req:
+          type: boolean
+          format: boolean
+          example: false

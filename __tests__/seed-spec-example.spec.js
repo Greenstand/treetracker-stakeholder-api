@@ -17,9 +17,9 @@ const capture = {
   id: 999999,
 };
 
-const captureB = {
-  id: 999998,
-};
+// const captureB = {
+//   id: 999998,
+// };
 
 const token = {
   id: 9,
@@ -36,25 +36,24 @@ const wallet = {
   type: 'p',
 };
 
-const storyOfThisSeed = `
-    a capture: #${capture.id}
+// const storyOfThisSeed = `
+//     a capture: #${capture.id}
 
-    a token: #${token.id}
-      capture: #${capture.id}
-      wallet: #${wallet.id}
-      uuid: ${token.uuid}
+//     a token: #${token.id}
+//       capture: #${capture.id}
+//       wallet: #${wallet.id}
+//       uuid: ${token.uuid}
 
-    wallet #${wallet.id} connected to capture #${capture.id}, get a token #${token.id}
+//     wallet #${wallet.id} connected to capture #${capture.id}, get a token #${token.id}
 
-    Another capture: #${captureB.id}
+//     Another capture: #${captureB.id}
 
-
-`;
-console.debug(
-  '--------------------------story of database ----------------------------------',
-  storyOfThisSeed,
-  '-----------------------------------------------------------------------------',
-);
+// `;
+// console.debug(
+//   '--------------------------story of database ----------------------------------',
+//   storyOfThisSeed,
+//   '-----------------------------------------------------------------------------',
+// );
 
 async function seed() {
   log.debug('seed api key');

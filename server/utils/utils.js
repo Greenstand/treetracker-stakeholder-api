@@ -1,11 +1,12 @@
 /*
  * Some utils for router/express
  */
-// const ApiKeyService = require("../services/ApiKeyService");
-// const JWTService = require("../services/JWTService.js");
 const log = require('loglevel');
 const { ValidationError } = require('joi');
-const HttpError = require("./HttpError");
+const HttpError = require('./HttpError');
+// const ApiKeyService = require("../services/ApiKeyService");
+// const JWTService = require('../services/JWTService.js');
+// const Session = require('../models/Session');
 
 /*
  * This is from the library https://github.com/Abazhenov/express-async-handler
@@ -31,7 +32,7 @@ exports.handlerWrapper = (fn) =>
     });
   };
 
-exports.errorHandler = (err, req, res, next) => {
+exports.errorHandler = (err, req, res) => {
   log.debug('catch error:', err);
   if (err instanceof HttpError) {
     res.status(err.code).send({
@@ -65,3 +66,6 @@ exports.errorHandler = (err, req, res, next) => {
 //   res.locals.wallet_id = decode.id;
 //   next();
 // });
+
+exports.camelToSnakeCase = (str) =>
+  str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);

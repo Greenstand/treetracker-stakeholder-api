@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const mockKnex = require('mock-knex');
 const BaseRepository = require('./BaseRepository');
-const knex = require('../database/knex');
+const knex = require('../../database/connection');
 
 const tracker = mockKnex.getTracker();
 const Session = require('../models/Session');
@@ -201,7 +201,7 @@ describe('BaseRepository', () => {
         tracker.uninstall();
         tracker.install();
         tracker.on('query', (query) => {
-          console.log('sql:', query.sql);
+          // console.log('sql:', query.sql);
           expect(query.sql).match(
             /select.*testTable.*where.*c1.*=.*or.*c2.*=.*or.*c3.*and.*c4.*/,
           ) || expect(query.sql).match(/select.*.count.*entity.*/);
@@ -239,7 +239,7 @@ describe('BaseRepository', () => {
         tracker.uninstall();
         tracker.install();
         tracker.on('query', (query) => {
-          console.log('sql:', query.sql);
+          // console.log('sql:', query.sql);
           expect(query.sql).match(
             /select.*testTable.*where.*c3.*=.*and.*c4.*=.*or.*c3.*and.*c4.*/,
           ) || expect(query.sql).match(/select.*.count.*entity.*/);

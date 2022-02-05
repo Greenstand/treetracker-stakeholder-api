@@ -1,12 +1,19 @@
 const express = require('express');
 const Sentry = require('@sentry/node');
+const cors = require('cors');
+const log = require('loglevel');
 const HttpError = require('./utils/HttpError');
-
-const router = require('./routes');
 const { sentryDSN } = require('../config/config');
-const { errorHandler, handlerWrapper } = require('./utils/utils');
+const { errorHandler } = require('./utils/utils');
+const helper = require('./utils/utils');
+const router = require('./routes');
 
 const app = express();
+
+if (process.env.NODE_ENV === 'development') {
+  log.info('disable cors');
+  app.use(cors());
+}
 
 Sentry.init({ dsn: sentryDSN });
 
@@ -14,7 +21,7 @@ Sentry.init({ dsn: sentryDSN });
  * Check request
  */
 app.use(
-  handlerWrapper(async (req, _res, next) => {
+  helper.handlerWrapper(async (req, _res, next) => {
     if (
       req.method === 'POST' ||
       req.method === 'PATCH' ||
@@ -31,13 +38,12 @@ app.use(
   }),
 );
 
-app.use(express.urlencoded({ extended: false })); // parse application/x-www-form-urlencoded
-app.use(express.json()); // parse application/json
+app.use(express.urlencoded({ extended: false }));
 
-// routers
+app.use(express.json());
+
 app.use('/', router);
 
-// Global error handler
 app.use(errorHandler);
 
 const { version } = require('../package.json');

@@ -1,5 +1,5 @@
 {
-  "name": "treetracker",
+  "name": "stakeholder",
   "version": "0.0.0",
   "private": true,
   "engines": {
@@ -13,7 +13,7 @@
     "eslint": "eslint --report-unused-disable-directives .",
     "eslint:fix": "npm run eslint -- --fix",
     "test": "npm run test-unit-ci; npm run test-integration-ci;npm run test-repository-ci",
-    "test-unit-ci": "NODE_ENV=test mocha -r dotenv/config --exit ./server/models/**/*.spec.js ./server/routes/**/*.spec.js",
+    "test-unit-ci": "NODE_ENV=test mocha -r dotenv/config --exit ./server/models/**/*.spec.js ./server/**/*.spec.js",
     "test-repository-ci": "NODE_ENV=test mocha -r dotenv/config --exit ./server/repositories/**/*.spec.js",
     "server-test": "DEBUG=express:* NODE_LOG_LEVEL=debug nodemon './__tests__/serverTest.js'",
     "test-integration-ci": "NODE_ENV=test mocha -r dotenv/config  --exit --timeout 20000  './__tests__/api-tests'",
@@ -23,6 +23,10 @@
     "test-watch-debug": "NODE_ENV=test NODE_LOG_LEVEL=debug mocha -r dotenv/config dotenv_config_path=.env.test --timeout 10000 -w -b --ignore './server/repositories/**/*.spec.js'  './server/setup.js' './server/**/*.spec.js' './__tests__/seed-spec-example.spec.js' './__tests__/supertest-example.spec.js'",
     "prettier-fix": "prettier ./ --write",
     "db-migrate-ci": "cd database; db-migrate up",
+    "migrate": "knex migrate:latest",
+    "rollback": "knex migrate:rollback",
+    "seed": "knex seed:run",
+    "proxy": "http://localhost:3001/",
     "prepare": "husky install"
   },
   "keywords": [
@@ -33,6 +37,7 @@
   "dependencies": {
     "@sentry/node": "^5.1.0",
     "body-parser": "^1.18.2",
+    "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "expect": "^26.4.2",
     "expect-runtime": "^0.7.0",
