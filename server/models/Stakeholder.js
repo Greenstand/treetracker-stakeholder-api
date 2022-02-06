@@ -295,10 +295,8 @@ const getAllStakeholders =
     let filter = {};
     filter = FilterCriteria({ ...idFilters, ...where });
 
-    let options = { limit, offset };
-    options = {
-      ...options,
-      ...QueryOptions({ ...order }),
+    const options = {
+      ...QueryOptions({ limit, offset, ...order }),
     };
 
     const { next, prev } = makeNextPrevUrls(url, filter, options);
@@ -346,10 +344,8 @@ const getAllStakeholdersById =
     let filter = {};
     filter = FilterCriteria({ ...idFilters, ...where });
 
-    let options = { limit: 100, offset: 0 };
-    options = {
-      ...options,
-      ...QueryOptions({ ...order }),
+    const options = {
+      ...QueryOptions({ limit: 100, offset: 0, ...order }),
     };
 
     // create next and prev urls

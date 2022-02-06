@@ -57,7 +57,7 @@ class StakeholderRepository extends BaseRepository {
       .leftJoin('stakeholder_relations as sr', 's.id', 'sr.child_id')
       .whereNull('sr.child_id')
       .orderBy('s.org_name', 'asc')
-      .limit(options.limit)
+      .limit(Number(options.limit))
       .offset(options.offset);
 
     const count = await this._session.getDB()('stakeholder as s').count('*');
@@ -79,7 +79,7 @@ class StakeholderRepository extends BaseRepository {
       .orWhere('s.owner_id', id)
       .andWhere('sr.child_id', null)
       .orderBy('s.org_name', 'asc')
-      .limit(options.limit)
+      .limit(Number(options.limit))
       .offset(options.offset);
 
     // count all the stakeholders, regardless of nesting
@@ -168,7 +168,7 @@ class StakeholderRepository extends BaseRepository {
       .select('*')
       .where({ ...filter })
       .orderBy('org_name', 'asc')
-      .limit(options.limit)
+      .limit(Number(options.limit))
       .offset(options.offset);
 
     const count = await this._session
@@ -190,7 +190,7 @@ class StakeholderRepository extends BaseRepository {
       )
       .andWhere({ ...filter })
       .orderBy('org_name', 'asc')
-      .limit(options.limit)
+      .limit(Number(options.limit))
       .offset(options.offset);
 
     const count = await this._session
@@ -205,29 +205,29 @@ class StakeholderRepository extends BaseRepository {
   }
 
   // in progress
-  async getSearch(value, options) {
-    const stakeholders = await this._session
-      .getDB()(this._tableName)
-      .select('*')
-      .whereILike('org_name', value)
-      .orWhereILike('first_name', value)
-      .orWhereILike('last_name', value)
-      .orWhereILike('email', value)
-      .orWhereILike('phone', value)
-      .limit(options.limit)
-      .offset(options.offset);
+  // async getSearch(value, options) {
+  //   const stakeholders = await this._session
+  //     .getDB()(this._tableName)
+  //     .select('*')
+  //     .whereILike('org_name', value)
+  //     .orWhereILike('first_name', value)
+  //     .orWhereILike('last_name', value)
+  //     .orWhereILike('email', value)
+  //     .orWhereILike('phone', value)
+  //     .limit(options.limit)
+  //     .offset(options.offset);
 
-    const count = await this._session
-      .getDB()(this._tableName)
-      .count('*')
-      .whereILike('org_name', value)
-      .orWhereILike('first_name', value)
-      .orWhereILike('last_name', value)
-      .orWhereILike('email', value)
-      .orWhereILike('phone', value);
+  //   const count = await this._session
+  //     .getDB()(this._tableName)
+  //     .count('*')
+  //     .whereILike('org_name', value)
+  //     .orWhereILike('first_name', value)
+  //     .orWhereILike('last_name', value)
+  //     .orWhereILike('email', value)
+  //     .orWhereILike('phone', value);
 
-    return { stakeholders, count: +count[0].count };
-  }
+  //   return { stakeholders, count: +count[0].count };
+  // }
 
   async createStakeholder(object) {
     const created = await this._session
