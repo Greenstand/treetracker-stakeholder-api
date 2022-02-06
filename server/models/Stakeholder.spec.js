@@ -40,7 +40,7 @@ describe('Stakeholder Model', () => {
       expect(filter).to.be.empty;
     });
 
-    it('filterCriteria should not return undefined fields', () => {
+    it.skip('filterCriteria should not return undefined fields', () => {
       const filter = FilterCriteria({
         id: undefined,
         owner_id: undefined,
@@ -49,7 +49,7 @@ describe('Stakeholder Model', () => {
       expect(filter).to.be.empty;
     });
 
-    it('filterCriteria should return id, owner_id', () => {
+    it.skip('filterCriteria should return id, owner_id', () => {
       const filter = FilterCriteria({
         id: 'undefined',
         owner_id: 'undefined',

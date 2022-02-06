@@ -34,6 +34,7 @@ class BaseRepository {
       if (object.and) {
         expect(Object.keys(object)).lengthOf(1);
         expect(object.and).a(expect.any(Array));
+        // eslint-disable-next-line no-restricted-syntax
         for (const one of object.and) {
           if (one.or) {
             result = result.andWhere((subBuilder) =>
@@ -50,6 +51,7 @@ class BaseRepository {
       } else if (object.or) {
         expect(Object.keys(object)).lengthOf(1);
         expect(object.or).a(expect.any(Array));
+        // eslint-disable-next-line no-restricted-syntax
         for (const one of object.or) {
           if (one.and) {
             result = result.orWhere((subBuilder) =>

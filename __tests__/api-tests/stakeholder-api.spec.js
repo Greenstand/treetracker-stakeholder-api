@@ -15,7 +15,7 @@ describe('Stakeholder API tests.', () => {
         .set('Accept', 'application/json')
         .expect(422)
         .end(function (err, res) {
-          console.log('res.body.message ----------> ', res.body, err);
+          // console.log('res.body.message ----------> ', res.body, err);
           expect(res.body.message).to.eql('"limit" must be an integer');
           if (err) return done(err);
           return done();
@@ -31,7 +31,7 @@ describe('Stakeholder API tests.', () => {
         .set('Accept', 'application/json')
         .expect(422)
         .end(function (err, res) {
-          console.log('res.body.message ----------> ', res.body);
+          // console.log('res.body.message ----------> ', res.body);
           expect(res.body.message).to.eql('"limit" must be greater than 0');
           if (err) return done(err);
           return done();
@@ -47,7 +47,7 @@ describe('Stakeholder API tests.', () => {
         .set('Accept', 'application/json')
         .expect(422)
         .end(function (err, res) {
-          console.log('res.body.message ----------> ', res.body);
+          // console.log('res.body.message ----------> ', res.body);
           expect(res.body.message).to.eql('"limit" must be less than 101');
           if (err) return done(err);
           return done();
@@ -63,7 +63,7 @@ describe('Stakeholder API tests.', () => {
         .set('Accept', 'application/json')
         .expect(422)
         .end(function (err, res) {
-          console.log('res.body.message ----------> ', res.body);
+          // console.log('res.body.message ----------> ', res.body);
           expect(res.body.message).to.eql('"offset" must be an integer');
           if (err) return done(err);
           return done();
@@ -79,7 +79,7 @@ describe('Stakeholder API tests.', () => {
         .set('Accept', 'application/json')
         .expect(422)
         .end(function (err, res) {
-          console.log('res.body.message ----------> ', res.body);
+          // console.log('res.body.message ----------> ', res.body);
           expect(res.body.message).to.eql('"offset" must be greater than -1');
           if (err) return done(err);
           return done();
@@ -95,7 +95,7 @@ describe('Stakeholder API tests.', () => {
         .set('Accept', 'application/json')
         .expect(422)
         .end(function (err, res) {
-          console.log('res.body.message ----------> ', res.body);
+          // console.log('res.body.message ----------> ', res.body);
           expect(res.body.message).to.eql(
             '"id" must be a valid GUID',
           );
@@ -113,7 +113,7 @@ describe('Stakeholder API tests.', () => {
         .set('Accept', 'application/json')
         .expect(422)
         .end(function (err, res) {
-          console.log('res.body.message ----------> ', res.body);
+          // console.log('res.body.message ----------> ', res.body);
           expect(res.body.message).to.eql('"owner_id" must be a valid GUID');
           if (err) return done(err);
           return done();
