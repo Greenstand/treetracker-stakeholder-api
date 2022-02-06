@@ -1,3 +1,10 @@
+## [1.0.7](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.0.6...v1.0.7) (2022-02-06)
+
+
+### Bug Fixes
+
+* point deployment to correct secret name ([17a3d00](https://github.com/Greenstand/treetracker-stakeholder-api/commit/17a3d009447eb8495eccac4412a4fed42e8de5b3))
+
 ## [1.0.6](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.0.5...v1.0.6) (2022-02-05)
 
 
