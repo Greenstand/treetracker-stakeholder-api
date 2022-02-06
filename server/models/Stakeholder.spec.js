@@ -37,19 +37,21 @@ describe('Stakeholder Model', () => {
   describe('FilterCriteria', () => {
     it('filterCriteria should not return results other than id, owner_id, organization_id, type, orgName, firstName, lastName, imageUrl, email, phone, website, logoUrl, map', () => {
       const filter = FilterCriteria({ check: true });
+      // eslint-disable-next-line no-unused-expressions
       expect(filter).to.be.empty;
     });
 
-    it.skip('filterCriteria should not return undefined fields', () => {
+    it('filterCriteria should not return undefined fields', () => {
       const filter = FilterCriteria({
         id: undefined,
         owner_id: undefined,
         organization_id: undefined,
       });
+      // eslint-disable-next-line no-unused-expressions
       expect(filter).to.be.empty;
     });
 
-    it.skip('filterCriteria should return id, owner_id', () => {
+    it('filterCriteria should return id, owner_id', () => {
       const filter = FilterCriteria({
         id: 'undefined',
         owner_id: 'undefined',

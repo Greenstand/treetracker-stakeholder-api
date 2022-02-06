@@ -2,7 +2,7 @@ require('dotenv').config();
 const request = require('supertest');
 const { expect } = require('chai');
 const server = require('../../server/app');
-const { stakeholderOne, stakeholderTwo } = require('./seed-data-creation');
+const { stakeholderOne } = require('./seed-data-creation');
 
 describe('Stakeholder API tests.', () => {
   describe('Stakeholder GET', () => {
@@ -154,6 +154,7 @@ describe('Stakeholder API tests.', () => {
           expect(res.body.links.prev).to.eq(null);
           expect(res.body.stakeholders).to.have.lengthOf(2);
 
+          // eslint-disable-next-line no-restricted-syntax
           for (const stakeholder of res.body.stakeholders) {
             expect(stakeholder).to.have.keys([
               'id',
