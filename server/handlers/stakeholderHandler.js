@@ -2,12 +2,14 @@ const Joi = require('joi');
 const log = require('loglevel');
 
 const {
-  getStakeholders,
+  getAllStakeholdersById,
   getAllStakeholders,
-  getUnlinkedStakeholders,
-  updateLinkStakeholder,
-  updateStakeholder,
   createStakeholder,
+  updateStakeholder,
+  getRelations,
+  getNonRelations,
+  createRelation,
+  deleteRelation,
 } = require('../models/Stakeholder');
 // const { dispatch } = require('../models/DomainEvent');
 
@@ -58,22 +60,19 @@ const stakeholderGetAll = async (req, res, next) => {
   }
 };
 
-const stakeholderGet = async function (req, res, next) {
+const stakeholderGetAllById = async function (req, res, next) {
   const filter = req.query.filter ? JSON.parse(req.query.filter) : {};
   const query = { ...req.query, filter };
   await stakeholderGetQuerySchema.validateAsync(query, {
     abortEarly: false,
   });
-  const { stakeholder_id } = req.params;
+  const { id } = req.params;
   const session = new Session(false);
   const stakeholderRepo = new StakeholderRepository(session);
   const url = `${req.protocol}://${req.get('host')}/stakeholder`;
-  const executeGetStakeholder = getStakeholders(
-    stakeholderRepo,
-    Number(stakeholder_id),
-  );
+  const executeGetStakeholders = getAllStakeholdersById(stakeholderRepo, id);
   try {
-    const result = await executeGetStakeholder(query, url);
+    const result = await executeGetStakeholders(query, url);
     res.send(result);
     res.end();
   } catch (e) {
@@ -81,71 +80,99 @@ const stakeholderGet = async function (req, res, next) {
   }
 };
 
-const stakeholderGetUnlinked = async function (req, res, next) {
-  const { acctStakeholder_id = null, stakeholder_id = null } = req.params;
+const stakeholderGetRelations = async function (req, res, next) {
+  const { id } = req.params;
+  const { isRelation = true, owner_id = null } = req.query;
   const session = new Session(false);
   const stakeholderRepo = new StakeholderRepository(session);
-  const executeGetUnlinked = getUnlinkedStakeholders(
-    stakeholderRepo,
-    acctStakeholder_id,
-  );
-  try {
-    const result = await executeGetUnlinked(stakeholder_id);
-    res.send(result);
-    res.end();
-  } catch (e) {
-    next(e);
+
+  if (isRelation !== 'false') {
+    const executeGetRelations = getRelations(stakeholderRepo, id);
+    try {
+      const result = await executeGetRelations(owner_id);
+      res.send(result);
+      res.end();
+    } catch (e) {
+      next(e);
+    }
+  } else {
+    const executeGetNonRelations = getNonRelations(stakeholderRepo, id);
+    try {
+      const result = await executeGetNonRelations(owner_id);
+      res.send(result);
+      res.end();
+    } catch (e) {
+      next(e);
+    }
   }
 };
 
-const stakeholderUpdateLink = async function (req, res, next) {
-  const { stakeholder_id } = req.params;
+const stakeholderCreateRelation = async function (req, res, next) {
+  const { id } = req.params;
   const session = new Session();
   const stakeholderRepo = new StakeholderRepository(session);
-  const executeUpdateLink = updateLinkStakeholder(
-    stakeholderRepo,
-    stakeholder_id,
-  );
+  const executeCreateRelation = createRelation(stakeholderRepo, id);
 
-  // only fields that are required to have a value
-  const updateStakeholderSchema = Joi.object({
+  const createStakeholderSchema = Joi.object({
     type: Joi.string().required(),
-    linked: Joi.boolean().required(),
+    data: Joi.object().required(),
   });
 
   try {
-    const value = await updateStakeholderSchema
+    const value = await createStakeholderSchema
       .unknown(true)
       .validateAsync(req.body, {
         abortEarly: false,
       });
 
-    const result = await executeUpdateLink(value);
+    const result = await executeCreateRelation(value);
     res.send(result);
     res.end();
   } catch (e) {
-    // if (session.isTransactionInProgress()) {
-    //   await session.rollbackTransaction();
-    // }
     next(e);
   }
 };
 
-const stakeholderPost = async function (req, res, next) {
-  const { stakeholder_id } = req.params;
+const stakeholderDeleteRelation = async function (req, res, next) {
+  const { id } = req.params;
+  const session = new Session();
+  const stakeholderRepo = new StakeholderRepository(session);
+  const executeDeleteRelation = deleteRelation(stakeholderRepo, id);
+
+  const deleteStakeholderSchema = Joi.object({
+    type: Joi.string().required(),
+    data: Joi.object().required(),
+  });
+
+  try {
+    const value = await deleteStakeholderSchema
+      .unknown(true)
+      .validateAsync(req.body, {
+        abortEarly: false,
+      });
+
+    const result = await executeDeleteRelation(value);
+    res.send(result);
+    res.end();
+  } catch (e) {
+    next(e);
+  }
+};
+
+const stakeholderCreate = async function (req, res, next) {
+  const { id } = req.params;
   const session = new Session();
   const stakeholderRepo = new StakeholderRepository(session);
 
   // const eventRepository = new EventRepository(session);
   const executeCreateStakeholder = createStakeholder(
     stakeholderRepo,
-    stakeholder_id,
+    id,
     // eventRepository,
   );
 
   // const eventDispatch = dispatch(eventRepository, publishMessage);
 
-  // only fields that are required to have a value
   const stakeholderPostSchema = Joi.object({
     type: Joi.string(),
     email: Joi.string(),
@@ -177,16 +204,12 @@ const stakeholderPost = async function (req, res, next) {
   }
 };
 
-const stakeholderPatch = async function (req, res, next) {
-  const { stakeholder_id } = req.params;
+const stakeholderUpdate = async function (req, res, next) {
+  const { id } = req.params;
   const session = new Session();
   const stakeholderRepo = new StakeholderRepository(session);
-  const executeUpdateStakeholder = updateStakeholder(
-    stakeholderRepo,
-    stakeholder_id,
-  );
+  const executeUpdateStakeholder = updateStakeholder(stakeholderRepo, id);
 
-  // only fields that are required to have a value
   const updateStakeholderSchema = Joi.object({
     id: Joi.string().uuid().required(),
     type: Joi.string().required(),
@@ -208,18 +231,16 @@ const stakeholderPatch = async function (req, res, next) {
     res.send(result);
     res.end();
   } catch (e) {
-    // if (session.isTransactionInProgress()) {
-    //   await session.rollbackTransaction();
-    // }
     next(e);
   }
 };
 
 module.exports = {
-  stakeholderGet,
+  stakeholderGetAllById,
   stakeholderGetAll,
-  stakeholderGetUnlinked,
-  stakeholderUpdateLink,
-  stakeholderPost,
-  stakeholderPatch,
+  stakeholderGetRelations,
+  stakeholderCreateRelation,
+  stakeholderDeleteRelation,
+  stakeholderCreate,
+  stakeholderUpdate,
 };

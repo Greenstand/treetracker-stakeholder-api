@@ -40,6 +40,7 @@ describe('BaseRepository', () => {
       tracker.uninstall();
       tracker.install();
       tracker.on('query', (query) => {
+        // eslint-disable-next-line no-unused-expressions
         expect(query.sql).match(/select.*testTable.*name.*/) ||
           expect(query.sql).match(/select.*.count.*entity.*/);
         const response = query.sql.includes('count')
@@ -110,6 +111,7 @@ describe('BaseRepository', () => {
         tracker.uninstall();
         tracker.install();
         tracker.on('query', (query) => {
+          // eslint-disable-next-line no-unused-expressions
           expect(query.sql).match(
             /select.*testTable.*where.*c1.*=.*and.*c2.*=.*/,
           ) || expect(query.sql).match(/select.*.count.*entity.*/);
@@ -137,6 +139,7 @@ describe('BaseRepository', () => {
         tracker.uninstall();
         tracker.install();
         tracker.on('query', (query) => {
+          // eslint-disable-next-line no-unused-expressions
           expect(query.sql).match(
             /select.*testTable.*where.*c1.*=.*or.*c2.*=.*/,
           ) || expect(query.sql).match(/select.*.count.*entity.*/);
@@ -164,6 +167,7 @@ describe('BaseRepository', () => {
         tracker.uninstall();
         tracker.install();
         tracker.on('query', (query) => {
+          // eslint-disable-next-line no-unused-expressions
           expect(query.sql).match(
             /select.*testTable.*where.*c1.*=.*and.*c2.*=.*and.*c3.*or.*c4.*/,
           ) || expect(query.sql).match(/select.*.count.*entity.*/);
@@ -202,6 +206,7 @@ describe('BaseRepository', () => {
         tracker.install();
         tracker.on('query', (query) => {
           // console.log('sql:', query.sql);
+          // eslint-disable-next-line no-unused-expressions
           expect(query.sql).match(
             /select.*testTable.*where.*c1.*=.*or.*c2.*=.*or.*c3.*and.*c4.*/,
           ) || expect(query.sql).match(/select.*.count.*entity.*/);
@@ -240,6 +245,7 @@ describe('BaseRepository', () => {
         tracker.install();
         tracker.on('query', (query) => {
           // console.log('sql:', query.sql);
+          // eslint-disable-next-line no-unused-expressions
           expect(query.sql).match(
             /select.*testTable.*where.*c3.*=.*and.*c4.*=.*or.*c3.*and.*c4.*/,
           ) || expect(query.sql).match(/select.*.count.*entity.*/);

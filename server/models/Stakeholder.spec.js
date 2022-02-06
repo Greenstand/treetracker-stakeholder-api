@@ -1,14 +1,14 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const {
-  getStakeholders,
-  Stakeholder,
+  getAllStakeholders,
+  StakeholderTree,
   FilterCriteria,
 } = require('./Stakeholder');
 
 describe('Stakeholder Model', () => {
   it('Stakeholder Model should return defined fields', () => {
-    const stakeholder = Stakeholder({});
+    const stakeholder = StakeholderTree({});
     expect(stakeholder).to.have.keys([
       'id',
       'type',
@@ -29,12 +29,15 @@ describe('Stakeholder Model', () => {
       'map',
       'owner_id',
       'organization_id',
+      'parents',
+      'children'
     ]);
   });
 
   describe('FilterCriteria', () => {
     it('filterCriteria should not return results other than id, owner_id, organization_id, type, orgName, firstName, lastName, imageUrl, email, phone, website, logoUrl, map', () => {
       const filter = FilterCriteria({ check: true });
+      // eslint-disable-next-line no-unused-expressions
       expect(filter).to.be.empty;
     });
 
@@ -44,6 +47,7 @@ describe('Stakeholder Model', () => {
         owner_id: undefined,
         organization_id: undefined,
       });
+      // eslint-disable-next-line no-unused-expressions
       expect(filter).to.be.empty;
     });
 
@@ -57,26 +61,35 @@ describe('Stakeholder Model', () => {
     });
   });
 
-  describe('getStakeholders', () => {
+  describe('getAllStakeholders', () => {
     it('should get stakeholders with filter --id', async () => {
-      const getFilterById = sinon.mock();
+      const getFilter = sinon.mock();
+      const getParents = sinon.mock();
+      const getChildren = sinon.mock();
       const getStakeholderByOrganizationId = sinon.mock();
-      const executeGetStakeholders = getStakeholders({
-        getFilterById,
-        getStakeholderByOrganizationId,
+      const executeGetStakeholders = getAllStakeholders({
+        getFilter,
+        getParents,
+        getChildren,
       });
-      getFilterById.resolves({ count: 1, stakeholders: [{ id: 1 }] });
-      const result = await executeGetStakeholders({
-        filter: {
-          where: { id: 1 },
+      getFilter.resolves({ count: 1, stakeholders: [{ id: 1 }] });
+      getParents.resolves([]);
+      getChildren.resolves([]);
+      const result = await executeGetStakeholders(
+        {
+          filter: {
+            where: { id: 1 },
+          },
         },
-      });
+        '/stakeholder',
+      );
       expect(
-        getFilterById.calledWith(1, {
+        getFilter.calledWith(1, {
           filter: 100,
           offset: 0,
         }),
       );
+
       sinon.assert.notCalled(getStakeholderByOrganizationId);
       expect(result.stakeholders).to.have.length(1);
       expect(result.totalCount).to.eql(1);
@@ -85,25 +98,33 @@ describe('Stakeholder Model', () => {
 
     it('should get stakeholders with filter --organization_id', async () => {
       const getStakeholderByOrganizationId = sinon.mock();
-      const getFilterById = sinon.mock();
-      const executeGetStakeholders = getStakeholders({
+      const getFilter = sinon.mock();
+      const getParents = sinon.mock();
+      const getChildren = sinon.mock();
+      const executeGetStakeholders = getAllStakeholders({
+        getFilter,
+        getParents,
+        getChildren,
         getStakeholderByOrganizationId,
-        getFilterById,
       });
 
+      getFilter.resolves({ count: 1, stakeholders: [{ id: 1 }] });
+      getParents.resolves([]);
+      getChildren.resolves([]);
       getStakeholderByOrganizationId.resolves({
         totalCount: 1,
         stakeholders: [{ id: 1 }],
         links: {},
       });
 
-      getFilterById.resolves({ count: 1, stakeholders: [{ id: 1 }] });
-
-      const result = await executeGetStakeholders({
-        filter: {
-          where: { organization_id: 1 },
+      const result = await executeGetStakeholders(
+        {
+          filter: {
+            where: { organization_id: 1 },
+          },
         },
-      });
+        '/stakeholder',
+      );
 
       expect(
         getStakeholderByOrganizationId.calledWith(1, {
@@ -112,7 +133,7 @@ describe('Stakeholder Model', () => {
         }),
       );
       expect(
-        getFilterById.calledWith(1, {
+        getFilter.calledWith(1, {
           filter: 100,
           offset: 0,
         }),

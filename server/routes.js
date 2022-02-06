@@ -1,38 +1,66 @@
 const router = require('express').Router();
+// const uuid = require('uuid');
 // const log = require('loglevel');
+
 // const validateRequest = (req, res, next) => {
+//   console.log('QUERY -------> ', req.query);
+
+//   if(req.query.limit && !Number.isInteger(+req.query.limit)) {
+//     // throw new Error('"limit" must be an integer');
+//     next({ status: 422, message: '"limit" must be an integer' });
+//   }
+//   if (req.query.limit && +req.query.limit < 1) {
+//     next({ status: 422, message: '"limit" must be greater than 0' });
+//   }
+//   if (req.query.limit && +req.query.limit > 100) {
+//     next({ status: 422, message: '"limit" must be less than 101' });
+//   }
+//   if (req.query.offset && !Number.isInteger(+req.query.offset)) {
+//     next({ status: 422, message: '"offset" must be an integer' });
+//   }
+//   if (req.query.offset && +req.query.offset < 0) {
+//     next({ status: 422, message: '"offset" must be greater than -1' });
+//   }
+//   if (req.query.id && !uuid.validate(req.query.id)) {
+//     next({ status: 422, message: '"id" must be a valid GUID' });
+//   }
+//   if (req.query.owner_id && !uuid.validate(req.query.owner_id)) {
+//     next({ status: 422, message: '"id" must be a valid GUID' });
+//   }
+//   if(req.query.organization_id && !Number.isInteger(+req.query.organization_id)) {
+//     next({ status: 422, message: '"organization_id" must be an integer' });
+//   }
+
 //   next();
 // };
+
 const {
-  stakeholderGet,
+  stakeholderGetAllById,
   stakeholderGetAll,
-  stakeholderGetUnlinked,
-  stakeholderUpdateLink,
-  stakeholderPatch,
-  stakeholderPost,
+  stakeholderGetRelations,
+  stakeholderCreateRelation,
+  stakeholderDeleteRelation,
+  stakeholderUpdate,
+  stakeholderCreate,
 } = require('./handlers/stakeholderHandler');
 const { handlerWrapper } = require('./utils/utils');
 
 router
-  .route('/links/:stakeholder_id/:acctStakeholder_id')
-  .get(handlerWrapper(stakeholderGetUnlinked))
-  .patch(handlerWrapper(stakeholderUpdateLink));
+  .route('/stakeholders/relations/:id')
+  .get(handlerWrapper(stakeholderGetRelations))
+  .post(handlerWrapper(stakeholderCreateRelation))
+  .delete(handlerWrapper(stakeholderDeleteRelation));
 
 router
-  .route('/links/:stakeholder_id')
-  .get(handlerWrapper(stakeholderGetUnlinked))
-  .patch(handlerWrapper(stakeholderUpdateLink));
+  .route('/stakeholders/:id')
+  .get(handlerWrapper(stakeholderGetAllById))
+  .post(handlerWrapper(stakeholderCreate))
+  .patch(handlerWrapper(stakeholderUpdate));
 
 router
-  .route('/:stakeholder_id')
-  .get(handlerWrapper(stakeholderGet))
-  .patch(handlerWrapper(stakeholderPatch))
-  .post(handlerWrapper(stakeholderPost)); // for account sign-ons
-
-router
-  .route('/')
+  .route('/stakeholders')
   .get(handlerWrapper(stakeholderGetAll))
-  .patch(handlerWrapper(stakeholderPatch))
-  .post(handlerWrapper(stakeholderPost));
+  .post(handlerWrapper(stakeholderCreate))
+  .patch(handlerWrapper(stakeholderUpdate));
 
 module.exports = router;

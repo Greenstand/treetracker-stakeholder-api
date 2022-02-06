@@ -2,8 +2,8 @@ const path = require('path');
 const expect = require('expect-runtime');
 const connection = require('./config/config').connectionString;
 
-console.log('connection', connection);
-// expect(connection).to.match(/^postgresql:\//);
+// console.log('connection', connection);
+expect(connection).to.match(/^postgresql:\//);
 
 module.exports = {
   development: {

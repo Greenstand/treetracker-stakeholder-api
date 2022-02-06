@@ -1,5 +1,5 @@
 # Name of this microservice
-   
+
 Description of this microservice
 
 # Development toolkit
@@ -15,7 +15,7 @@ This repository was created from Greenstand's template for microservice projects
 
 
 # Getting Started
-  
+
 ## Project Setup
 
 Open terminal and navigate to a folder to install this project:
@@ -24,7 +24,7 @@ Open terminal and navigate to a folder to install this project:
 git clone https://github.com/Greenstand/treetracker-repository-name.git
 
 ```
-Install all necessary dependencies: 
+Install all necessary dependencies:
 
 ```
 npm install
@@ -34,21 +34,22 @@ npm install
 
 ### Database Setup
 
-This repository using db-migrate to manage database migrations for its schema.
+This repository using knex to manage database migrations for its schema.
 
+To do migrations:
 ```
-cd database/
-db-migrate --env dev up
+knex migrate:latest
+```
+To rollback migrations and empty database:
+```
+knex migrate:rollback
+```
+To seed tables:
+```
+knex seed:run
 ```
 
-If you have not installed db-migrate globally, you can run:
-
-```
-cd database/
-../node_modules/db-migrate/bin/db-migrate --env dev up
-```
-
-Documentation for db-migrate: https://db-migrate.readthedocs.io/en/latest/
+Documentation for knex migrations: https://knexjs.org/#Migrations
 
 # Architecture of this project
 
@@ -65,7 +66,7 @@ The Express-routers work like the controller role in MVC, they receive the reque
 
 * **Service layer**
 
-Both service layer and model layer are where all the business logic is located. Comparing to the Model , `service` object don't have state (stateless).  
+Both service layer and model layer are where all the business logic is located. Comparing to the Model , `service` object don't have state (stateless).
 
 Please put business logic code into service object when it is hard to put them into the `Model` object.
 
@@ -73,7 +74,7 @@ Because we didn't use Factory or dependency injection to create object, so servi
 
 * **Model layer**
 
-The business model, major business logic is here. They are real object, in the perspective of object oriented programming: they have states, they have the method to do stuff. 
+The business model, major business logic is here. They are real object, in the perspective of object oriented programming: they have states, they have the method to do stuff.
 
 There are more discussion about this, check below selection.
 
