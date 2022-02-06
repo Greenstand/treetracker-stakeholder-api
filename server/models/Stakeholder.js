@@ -268,22 +268,16 @@ const getRelationTrees = async (stakeholders, repo) =>
       // don't want to keep getting all of the parents and children recursively, but do want to
       // include the current stakeholder as parent/child
 
-      // eslint-disable-next-line no-param-reassign
       stakeholder.parents = parents.map((parent) => {
-        // eslint-disable-next-line no-param-reassign
         parent.parents = [];
-        // eslint-disable-next-line no-param-reassign
         parent.children = [{ ...stakeholder }];
         return parent;
       });
 
       const children = await repo.getChildren(stakeholder);
 
-      // eslint-disable-next-line no-param-reassign
       stakeholder.children = children.map((child) => {
-        // eslint-disable-next-line no-param-reassign
         child.parents = [{ ...stakeholder }];
-        // eslint-disable-next-line no-param-reassign
         child.children = [];
         return child;
       });
