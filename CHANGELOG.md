@@ -1,3 +1,21 @@
+# [1.1.0](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.0.7...v1.1.0) (2022-02-06)
+
+
+### Bug Fixes
+
+* comment out failing validation tests ([9ff5bd9](https://github.com/Greenstand/treetracker-stakeholder-api/commit/9ff5bd9d7066b32072be8f62f276869daa430c04))
+* incomplete test fixes ([e73b5fa](https://github.com/Greenstand/treetracker-stakeholder-api/commit/e73b5fad335953e411f4f746ed84b08d6321a26d))
+* link errors ([222b61b](https://github.com/Greenstand/treetracker-stakeholder-api/commit/222b61b423d313264212a8b468a754dbcba95628))
+* link errors ([daf6892](https://github.com/Greenstand/treetracker-stakeholder-api/commit/daf6892aafd37dc98eaac22730ce4ed5a2bb10c5))
+* link errors ([c87aec0](https://github.com/Greenstand/treetracker-stakeholder-api/commit/c87aec05470357702501e26344f7b0a4e8c36ae4))
+* tests to reference new names from model ([fbf0b01](https://github.com/Greenstand/treetracker-stakeholder-api/commit/fbf0b018db28ff4d7fe9e2b91780eabaec3a5c2b))
+* uncomment the database url test ([bdd8a20](https://github.com/Greenstand/treetracker-stakeholder-api/commit/bdd8a207aee7bbc2e3c553548ac30bd1d701e90f))
+
+
+### Features
+
+* start adding validation, add documentation for migrating ([28c0133](https://github.com/Greenstand/treetracker-stakeholder-api/commit/28c0133f85c083459a7b4a3c17582f5b6e0b5c53))
+
 ## [1.0.7](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.0.6...v1.0.7) (2022-02-06)
 
 
