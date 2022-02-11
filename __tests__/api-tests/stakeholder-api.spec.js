@@ -4,7 +4,7 @@ const { expect } = require('chai');
 const server = require('../../server/app');
 const { stakeholderOne } = require('./seed-data-creation');
 
-describe.skip('Stakeholder API tests.', () => {
+describe('Stakeholder API tests.', () => {
   describe('Stakeholder GET', () => {
     it(`Should raise validation error with error code 422 -- 'limit' query parameter should be an integer  `, function (done) {
       request(server)

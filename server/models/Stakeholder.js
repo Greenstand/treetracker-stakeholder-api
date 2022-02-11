@@ -176,7 +176,7 @@ const FilterCriteria = ({
     }, {});
 };
 
-const QueryOptions = ({ limit = undefined, offset = undefined }) => {
+const QueryOptions = ({ limit = 100, offset = 0 }) => {
   return Object.entries({ limit, offset })
     .filter((entry) => entry[1] !== undefined)
     .reduce((result, item) => {
@@ -295,10 +295,7 @@ const getAllStakeholders =
     let filter = {};
     filter = FilterCriteria({ ...idFilters, ...where });
 
-    const options = {
-      ...QueryOptions({ limit, offset, ...order }),
-    };
-
+    const options = {...QueryOptions({ limit, offset, ...order })};
     const { next, prev } = makeNextPrevUrls(url, filter, options);
 
     // get organization from old entity table, enter org id to insert it and it's children
@@ -315,9 +312,7 @@ const getAllStakeholders =
       dbStakeholders = stakeholders;
       count = dbCount;
     } else {
-      const { stakeholders, count: dbCount } = await repo.getAllStakeholders(
-        options,
-      );
+      const { stakeholders, count: dbCount } = await repo.getAllStakeholders(options);
       dbStakeholders = stakeholders;
       count = dbCount;
     }
@@ -340,12 +335,12 @@ const getAllStakeholders =
 
 const getAllStakeholdersById =
   (repo, acctStakeholder_id) =>
-  async ({ filter: { where, order }, ...idFilters } = undefined, url) => {
+  async ({ filter: { where, order, limit, offset }, ...idFilters } = undefined, url) => {
     let filter = {};
     filter = FilterCriteria({ ...idFilters, ...where });
 
     const options = {
-      ...QueryOptions({ limit: 100, offset: 0, ...order }),
+      ...QueryOptions({ limit, offset, ...order }),
     };
 
     // create next and prev urls
