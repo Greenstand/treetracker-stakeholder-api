@@ -41,12 +41,13 @@ exports.errorHandler = (err, req, res) => {
       code: err.code,
       message: err.message,
     });
-  } else if (err instanceof ValidationError) {
+  } else if (err instanceof ValidationError || err.status === 422) {
     res.status(422).send({
       code: 422,
-      message: err.details.map((m) => m.message).join(';'),
+      message: err.details ? err.details.map((m) => m.message).join(';') : err.message,
     });
   } else {
+    console.log('error ---------> ', err)
     res.status(500).send({
       code: 500,
       message: `Unknown error (${err.message})`,

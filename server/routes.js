@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const uuid = require('uuid');
+const { ValidationError } = require('joi');
 const {
   stakeholderGetAllById,
   stakeholderGetAll,
@@ -15,9 +16,14 @@ const log = require('loglevel');
 const validateRequest = (req, res, next) => {
   console.log('QUERY -------> ', req.query);
 
-  if(req.query.limit && !Number.isInteger(+req.query.limit)) {
-    next({ status: 422, message: '"limit" must be an integer' });
-    // errorHandler({ status: 422, message: '"limit" must be an integer' }, req, res);
+  if(!req.query.limit && !Number.isInteger(+req.query.limit)) {
+    // throw new ValidationError('limit must be an integer');
+    // next({ status: 422, message: '"limit" must be an integer' });
+    return errorHandler(
+      new ValidationError('limit must be an integer'),
+      req,
+      res,
+    );
   }
   if (req.query.limit && +req.query.limit < 1) {
     next({ status: 422, message: '"limit" must be greater than 0' });
