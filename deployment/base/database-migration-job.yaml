@@ -8,7 +8,7 @@ spec:
     spec:
       containers:
       - name: migration
-        image: greenstand/treetracker-stakeholder-api:VERSION
+        image: greenstand/treetracker-api:VERSION
         env:
           - name: DATABASE_URL
             valueFrom:
