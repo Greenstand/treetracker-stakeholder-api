@@ -24,8 +24,8 @@ spec:
                 values:
                 - microservices-node-pool
       containers:
-      - name: treetracker-api
-        image: greenstand/treetracker-api:VERSION
+      - name: treetracker-stakeholder-api
+        image: greenstand/treetracker-stakeholder-api:VERSION
         ports:
         - containerPort: 80
         env:
