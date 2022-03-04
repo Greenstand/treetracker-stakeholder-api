@@ -1,3 +1,10 @@
+## [1.1.3](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.1.2...v1.1.3) (2022-03-04)
+
+
+### Bug Fixes
+
+* update migration test env ([aa1eabf](https://github.com/Greenstand/treetracker-stakeholder-api/commit/aa1eabf0ad367ab15cdd57f544b88c840604b315))
+
 ## [1.1.2](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.1.1...v1.1.2) (2022-03-04)
 
 
