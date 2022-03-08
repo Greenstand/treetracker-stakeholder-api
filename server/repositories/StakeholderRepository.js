@@ -54,7 +54,7 @@ class StakeholderRepository extends BaseRepository {
     const results = await this._session
       .getDB()('stakeholder as s')
       .select('s.*')
-      .leftJoin('stakeholder_relations as sr', 's.id', 'sr.child_id')
+      .leftJoin('stakeholder_relation as sr', 's.id', 'sr.child_id')
       .whereNull('sr.child_id')
       .orderBy('s.org_name', 'asc')
       .limit(Number(options.limit))
@@ -63,7 +63,7 @@ class StakeholderRepository extends BaseRepository {
     const count = await this._session.getDB()('stakeholder as s').count('*');
 
     // // add these lines to count only the parents and not the children:
-    // .leftJoin('stakeholder_relations as sr', 's.id', 'sr.child_id')
+    // .leftJoin('stakeholder_relation as sr', 's.id', 'sr.child_id')
     // .whereNull('sr.child_id');
 
     return { stakeholders: results, count: +count[0].count };
@@ -74,7 +74,7 @@ class StakeholderRepository extends BaseRepository {
     const results = await this._session
       .getDB()('stakeholder as s')
       .select('s.*')
-      .leftJoin('stakeholder_relations as sr', 's.id', 'sr.child_id')
+      .leftJoin('stakeholder_relation as sr', 's.id', 'sr.child_id')
       .where('s.id', id)
       .orWhere('s.owner_id', id)
       .andWhere('sr.child_id', null)
@@ -119,7 +119,7 @@ class StakeholderRepository extends BaseRepository {
     const parents = await this._session
       .getDB()('stakeholder as s')
       .select('sr.parent_id')
-      .join('stakeholder_relations as sr', 's.id', 'sr.child_id')
+      .join('stakeholder_relation as sr', 's.id', 'sr.child_id')
       .where('s.id', id);
 
     return parents.length ? parents.map((parent) => parent.parent_id) : [];
@@ -142,7 +142,7 @@ class StakeholderRepository extends BaseRepository {
     const children = await this._session
       .getDB()('stakeholder as s')
       .select('sr.child_id')
-      .join('stakeholder_relations as sr', 's.id', 'sr.parent_id')
+      .join('stakeholder_relation as sr', 's.id', 'sr.parent_id')
       .where('s.id', id);
 
     return children.length ? children.map((child) => child.child_id) : [];
@@ -263,7 +263,7 @@ class StakeholderRepository extends BaseRepository {
     const relatedIds = await this._session
       .getDB()('stakeholder as s')
       .select('sr.child_id', 'sr.parent_id')
-      .join('stakeholder_relations as sr', function () {
+      .join('stakeholder_relation as sr', function () {
         this.on(function () {
           this.on('s.id', 'sr.child_id');
           this.orOn('s.id', 'sr.parent_id');
@@ -323,7 +323,7 @@ class StakeholderRepository extends BaseRepository {
 
   async createRelation(stakeholder) {
     const linkedStakeholders = await this._session
-      .getDB()('stakeholder_relations')
+      .getDB()('stakeholder_relation')
       .insert(stakeholder)
       .returning('*');
 
@@ -334,7 +334,7 @@ class StakeholderRepository extends BaseRepository {
 
   async deleteRelation(stakeholder) {
     const linkedStakeholders = await this._session
-      .getDB()('stakeholder_relations')
+      .getDB()('stakeholder_relation')
       .where(stakeholder)
       .del()
       .returning('*');

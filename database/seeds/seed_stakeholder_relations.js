@@ -1,10 +1,10 @@
 exports.seed = function (knex) {
   // Deletes ALL existing entries
-  return knex('stakeholder_relations')
+  return knex('stakeholder_relation')
     .del()
     .then(function () {
       // Inserts seed entries
-      return knex('stakeholder_relations').insert([
+      return knex('stakeholder_relation').insert([
         {
           parent_id: '792a4eee-8e18-4750-a56f-91bdec383aa6',
           child_id: '1a05ec87-3c38-4395-b9f3-aa15becedc31',
