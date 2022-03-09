@@ -1,3 +1,10 @@
+## [1.1.5](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.1.4...v1.1.5) (2022-03-09)
+
+
+### Bug Fixes
+
+* prevent knex from doing migrations on startup ([f8f622a](https://github.com/Greenstand/treetracker-stakeholder-api/commit/f8f622ac18d3df0889e6ae770d436ae129e2c7c5))
+
 ## [1.1.4](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.1.3...v1.1.4) (2022-03-09)
 
 
