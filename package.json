@@ -22,8 +22,7 @@
     "test-watch": "NODE_ENV=test NODE_LOG_LEVEL=info mocha -r dotenv/config dotenv_config_path=.env.test --timeout 10000 -w -b --ignore './server/repositories/**/*.spec.js'  './server/setup.js' './server/**/*.spec.js' './__tests__/seed-spec-example.spec.js' './__tests__/supertest-example.spec.js'",
     "test-watch-debug": "NODE_ENV=test NODE_LOG_LEVEL=debug mocha -r dotenv/config dotenv_config_path=.env.test --timeout 10000 -w -b --ignore './server/repositories/**/*.spec.js'  './server/setup.js' './server/**/*.spec.js' './__tests__/seed-spec-example.spec.js' './__tests__/supertest-example.spec.js'",
     "prettier-fix": "prettier ./ --write",
-    "migrate": "knex migrate:latest",
-    "rollback": "knex migrate:rollback",
+    "migrate": "cd database; db-migrate up",
     "seed": "knex seed:run",
     "proxy": "http://localhost:3001/",
     "prepare": "husky install"
@@ -37,7 +36,7 @@
     "@sentry/node": "^5.1.0",
     "body-parser": "^1.18.2",
     "cors": "^2.8.5",
-    "db-migrate": "^0.11.12", 
+    "db-migrate": "^0.11.12",
     "db-migrate-pg": "^1.2.2",
     "dotenv": "^8.2.0",
     "expect": "^26.4.2",
