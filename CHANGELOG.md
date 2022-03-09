@@ -1,3 +1,10 @@
+## [1.1.6](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.1.5...v1.1.6) (2022-03-09)
+
+
+### Bug Fixes
+
+* added children function ([0e22609](https://github.com/Greenstand/treetracker-stakeholder-api/commit/0e226097336bd87734386ee7b4c831720575b2b8))
+
 ## [1.1.5](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.1.4...v1.1.5) (2022-03-09)
 
 
