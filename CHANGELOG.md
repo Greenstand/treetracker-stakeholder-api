@@ -1,3 +1,13 @@
+## [1.1.4](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.1.3...v1.1.4) (2022-03-09)
+
+
+### Bug Fixes
+
+* add postgres extension uuid-ossp ([97b87c1](https://github.com/Greenstand/treetracker-stakeholder-api/commit/97b87c15c3ea27dd87124a3f2ede8efe3cac0160))
+* linting ([2e9020e](https://github.com/Greenstand/treetracker-stakeholder-api/commit/2e9020e78217ef3b3d0fcab94fe725b8f4999e2c))
+* update migration script ([f89df5b](https://github.com/Greenstand/treetracker-stakeholder-api/commit/f89df5b8e95a250b66156a05c042d4083cd57163))
+* use db-migrate ([7d12e76](https://github.com/Greenstand/treetracker-stakeholder-api/commit/7d12e76c744d5ff78b4cc9d309ff7dd6f718bdd7))
+
 ## [1.1.3](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.1.2...v1.1.3) (2022-03-04)
 
 
