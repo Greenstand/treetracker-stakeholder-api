@@ -25,7 +25,8 @@
     "migrate": "cd database; db-migrate up",
     "seed": "knex seed:run",
     "proxy": "http://localhost:3001/",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "seed-dev": "NODE_ENV=development knex seed:run"
   },
   "keywords": [
     "ecology"

@@ -1,8 +1,9 @@
+require('dotenv').config({ path: `.env.${process.env.NODE_ENV}` });
 const path = require('path');
 const expect = require('expect-runtime');
-const connection = require('./config/config').connectionString;
 
-// console.log('connection', connection);
+const connection = process.env.DATABASE_URL_SEEDER;
+
 expect(connection).to.match(/^postgresql:\//);
 
 module.exports = {
@@ -14,14 +15,11 @@ module.exports = {
       min: 1,
       max: 100,
     },
-    migrations: {
-      directory: path.join(__dirname, 'database', 'migrations'),
-    },
     seeds: {
       directory: path.join(__dirname, 'database', 'seeds'),
     },
+    debug: process.env.NODE_LOG_LEVEL === 'debug',
   },
-
   test: {
     client: 'pg',
     connection,
@@ -30,27 +28,9 @@ module.exports = {
       min: 1,
       max: 100,
     },
-    migrations: {
-      directory: path.join(__dirname, 'database', 'migrations'),
-    },
     seeds: {
       directory: path.join(__dirname, 'database', 'seeds'),
     },
-  },
-
-  production: {
-    client: 'pg',
-    connection,
-    searchPath: [process.env.DATABASE_SCHEMA, 'public'],
-    pool: {
-      min: 1,
-      max: 100,
-    },
-    migrations: {
-      directory: path.join(__dirname, 'database', 'migrations'),
-    },
-    seeds: {
-      directory: path.join(__dirname, 'database', 'seeds'),
-    },
+    debug: process.env.NODE_LOG_LEVEL === 'debug',
   },
 };
