@@ -14,18 +14,9 @@ exports.seed = async function (knex) {
     last_name: '',
     email: 'hello@greenstand.com',
     phone: '123-123-2122',
-    pwd_reset_required: null,
-    password: null,
-    wallet: null,
-    salt: null,
-    offering_pay_to_plant: null,
-    active_contract_id: null,
-    tree_validation_contract_id: null,
     website: 'greenstand',
     logo_url: './logo_192x192.png',
-    map: '/greenstandMap',
-    organization_id: 1,
-    owner_id: null,
+    map: 'greenstandMap',
   }
 
   organization.id = parentId;

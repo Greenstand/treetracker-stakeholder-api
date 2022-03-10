@@ -254,7 +254,6 @@ paths:
                   parent_message_id: 0
                   recipient_handle: '+13132324232'
                   author_handle: string
-                  subject: string
                   body: string
               org-wide-message-with-survey:
                 value:
