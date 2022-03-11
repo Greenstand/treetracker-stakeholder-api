@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const mockKnex = require('mock-knex');
 const BaseRepository = require('./BaseRepository');
-const knex = require('../../database/connection');
+const knex = require('../../database/knex');
 
 const tracker = mockKnex.getTracker();
 const Session = require('../models/Session');
