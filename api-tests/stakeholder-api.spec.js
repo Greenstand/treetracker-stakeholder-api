@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: `.env.${process.env.NODE_ENV}` });
 const request = require('supertest');
 const { expect } = require('chai');
 const server = require('../server/app');
