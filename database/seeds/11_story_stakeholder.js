@@ -1,3 +1,4 @@
+const { v4: uuid } = require('uuid');
 
 const stakeholderOne = Object.freeze({
   id: uuid(),
@@ -43,9 +44,15 @@ const stakeholderTwo = Object.freeze({
   organization_id: 5000001,
 });
 
-exports.seed = async function (knex) {
+const seed = async function (knex) {
 
   await knex('stakeholder').insert([stakeholderOne, stakeholderTwo]);
 
+}
+
+module.exports = {
+  seed,
+  stakeholderOne,
+  stakeholderTwo
 }
 
