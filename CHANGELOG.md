@@ -1,3 +1,24 @@
+# [1.2.0](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.1.6...v1.2.0) (2022-03-11)
+
+
+### Bug Fixes
+
+* add api tests back in ([7f197ad](https://github.com/Greenstand/treetracker-stakeholder-api/commit/7f197ad97174d5b9eafab4fad2eff81a9be89fec))
+* clean up unnecessary configs ([395b38a](https://github.com/Greenstand/treetracker-stakeholder-api/commit/395b38a9296ccf8a6c39e0872282da086e0a87a6))
+* database connection file ([95100d2](https://github.com/Greenstand/treetracker-stakeholder-api/commit/95100d2457de07f4f5158bd1b3e52910dbb2672d))
+* env ([2c922d2](https://github.com/Greenstand/treetracker-stakeholder-api/commit/2c922d29dee9a2b0fdbb52202183c3e582552d22))
+* linting ([cea8247](https://github.com/Greenstand/treetracker-stakeholder-api/commit/cea824740ff37ee53c3afce7483c942198ca731c))
+* linting ([c5032a3](https://github.com/Greenstand/treetracker-stakeholder-api/commit/c5032a3d6e8b0bd1c532e2c8f90a2c070ebab57f))
+* paths ([7f419a9](https://github.com/Greenstand/treetracker-stakeholder-api/commit/7f419a9e78eeada67d5f6fc33f62f0dce23a9a95))
+* remove incorrect NOT NULLs ([353b2cd](https://github.com/Greenstand/treetracker-stakeholder-api/commit/353b2cda4d855b2340db600e8642f6353621bf27))
+* remove legacy columns from db table and seed ([4cda88e](https://github.com/Greenstand/treetracker-stakeholder-api/commit/4cda88ec5e88b0883e68ec1e66286ee183258306))
+* tests and seeds ([68a4ff3](https://github.com/Greenstand/treetracker-stakeholder-api/commit/68a4ff37972c6d9610c2064fc8545257f86511a9))
+
+
+### Features
+
+* add children function ([94388c7](https://github.com/Greenstand/treetracker-stakeholder-api/commit/94388c7387640edc2520275bbfc1c4b3437ffa19))
+
 ## [1.1.6](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.1.5...v1.1.6) (2022-03-09)
 
 
