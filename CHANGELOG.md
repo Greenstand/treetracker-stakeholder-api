@@ -1,3 +1,11 @@
+## [1.2.1](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.2.0...v1.2.1) (2022-03-11)
+
+
+### Bug Fixes
+
+* add affinity to database migration job ([8c71336](https://github.com/Greenstand/treetracker-stakeholder-api/commit/8c7133699dfec4c5948be59989ccc4ee6ab0fe9d))
+* add production overlay ([766fe1c](https://github.com/Greenstand/treetracker-stakeholder-api/commit/766fe1c6ce0de69b4f74afaf34d340c26c223e53))
+
 # [1.2.0](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.1.6...v1.2.0) (2022-03-11)
 
 
