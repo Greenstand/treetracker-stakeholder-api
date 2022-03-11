@@ -1,13 +1,13 @@
 require('dotenv').config({ path: `../../.env.${process.env.NODE_ENV}` });
-const generate_uuid_v4 = require("uuid").v4;
+const log = require('loglevel');
 
 const knex = require('../../server/database/knex');
 
 async function migrate() {
-  thx = await knex.transaction();
+  const thx = await knex.transaction();
 
   const entities = await thx.table('entity').select('*')
-  let entityIdLookup = {}
+  const entityIdLookup = {}
   entities.forEach( (stakeholderRow) => {
     entityIdLookup[stakeholderRow.id] = stakeholderRow.stakeholder_uuid;
   })
@@ -16,19 +16,19 @@ async function migrate() {
 
     const exists = await thx.table('stakeholder.stakeholder').where('id', '=', stakeholderRow.stakeholder_uuid);
     if(exists.length > 0){
-      console.log('stakeholder already exists')
+      log.warn('stakeholder already exists')
       return;
     }
 
 
     let type = 'Person';
-    if(stakeholderRow.type == 'o' || stakeholderRow.type == 'O'){
+    if(stakeholderRow.type === 'o' || stakeholderRow.type === 'O'){
       type = 'Organization';
     }
 
     const stakeholder = {
       id: stakeholderRow.stakeholder_uuid,
-      type: type,
+      type,
       org_name: stakeholderRow.org_name,
       first_name: stakeholderRow.first_name,
       last_name: stakeholderRow.last_name,
@@ -51,7 +51,7 @@ async function migrate() {
       await thx.table('stakeholder.stakeholder_relation').insert(relation);
     }))
   }))
-  console.log('DONE');
+  log.info('DONE');
   thx.commit();
 }
 
