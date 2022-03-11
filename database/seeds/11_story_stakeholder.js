@@ -1,5 +1,3 @@
-const { v4: uuid } = require('uuid');
-const knex = require('../../database/connection');
 
 const stakeholderOne = Object.freeze({
   id: uuid(),
@@ -45,25 +43,9 @@ const stakeholderTwo = Object.freeze({
   organization_id: 5000001,
 });
 
-before(async () => {
+exports.seed = async function (knex) {
+
   await knex('stakeholder').insert([stakeholderOne, stakeholderTwo]);
-});
 
-// after(async () => {
-//   await knex.raw(`
-//     DELETE FROM stakeholder
-//     WHERE password = '${stakeholderTwo.password}';
-//   `);
-// });
+}
 
-after(async () => {
-  await knex.raw(`
-    DELETE FROM stakeholder
-    WHERE organization_id = '${5000000}' OR organization_id = '${5000001}';
-  `);
-});
-
-module.exports = {
-  stakeholderOne,
-  stakeholderTwo,
-};

@@ -2,7 +2,8 @@ require('dotenv').config();
 const request = require('supertest');
 const { expect } = require('chai');
 const server = require('../../server/app');
-const { stakeholderOne } = require('./seed-data-creation');
+const stakeholderSeed = require('../database/seeds/11_story_stakeholder');
+stakeholderSeed.seed();
 
 describe.skip('Stakeholder API tests.', () => {
   describe('Stakeholder GET', () => {
