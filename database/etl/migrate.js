@@ -29,7 +29,7 @@ async function migrate() {
     const stakeholder = {
       id: stakeholderRow.stakeholder_uuid,
       type,
-      org_name: stakeholderRow.org_name,
+      org_name: stakeholderRow.name,
       first_name: stakeholderRow.first_name,
       last_name: stakeholderRow.last_name,
       email: stakeholderRow.email,
