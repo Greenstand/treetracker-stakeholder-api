@@ -1,5 +1,6 @@
 require('dotenv').config({ path: `../../.env.${process.env.NODE_ENV}` });
 const log = require('loglevel');
+
 log.setDefaultLevel('info');
 
 
@@ -11,7 +12,7 @@ async function migrate() {
   const roles = await thx.table('admin_role').select('*')
 
   await Promise.all(roles.map(async (row) => {
-    let policy = row.policy;
+    const { policy } = row;
     if(policy.organization){
       log.info(policy);
       const result = await thx.table('entity').where('id', '=', policy.organization.id)
