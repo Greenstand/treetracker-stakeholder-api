@@ -1,3 +1,10 @@
+## [1.2.3](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.2.2...v1.2.3) (2022-03-16)
+
+
+### Bug Fixes
+
+* linting ([3e68fff](https://github.com/Greenstand/treetracker-stakeholder-api/commit/3e68fff63084ee2f44842abb5013c5ee7ab88080))
+
 ## [1.2.2](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.2.1...v1.2.2) (2022-03-11)
 
 
