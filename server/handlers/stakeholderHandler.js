@@ -11,6 +11,8 @@ const {
   createRelation,
   deleteRelation,
 } = require('../models/Stakeholder');
+
+const { generatePrevAndNext } = require('../utils/utils');
 // const { dispatch } = require('../models/DomainEvent');
 
 const Session = require('../models/Session');
@@ -41,19 +43,38 @@ const stakeholderGetQuerySchema = Joi.object({
 
 const stakeholderGetAll = async (req, res, next) => {
   const filter = req.query.filter ? JSON.parse(req.query.filter) : {};
-  const query = { ...req.query, filter };
+
+  const defaultRange = { limit: 100, offset: 0 };
+  const limitOptions = {};
+  limitOptions.limit = +req.query.limit || defaultRange.limit;
+  limitOptions.offset = +req.query.offset || defaultRange.offset;
+
+  const query = { ...req.query, filter, ...limitOptions };
+
   await stakeholderGetQuerySchema.validateAsync(query, {
     abortEarly: false,
   });
   const session = new Session();
   const stakeholderRepo = new StakeholderRepository(session);
 
-  const url = `${req.protocol}://${req.get('host')}/stakeholder`;
+  const url = `stakeholder`;
 
   const executeGetAllStakeholders = getAllStakeholders(stakeholderRepo);
   try {
     const result = await executeGetAllStakeholders(query, url);
-    res.send(result);
+    const count = result.count;
+    delete result.count;
+    const links = generatePrevAndNext({
+      url,
+      count,
+      limitOptions,
+      queryObject: query,
+    });
+    res.send({
+      ...result,
+      links,
+      query: { total: count, ...query },
+    });
     res.end();
   } catch (e) {
     next(e);
@@ -62,18 +83,38 @@ const stakeholderGetAll = async (req, res, next) => {
 
 const stakeholderGetAllById = async function (req, res, next) {
   const filter = req.query.filter ? JSON.parse(req.query.filter) : {};
-  const query = { ...req.query, filter };
+
+  const defaultRange = { limit: 100, offset: 0 };
+  const limitOptions = {};
+  limitOptions.limit = +req.query.limit || defaultRange.limit;
+  limitOptions.offset = +req.query.offset || defaultRange.offset;
+
+  const query = { ...req.query, filter, ...limitOptions };
+
   await stakeholderGetQuerySchema.validateAsync(query, {
     abortEarly: false,
   });
+
   const { id } = req.params;
-  const session = new Session(false);
+  const url = `stakeholder/${id}`;
+  const session = new Session();
   const stakeholderRepo = new StakeholderRepository(session);
-  const url = `${req.protocol}://${req.get('host')}/stakeholder`;
   const executeGetStakeholders = getAllStakeholdersById(stakeholderRepo, id);
   try {
-    const result = await executeGetStakeholders(query, url);
-    res.send(result);
+    const result = await executeGetStakeholders(query);
+    const count = result.count;
+    delete result.count;
+    const links = generatePrevAndNext({
+      url,
+      count,
+      limitOptions,
+      queryObject: query,
+    });
+    res.send({
+      ...result,
+      links,
+      query: { total: count, ...query },
+    });
     res.end();
   } catch (e) {
     next(e);

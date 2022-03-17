@@ -1,0 +1,1 @@
+ALTER TABLE stakeholder ADD owner_id uuid;

@@ -1,0 +1,1 @@
+ALTER TABLE stakeholder DROP owner_id;

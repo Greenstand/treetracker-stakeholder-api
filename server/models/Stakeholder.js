@@ -185,27 +185,6 @@ const QueryOptions = ({ limit = undefined, offset = undefined }) => {
     }, {});
 };
 
-const makeNextPrevUrls = (url, filter, options) => {
-  const queryFilterObjects = { ...filter };
-  queryFilterObjects.limit = options.limit;
-  // remove offset property, as it is calculated later
-  delete queryFilterObjects.offset;
-
-  const query = Object.keys(queryFilterObjects)
-    .map((key) => `${key}=${encodeURIComponent(queryFilterObjects[key])}`)
-    .join('&');
-  const urlWithLimitAndOffset = `${url}?${query}&offset=`;
-
-  const next = `${urlWithLimitAndOffset}${+options.offset + +options.limit}`;
-
-  let prev = null;
-  if (options.offset - +options.limit >= 0) {
-    prev = `${urlWithLimitAndOffset}${+options.offset - +options.limit}`;
-  }
-
-  return { next, prev };
-};
-
 const getUUID = async (repo, id, options = { limit: 100, offset: 0 }) => {
   // check for id in current table first
   const stakeholderFound = await repo.getUUIDbyId(id);
@@ -299,8 +278,6 @@ const getAllStakeholders =
       ...QueryOptions({ limit, offset, ...order }),
     };
 
-    const { next, prev } = makeNextPrevUrls(url, filter, options);
-
     // get organization from old entity table, enter org id to insert it and it's children
     // await getUUID(repo, 1);
 
@@ -330,11 +307,7 @@ const getAllStakeholders =
         stakeholders.map((row) => {
           return StakeholderTree({ ...row });
         }),
-      totalCount: count,
-      links: {
-        prev,
-        next,
-      },
+      count,
     };
   };
 
@@ -347,13 +320,6 @@ const getAllStakeholdersById =
     const options = {
       ...QueryOptions({ limit: 100, offset: 0, ...order }),
     };
-
-    // create next and prev urls
-    const { next, prev } = makeNextPrevUrls(
-      `${url}/${acctStakeholder_id}`,
-      filter,
-      options,
-    );
 
     const orgId = Number(acctStakeholder_id);
     // get organization from old entity table
@@ -388,11 +354,7 @@ const getAllStakeholdersById =
         stakeholders.map((row) => {
           return StakeholderTree({ ...row });
         }),
-      totalCount: count,
-      links: {
-        prev,
-        next,
-      },
+      count,
     };
   };
 
@@ -587,5 +549,5 @@ module.exports = {
   createRelation,
   deleteRelation,
   StakeholderTree,
-  FilterCriteria
+  FilterCriteria,
 };

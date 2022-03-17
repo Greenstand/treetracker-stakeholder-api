@@ -27,14 +27,12 @@ exports.handlerWrapper = (fn) =>
   function wrap(...args) {
     const fnReturn = fn(...args);
     const next = args[args.length - 1];
-    log.debug('handlerWrapper args:', args);
     return Promise.resolve(fnReturn).catch((e) => {
-      log.debug('handlerWrapper error:', e);
       next(e);
     });
   };
 
-exports.errorHandler = (err, req, res) => {
+exports.errorHandler = (err, req, res, _next) => {
   log.debug('errorHandler error:', err);
   if (err instanceof HttpError) {
     res.status(err.code).send({
@@ -71,3 +69,34 @@ exports.errorHandler = (err, req, res) => {
 
 exports.camelToSnakeCase = (str) =>
   str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+
+exports.generatePrevAndNext = ({
+  url,
+  count,
+  limitOptions: { limit, offset },
+  queryObject,
+}) => {
+  // offset starts from 0, hence the -1
+  const noOfIterations = count / limit - 1;
+  const currentIteration = offset / limit;
+
+  const queryObjectCopy = { ...queryObject };
+  delete queryObjectCopy.offset;
+
+  const query = Object.keys(queryObjectCopy)
+    .map((key) => `${key}=${encodeURIComponent(queryObjectCopy[key])}`)
+    .join('&');
+
+  const urlWithLimitAndOffset = `${url}?${query}&offset=`;
+
+  const nextUrl =
+    currentIteration < noOfIterations
+      ? `${urlWithLimitAndOffset}${+offset + +limit}`
+      : null;
+  let prev = null;
+  if (offset - +limit >= 0) {
+    prev = `${urlWithLimitAndOffset}${+offset - +limit}`;
+  }
+
+  return { next: nextUrl, prev };
+};
