@@ -62,7 +62,7 @@ const stakeholderGetAll = async (req, res, next) => {
   const executeGetAllStakeholders = getAllStakeholders(stakeholderRepo);
   try {
     const result = await executeGetAllStakeholders(query, url);
-    const count = result.count;
+    const {count} = result;
     delete result.count;
     const links = generatePrevAndNext({
       url,
@@ -102,7 +102,7 @@ const stakeholderGetAllById = async function (req, res, next) {
   const executeGetStakeholders = getAllStakeholdersById(stakeholderRepo, id);
   try {
     const result = await executeGetStakeholders(query);
-    const count = result.count;
+    const {count} = result;
     delete result.count;
     const links = generatePrevAndNext({
       url,

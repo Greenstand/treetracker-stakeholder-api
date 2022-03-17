@@ -267,10 +267,10 @@ const getRelationTrees = async (stakeholders, repo) =>
 
 const getAllStakeholders =
   (repo) =>
-  async (
-    { filter: { where, order, limit, offset }, ...idFilters } = undefined,
-    url,
-  ) => {
+  async ({
+    filter: { where, order, limit, offset },
+    ...idFilters
+  } = undefined) => {
     let filter = {};
     filter = FilterCriteria({ ...idFilters, ...where });
 
@@ -313,7 +313,7 @@ const getAllStakeholders =
 
 const getAllStakeholdersById =
   (repo, acctStakeholder_id) =>
-  async ({ filter: { where, order }, ...idFilters } = undefined, url) => {
+  async ({ filter: { where, order }, ...idFilters } = undefined) => {
     let filter = {};
     filter = FilterCriteria({ ...idFilters, ...where });
 
