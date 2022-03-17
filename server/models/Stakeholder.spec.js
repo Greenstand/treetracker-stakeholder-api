@@ -30,7 +30,7 @@ describe('Stakeholder Model', () => {
       'owner_id',
       'organization_id',
       'parents',
-      'children'
+      'children',
     ]);
   });
 
@@ -92,7 +92,7 @@ describe('Stakeholder Model', () => {
 
       sinon.assert.notCalled(getStakeholderByOrganizationId);
       expect(result.stakeholders).to.have.length(1);
-      expect(result.totalCount).to.eql(1);
+      expect(result.count).to.eql(1);
       expect(result.stakeholders[0]).property('id').eq(1);
     });
 
@@ -112,7 +112,7 @@ describe('Stakeholder Model', () => {
       getParents.resolves([]);
       getChildren.resolves([]);
       getStakeholderByOrganizationId.resolves({
-        totalCount: 1,
+        count: 1,
         stakeholders: [{ id: 1 }],
         links: {},
       });
@@ -140,7 +140,7 @@ describe('Stakeholder Model', () => {
       );
       // sinon.assert.notCalled(getFilterById);
       expect(result.stakeholders).to.have.length(1);
-      expect(result.totalCount).to.eql(1);
+      expect(result.count).to.eql(1);
       expect(result.stakeholders[0]).property('id').eq(1);
     });
   });
