@@ -98,9 +98,7 @@ describe.skip('Stakeholder API tests.', () => {
         .expect(422)
         .end(function (err, res) {
           // console.log('res.body.message ----------> ', res.body);
-          expect(res.body.message).to.eql(
-            '"id" must be a valid GUID',
-          );
+          expect(res.body.message).to.eql('"id" must be a valid GUID');
           if (err) return done(err);
           return done();
         });
@@ -147,11 +145,7 @@ describe.skip('Stakeholder API tests.', () => {
         .expect(200)
         .end(function (err, res) {
           if (err) return done(err);
-          expect(res.body).to.have.keys([
-            'stakeholders',
-            'links',
-            'totalCount',
-          ]);
+          expect(res.body).to.have.keys(['stakeholders', 'links', 'query']);
           expect(res.body.links).to.have.keys(['prev', 'next']);
           expect(res.body.links.prev).to.eq(null);
           expect(res.body.stakeholders).to.have.lengthOf(2);
@@ -179,7 +173,7 @@ describe.skip('Stakeholder API tests.', () => {
               'organization_id',
               'owner_id',
               'children',
-              'parents'
+              'parents',
             ]);
           }
 
@@ -195,14 +189,10 @@ describe.skip('Stakeholder API tests.', () => {
         .expect(200)
         .end(function (err, res) {
           if (err) return done(err);
-          expect(res.body).to.have.keys([
-            'stakeholders',
-            'links',
-            'totalCount',
-          ]);
+          expect(res.body).to.have.keys(['stakeholders', 'links', 'query']);
           expect(res.body.links).to.have.keys(['prev', 'next']);
           expect(res.body.links.prev).to.eq(null);
-          expect(res.body.totalCount).to.eq(1);
+          expect(res.body.query.count).to.eq(1);
           expect(res.body.stakeholders[0]).to.eql({
             ...stakeholderSeed.stakeholderOne,
             children: [],
