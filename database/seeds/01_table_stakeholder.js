@@ -101,6 +101,18 @@ exports.seed = function (knex) {
           logo_url: './person_192x192.png',
           map: '',
         },
+        {
+          id: 'a8567323-88b1-4870-8c48-68d2da3ab356',
+          type: 'Organization',
+          org_name: 'Mobile Test',
+          first_name: '',
+          last_name: '',
+          email: 'mobiletest@gmail.com',
+          phone: '123-123-1235',
+          website: '',
+          logo_url: './logo_192x192.pn',
+          map: 'mobile-test',
+        },
       ]);
     });
 };
