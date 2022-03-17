@@ -8,18 +8,9 @@ const stakeholderOne = Object.freeze({
   last_name: 'last_name',
   email: 'email',
   phone: 'phone',
-  pwd_reset_required: true,
   website: 'website',
-  wallet: 'wallet@@#',
-  password: 'password',
-  salt: 'salt',
-  active_contract_id: uuid(),
-  offering_pay_to_plant: true,
-  tree_validation_contract_id: uuid(),
   logo_url: 'url',
-  map: 'ma,e',
-  owner_id: uuid(),
-  organization_id: 5000000,
+  map: 'ma,e'
 });
 
 const stakeholderTwo = Object.freeze({
@@ -30,19 +21,11 @@ const stakeholderTwo = Object.freeze({
   last_name: 'last_name',
   email: 'email',
   phone: 'phone',
-  pwd_reset_required: true,
   website: 'website',
-  wallet: 'wallet@!#',
-  password: 'password',
-  salt: 'salt',
-  active_contract_id: uuid(),
-  offering_pay_to_plant: true,
-  tree_validation_contract_id: uuid(),
   logo_url: 'url',
   map: 'ma,e',
-  owner_id: uuid(),
-  organization_id: 5000001,
 });
+
 
 const seed = async function (knex) {
 

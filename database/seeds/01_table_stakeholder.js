@@ -18,7 +18,7 @@ exports.seed = function (knex) {
           map: 'greenstandMap',
         },
         {
-          id: 'a8567323-88b1-4870-8c48-68d2da3ab356',
+          id: 'b683313a-f082-4829-9127-59a176be916d',
           type: 'Organization',
           org_name: 'Greenstance',
           first_name: '',
