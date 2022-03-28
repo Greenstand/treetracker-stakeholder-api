@@ -1,3 +1,11 @@
+## [1.2.4](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.2.3...v1.2.4) (2022-03-28)
+
+
+### Bug Fixes
+
+* remove stakeholder schema reference in migration ([68ca6d3](https://github.com/Greenstand/treetracker-stakeholder-api/commit/68ca6d314b9b9bc3e8bc5a226b4a0ed2be476a9a))
+* res.status error ([02bacff](https://github.com/Greenstand/treetracker-stakeholder-api/commit/02bacffae491e5a3b51ba4233e08ea07def545a4))
+
 ## [1.2.3](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.2.2...v1.2.3) (2022-03-16)
 
 
