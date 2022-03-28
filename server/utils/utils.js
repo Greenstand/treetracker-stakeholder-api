@@ -27,14 +27,13 @@ exports.handlerWrapper = (fn) =>
   function wrap(...args) {
     const fnReturn = fn(...args);
     const next = args[args.length - 1];
-    log.debug('handlerWrapper args:', args);
     return Promise.resolve(fnReturn).catch((e) => {
       log.debug('handlerWrapper error:', e);
       next(e);
     });
   };
 
-exports.errorHandler = (err, req, res) => {
+exports.errorHandler = (err, req, res, _next) => {
   log.debug('errorHandler error:', err);
   if (err instanceof HttpError) {
     res.status(err.code).send({
