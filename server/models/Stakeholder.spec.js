@@ -22,15 +22,15 @@ describe('Stakeholder Model', () => {
       'wallet',
       'password',
       'salt',
-      'active_contract_id',
-      'offering_pay_to_plant',
+      // 'active_contract_id',
+      // 'offering_pay_to_plant',
       'tree_validation_contract_id',
       'logo_url',
       'map',
       'owner_id',
       'organization_id',
       'parents',
-      'children'
+      'children',
     ]);
   });
 

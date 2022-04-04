@@ -20,8 +20,8 @@ const StakeholderRepository = require('../repositories/StakeholderRepository');
 
 const stakeholderGetQuerySchema = Joi.object({
   id: Joi.string().uuid(),
-  organization_id: Joi.number().integer(),
-  owner_id: Joi.string().uuid(),
+  // organization_id: Joi.number().integer(),
+  // owner_id: Joi.string().uuid(),
   limit: Joi.number().integer().greater(0).less(101),
   offset: Joi.number().integer().greater(-1),
   type: Joi.string(),

@@ -58,7 +58,7 @@ paths:
                         wallet: 'wallet.com'
                         password: 'password'
                         salt: 'salt'
-                        active_contract_id: 1
+                        # active_contract_id: 1
                         offering_pay_to_plant: false
                         tree_validation_contract_id: 1
                         logo_url: 'logo_url'
@@ -101,9 +101,9 @@ paths:
                           type: string
                         salt:
                           type: string
-                        active_contract_id:
-                          type: number
-                          format: integer
+                        # active_contract_id:
+                        #   type: number
+                        #   format: integer
                         offering_pay_to_plant:
                           type: boolean
                         tree_validation_contract_id:

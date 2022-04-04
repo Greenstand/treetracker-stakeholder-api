@@ -98,9 +98,7 @@ describe.skip('Stakeholder API tests.', () => {
         .expect(422)
         .end(function (err, res) {
           // console.log('res.body.message ----------> ', res.body);
-          expect(res.body.message).to.eql(
-            '"id" must be a valid GUID',
-          );
+          expect(res.body.message).to.eql('"id" must be a valid GUID');
           if (err) return done(err);
           return done();
         });
@@ -171,7 +169,7 @@ describe.skip('Stakeholder API tests.', () => {
               'wallet',
               'password',
               'salt',
-              'active_contract_id',
+              // 'active_contract_id',
               'offering_pay_to_plant',
               'tree_validation_contract_id',
               'logo_url',
@@ -179,7 +177,7 @@ describe.skip('Stakeholder API tests.', () => {
               'organization_id',
               'owner_id',
               'children',
-              'parents'
+              'parents',
             ]);
           }
 

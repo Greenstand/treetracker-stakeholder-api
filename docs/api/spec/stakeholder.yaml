@@ -198,7 +198,7 @@ paths:
       description: get all Organization and Person entities that could possibly be linked to the stakeholder as children, parents
       # growers and users to be added soon
       parameters:
-      # NOT IMPLEMENTED YET
+        # NOT IMPLEMENTED YET
         # - in: query
         #   name: search
         #   description: pass an optional search term for partial match on any part of a name field, phone number, email, etc.
@@ -421,7 +421,7 @@ components:
         - wallet
         - salt
         - offering_pay_to_plant
-        - active_contract_id
+        # - active_contract_id
         - tree_validation_contract_id
         - website
         - logo_url
@@ -481,10 +481,10 @@ components:
           type: boolean
           format: boolean
           example: false
-        active_contract_id:
-          type: string
-          format: uuid
-          example: '792a4eee-8e18-4750-a56f-91bdec383aa6'
+        # active_contract_id:
+        #   type: string
+        #   format: uuid
+        #   example: '792a4eee-8e18-4750-a56f-91bdec383aa6'
         tree_validation_contract_id:
           type: string
           format: uuid
@@ -537,8 +537,7 @@ components:
           format: json
           items:
             $ref: '#/components/schemas/Stakeholder'
-          example:
-            [
+          example: [
               {
                 id: '1a05ec87-3c38-4395-b9f3-aa15becedc31',
                 type: 'Organization',
@@ -552,7 +551,7 @@ components:
                 wallet: null,
                 salt: null,
                 offering_pay_to_plant: null,
-                active_contract_id: null,
+                # active_contract_id: null,
                 tree_validation_contract_id: null,
                 website: 'childone.com',
                 logo_url: './logo_192x192.png',
@@ -573,7 +572,7 @@ components:
                 wallet: null,
                 salt: null,
                 offering_pay_to_plant: null,
-                active_contract_id: null,
+                # active_contract_id: null,
                 tree_validation_contract_id: null,
                 website: 'childtwo.com',
                 logo_url: './logo_192x192.png',
@@ -587,8 +586,7 @@ components:
           format: json
           items:
             $ref: '#/components/schemas/Stakeholder'
-          example:
-            [
+          example: [
               {
                 id: '792a4eee-8e18-4750-a56f-91bdec383aa6',
                 type: 'Organization',
@@ -602,7 +600,7 @@ components:
                 wallet: null,
                 salt: null,
                 offering_pay_to_plant: null,
-                active_contract_id: null,
+                # active_contract_id: null,
                 tree_validation_contract_id: null,
                 website: 'greenstand',
                 logo_url: './logo_192x192.png',
@@ -616,8 +614,7 @@ components:
           format: json
           items:
             $ref: '#/components/schemas/Stakeholder'
-          example:
-            [
+          example: [
               {
                 id: '35a23de8-f1ab-4409-be79-3c6a158d5bde',
                 type: 'Person',
@@ -631,7 +628,7 @@ components:
                 wallet: null,
                 salt: null,
                 offering_pay_to_plant: null,
-                active_contract_id: null,
+                # active_contract_id: null,
                 tree_validation_contract_id: null,
                 website: '',
                 logo_url: './person_192x192.png',
@@ -652,7 +649,7 @@ components:
                 wallet: null,
                 salt: null,
                 offering_pay_to_plant: null,
-                active_contract_id: null,
+                # active_contract_id: null,
                 tree_validation_contract_id: null,
                 website: '',
                 logo_url: './person_192x192.png',
