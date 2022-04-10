@@ -30,35 +30,31 @@ class StakeholderRepository extends BaseRepository {
   }
 
   async getUUIDbyId(id) {
-    const stakeholder_id = await this._session
+    return this._session
       .getDB()(this._tableName)
       .select('id')
       .where('organization_id', id)
       .first();
-
-    return stakeholder_id;
   }
 
-  async verifyById(id) {
-    const stakeholder = await this._session
+  async getById(id) {
+    return this._session
       .getDB()(this._tableName)
       .select('*')
       .where('id', id)
       .first();
-
-    return stakeholder;
   }
 
-  async getAllStakeholders(options) {
+  async getAllStakeholders() {
     // get only non-children to start building trees
     const results = await this._session
       .getDB()('stakeholder as s')
       .select('s.*')
       .leftJoin('stakeholder_relation as sr', 's.id', 'sr.child_id')
       .whereNull('sr.child_id')
-      .orderBy('s.org_name', 'asc')
-      .limit(Number(options.limit))
-      .offset(options.offset);
+      .orderBy('s.org_name', 'asc');
+    // .limit(Number(options.limit))
+    // .offset(options.offset);
 
     const count = await this._session.getDB()('stakeholder as s').count('*');
 
@@ -69,25 +65,25 @@ class StakeholderRepository extends BaseRepository {
     return { stakeholders: results, count: +count[0].count };
   }
 
-  async getAllStakeholdersById(id = null, options) {
+  async getAllStakeholdersById(id = null) {
     // get only non-children to start building trees
     const results = await this._session
       .getDB()('stakeholder as s')
       .select('s.*')
       .leftJoin('stakeholder_relation as sr', 's.id', 'sr.child_id')
       .where('s.id', id)
-      .orWhere('s.owner_id', id)
-      .andWhere('sr.child_id', null)
-      .orderBy('s.org_name', 'asc')
-      .limit(Number(options.limit))
-      .offset(options.offset);
+      // .orWhere('s.owner_id', id)
+      // .andWhere('sr.child_id', null)
+      .orderBy('s.org_name', 'asc');
+    // .limit(Number(options.limit))
+    // .offset(options.offset);
 
     // count all the stakeholders, regardless of nesting
     const count = await this._session
       .getDB()(this._tableName)
       .count('*')
-      .where('id', id)
-      .orWhere('owner_id', id);
+      .where('id', id);
+    // .orWhere('owner_id', id);
 
     return { stakeholders: results, count: +count[0].count };
   }
@@ -162,42 +158,129 @@ class StakeholderRepository extends BaseRepository {
     return [];
   }
 
-  async getFilter(filter, options) {
+  async getFilter(filter) {
+    const searchQuery = (
+      query,
+      search,
+      // {
+      //   id,
+      //   type,
+      //   org_name,
+      //   first_name,
+      //   last_name,
+      //   email,
+      //   phone,
+      //   website,
+      //   map,
+      //   search,
+      // },
+    ) => {
+      if (search) {
+        query.where('org_name', 'ilike', `%${search}%`);
+        query.orWhere('first_name', 'ilike', `%${search}%`);
+        query.orWhere('last_name', 'ilike', `%${search}%`);
+        query.orWhere('email', 'ilike', `%${search}%`);
+        query.orWhere('phone', 'ilike', `%${search}%`);
+        query.orWhere('website', 'ilike', `%${search}%`);
+        query.orWhere('map', 'ilike', `%${search}%`);
+      }
+      // if (id) {
+      //   query.where('id', 'ilike', `%${id}%`);
+      // }
+      // if (type) {
+      //   query.where('type', 'ilike', `%${type}%`);
+      // }
+      // if (org_name) {
+      //   query.where('org_name', 'ilike', `%${org_name}%`);
+      // }
+      // if (first_name) {
+      //   query.where('first_name', 'ilike', `%${first_name}%`);
+      // }
+      // if (last_name) {
+      //   query.where('last_name', 'ilike', `%${last_name}%`);
+      // }
+      // if (email) {
+      //   query.where('email', 'ilike', `%${email}%`);
+      // }
+      // if (phone) {
+      //   query.where('phone', 'ilike', `%${phone}%`);
+      // }
+      // if (website) {
+      //   query.where('website', 'ilike', `%${website}%`);
+      // }
+      // if (map) {
+      //   query.where('map', 'ilike', `%${map}%`);
+      // }
+    };
+
+    const { search = '', org_name = '', ...rest } = filter;
+    console.log('ORG_NAME', org_name);
+
     const stakeholders = await this._session
       .getDB()(this._tableName)
       .select('*')
-      .where({ ...filter })
-      .orderBy('org_name', 'asc')
-      .limit(Number(options.limit))
-      .offset(options.offset);
+      .where(function () {
+        this.where({ ...rest });
+        this.andWhere('org_name', 'ilike', `%${org_name}%`);
+      })
+      .andWhere(function () {
+        if (search) {
+          this.where('org_name', 'ilike', `%${search}%`);
+          this.orWhere('first_name', 'ilike', `%${search}%`);
+          this.orWhere('last_name', 'ilike', `%${search}%`);
+          this.orWhere('email', 'ilike', `%${search}%`);
+          this.orWhere('phone', 'ilike', `%${search}%`);
+          this.orWhere('website', 'ilike', `%${search}%`);
+          this.orWhere('map', 'ilike', `%${search}%`);
+        }
+      })
+      .orderBy('org_name', 'asc');
+    // .limit(Number(options.limit))
+    // .offset(options.offset)
 
     const count = await this._session
       .getDB()(this._tableName)
       .count('*')
-      .where({ ...filter });
+      .where(function () {
+        this.where({ ...rest });
+        this.andWhere('org_name', 'ilike', `%${org_name}%`);
+      })
+      .andWhere(function () {
+        if (search) {
+          this.where('org_name', 'ilike', `%${search}%`);
+          this.orWhere('first_name', 'ilike', `%${search}%`);
+          this.orWhere('last_name', 'ilike', `%${search}%`);
+          this.orWhere('email', 'ilike', `%${search}%`);
+          this.orWhere('phone', 'ilike', `%${search}%`);
+          this.orWhere('website', 'ilike', `%${search}%`);
+          this.orWhere('map', 'ilike', `%${search}%`);
+        }
+      });
 
     return { stakeholders, count: +count[0].count };
   }
 
-  async getFilterById(id, filter, options) {
+  async getFilterById(id, filter) {
     const relatedIds = await this.getRelatedIds(id);
 
     const stakeholders = await this._session
       .getDB()(this._tableName)
       .select('*')
-      .where((builder) =>
-        builder.whereIn('id', relatedIds).orWhere('owner_id', id),
+      .where(
+        (builder) => builder.whereIn('id', relatedIds),
+        // .orWhere('owner_id', id),
       )
       .andWhere({ ...filter })
-      .orderBy('org_name', 'asc')
-      .limit(Number(options.limit))
-      .offset(options.offset);
+      .orderBy('org_name', 'asc');
+    // .limit(Number(options.limit))
+    // .offset(options.offset);
 
     const count = await this._session
       .getDB()(this._tableName)
       .count('*')
-      .where((builder) =>
-        builder.whereIn('id', relatedIds).orWhere('owner_id', id),
+      .where(
+        (builder) => builder.whereIn('id', relatedIds),
+        // .orWhere('owner_id', id),
       )
       .andWhere({ ...filter });
 
@@ -244,6 +327,22 @@ class StakeholderRepository extends BaseRepository {
     return created[0];
   }
 
+  async deleteStakeholder(object) {
+    const deleted = await this._session
+      .getDB()(this._tableName)
+      .where('id', object.id)
+      .del()
+      .returning('*');
+
+    expect(deleted).match([
+      {
+        id: expect.anything(),
+      },
+    ]);
+
+    return deleted[0];
+  }
+
   async updateStakeholder(object) {
     const updated = await this._session
       .getDB()(this._tableName)
@@ -281,16 +380,17 @@ class StakeholderRepository extends BaseRepository {
     return Array.from(ids);
   }
 
-  async getRelations(id, owner_id) {
+  async getRelations(id) {
     const relatedIds = await this.getRelatedIds(id);
     const ids = relatedIds || [];
 
     const stakeholders = await this._session
       .getDB()(this._tableName)
       .select('*')
-      .whereIn('owner_id', [id, owner_id])
-      .orWhereNull('owner_id')
+      // .whereIn('owner_id', [id, owner_id])
+      // .orWhereNull('owner_id')
       .whereIn('id', [...ids, id])
+      .orWhereNull('id')
       .orderBy('org_name', 'asc');
 
     const count = await this._session
@@ -301,25 +401,25 @@ class StakeholderRepository extends BaseRepository {
     return { stakeholders, count: +count[0].count };
   }
 
-  async getNonRelations(id, owner_id) {
-    const relatedIds = await this.getRelatedIds(id);
-    const ids = relatedIds || [];
+  // async getNonRelations(id, owner_id) {
+  //   const relatedIds = await this.getRelatedIds(id);
+  //   const ids = relatedIds || [];
 
-    const stakeholders = await this._session
-      .getDB()(this._tableName)
-      .select('*')
-      .whereIn('owner_id', [id, owner_id])
-      .orWhereNull('owner_id')
-      .whereNotIn('id', [...ids, id])
-      .orderBy('org_name', 'asc');
+  //   const stakeholders = await this._session
+  //     .getDB()(this._tableName)
+  //     .select('*')
+  //     .whereIn('owner_id', [id, owner_id])
+  //     .orWhereNull('owner_id')
+  //     .whereNotIn('id', [...ids, id])
+  //     .orderBy('org_name', 'asc');
 
-    const count = await this._session
-      .getDB()(this._tableName)
-      .count('*')
-      .whereNotIn('id', [...ids, id]);
+  //   const count = await this._session
+  //     .getDB()(this._tableName)
+  //     .count('*')
+  //     .whereNotIn('id', [...ids, id]);
 
-    return { stakeholders, count: +count[0].count };
-  }
+  //   return { stakeholders, count: +count[0].count };
+  // }
 
   async createRelation(stakeholder) {
     const linkedStakeholders = await this._session
