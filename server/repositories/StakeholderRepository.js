@@ -24,8 +24,6 @@ class StakeholderRepository extends BaseRepository {
         [organization_id],
       );
 
-    // console.log('get by organization id ------> ', result.rows);
-
     return { stakeholders: result.rows, count: +count.rows[0].count };
   }
 
@@ -53,9 +51,8 @@ class StakeholderRepository extends BaseRepository {
       .leftJoin('stakeholder_relation as sr', 's.id', 'sr.child_id')
       .whereNull('sr.child_id')
       .orderBy('s.org_name', 'asc');
-    // .limit(Number(options.limit))
-    // .offset(options.offset);
 
+    // count all the stakeholders, regardless of nesting
     const count = await this._session.getDB()('stakeholder as s').count('*');
 
     // // add these lines to count only the parents and not the children:
@@ -72,18 +69,13 @@ class StakeholderRepository extends BaseRepository {
       .select('s.*')
       .leftJoin('stakeholder_relation as sr', 's.id', 'sr.child_id')
       .where('s.id', id)
-      // .orWhere('s.owner_id', id)
-      // .andWhere('sr.child_id', null)
       .orderBy('s.org_name', 'asc');
-    // .limit(Number(options.limit))
-    // .offset(options.offset);
 
     // count all the stakeholders, regardless of nesting
     const count = await this._session
       .getDB()(this._tableName)
       .count('*')
       .where('id', id);
-    // .orWhere('owner_id', id);
 
     return { stakeholders: results, count: +count[0].count };
   }
@@ -159,62 +151,7 @@ class StakeholderRepository extends BaseRepository {
   }
 
   async getFilter(filter) {
-    const searchQuery = (
-      query,
-      search,
-      // {
-      //   id,
-      //   type,
-      //   org_name,
-      //   first_name,
-      //   last_name,
-      //   email,
-      //   phone,
-      //   website,
-      //   map,
-      //   search,
-      // },
-    ) => {
-      if (search) {
-        query.where('org_name', 'ilike', `%${search}%`);
-        query.orWhere('first_name', 'ilike', `%${search}%`);
-        query.orWhere('last_name', 'ilike', `%${search}%`);
-        query.orWhere('email', 'ilike', `%${search}%`);
-        query.orWhere('phone', 'ilike', `%${search}%`);
-        query.orWhere('website', 'ilike', `%${search}%`);
-        query.orWhere('map', 'ilike', `%${search}%`);
-      }
-      // if (id) {
-      //   query.where('id', 'ilike', `%${id}%`);
-      // }
-      // if (type) {
-      //   query.where('type', 'ilike', `%${type}%`);
-      // }
-      // if (org_name) {
-      //   query.where('org_name', 'ilike', `%${org_name}%`);
-      // }
-      // if (first_name) {
-      //   query.where('first_name', 'ilike', `%${first_name}%`);
-      // }
-      // if (last_name) {
-      //   query.where('last_name', 'ilike', `%${last_name}%`);
-      // }
-      // if (email) {
-      //   query.where('email', 'ilike', `%${email}%`);
-      // }
-      // if (phone) {
-      //   query.where('phone', 'ilike', `%${phone}%`);
-      // }
-      // if (website) {
-      //   query.where('website', 'ilike', `%${website}%`);
-      // }
-      // if (map) {
-      //   query.where('map', 'ilike', `%${map}%`);
-      // }
-    };
-
     const { search = '', org_name = '', ...rest } = filter;
-    console.log('ORG_NAME', org_name);
 
     const stakeholders = await this._session
       .getDB()(this._tableName)
@@ -235,8 +172,6 @@ class StakeholderRepository extends BaseRepository {
         }
       })
       .orderBy('org_name', 'asc');
-    // .limit(Number(options.limit))
-    // .offset(options.offset)
 
     const count = await this._session
       .getDB()(this._tableName)
@@ -266,51 +201,18 @@ class StakeholderRepository extends BaseRepository {
     const stakeholders = await this._session
       .getDB()(this._tableName)
       .select('*')
-      .where(
-        (builder) => builder.whereIn('id', relatedIds),
-        // .orWhere('owner_id', id),
-      )
+      .where((builder) => builder.whereIn('id', relatedIds))
       .andWhere({ ...filter })
       .orderBy('org_name', 'asc');
-    // .limit(Number(options.limit))
-    // .offset(options.offset);
 
     const count = await this._session
       .getDB()(this._tableName)
       .count('*')
-      .where(
-        (builder) => builder.whereIn('id', relatedIds),
-        // .orWhere('owner_id', id),
-      )
+      .where((builder) => builder.whereIn('id', relatedIds))
       .andWhere({ ...filter });
 
     return { stakeholders, count: +count[0].count };
   }
-
-  // in progress
-  // async getSearch(value, options) {
-  //   const stakeholders = await this._session
-  //     .getDB()(this._tableName)
-  //     .select('*')
-  //     .whereILike('org_name', value)
-  //     .orWhereILike('first_name', value)
-  //     .orWhereILike('last_name', value)
-  //     .orWhereILike('email', value)
-  //     .orWhereILike('phone', value)
-  //     .limit(options.limit)
-  //     .offset(options.offset);
-
-  //   const count = await this._session
-  //     .getDB()(this._tableName)
-  //     .count('*')
-  //     .whereILike('org_name', value)
-  //     .orWhereILike('first_name', value)
-  //     .orWhereILike('last_name', value)
-  //     .orWhereILike('email', value)
-  //     .orWhereILike('phone', value);
-
-  //   return { stakeholders, count: +count[0].count };
-  // }
 
   async createStakeholder(object) {
     const created = await this._session
@@ -387,8 +289,6 @@ class StakeholderRepository extends BaseRepository {
     const stakeholders = await this._session
       .getDB()(this._tableName)
       .select('*')
-      // .whereIn('owner_id', [id, owner_id])
-      // .orWhereNull('owner_id')
       .whereIn('id', [...ids, id])
       .orWhereNull('id')
       .orderBy('org_name', 'asc');
@@ -401,6 +301,7 @@ class StakeholderRepository extends BaseRepository {
     return { stakeholders, count: +count[0].count };
   }
 
+  // KEEP IN CASE WE NEED TO ADD BACK
   // async getNonRelations(id, owner_id) {
   //   const relatedIds = await this.getRelatedIds(id);
   //   const ids = relatedIds || [];

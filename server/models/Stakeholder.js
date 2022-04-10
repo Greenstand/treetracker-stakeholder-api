@@ -12,15 +12,6 @@ const StakeholderPostObject = ({
   website,
   logo_url,
   map,
-  // pwd_reset_required,
-  // password,
-  // wallet,
-  // salt,
-  // active_contract_id,
-  // offering_pay_to_plant,
-  // tree_validation_contract_id,
-  // organization_id,
-  // owner_id,
 }) => {
   return Object.freeze({
     id: uuidv4(), // give it a uuid,
@@ -33,15 +24,6 @@ const StakeholderPostObject = ({
     website,
     logo_url,
     map,
-    // pwd_reset_required: pwd_reset_required || false,
-    // password,
-    // wallet,
-    // salt,
-    // active_contract_id: active_contract_id || null,
-    // offering_pay_to_plant,
-    // tree_validation_contract_id: tree_validation_contract_id || null,
-    // organization_id,
-    // owner_id,
   });
 };
 
@@ -95,8 +77,6 @@ const StakeholderTree = ({
 
 const FilterCriteria = ({
   id = null,
-  // owner_id = null,
-  // organization_id = null,
   type = null,
   org_name = null,
   first_name = null,
@@ -111,8 +91,6 @@ const FilterCriteria = ({
 }) => {
   return Object.entries({
     id,
-    // owner_id,
-    // organization_id,
     type,
     org_name,
     first_name,
@@ -165,20 +143,8 @@ const makeNextPrevUrls = (url, filter, options) => {
 };
 
 const createRelation = (repo, org_id) => async (stakeholder) => {
+  // eslint-disable-next-line no-use-before-define
   const id = await getUUID(repo, org_id);
-
-  // check both stakeholders exist
-  // const current = await repo.getById(id);
-  // const newRelation = await repo.getById(stakeholder.data.id);
-
-  // confirm there's permission to create
-  // note: owners should have their own id as owner_id
-  // if (
-  // newRelation.owner_id === id ||
-  // current.owner_id === newRelation.owner_id ||
-  //   id === null ||
-  //   newRelation.owner_id === null
-  // ) {
   const { type, data } = stakeholder;
   const insertObj = {};
 
@@ -191,10 +157,6 @@ const createRelation = (repo, org_id) => async (stakeholder) => {
   const stakeholderRelation = await repo.createRelation(insertObj);
 
   return stakeholderRelation;
-  // }
-  // throw new Error({
-  //   message: "Whoops! That stakeholder link can't be updated, no permission",
-  // });
 };
 
 async function getUUIDbyId(repo, id, options = { limit: 100, offset: 0 }) {
@@ -379,7 +341,6 @@ const getAllStakeholdersById =
   };
 
 const getRelations = (repo, current_id) => async () => {
-  // const id = await getUUID(repo, org_id);
   const { stakeholders, count } = await repo.getRelations(current_id);
 
   return {
@@ -394,6 +355,7 @@ const getRelations = (repo, current_id) => async () => {
   };
 };
 
+// SAVE IN CASE WE NEED TO ADD AGAIN
 // const getNonRelations = (repo, current_id) => async (org_id) => {
 //   const id = await getUUID(repo, org_id);
 //   const { stakeholders, count } = await repo.getNonRelations(current_id, id);
@@ -412,24 +374,6 @@ const getRelations = (repo, current_id) => async () => {
 
 const deleteRelation = (repo, current_id) => async (stakeholder) => {
   const id = await getUUID(repo, current_id);
-
-  // get relations for owner
-  // const relatedStakeholders = await repo.getRelatedIds(id);
-
-  // check both stakeholders exist
-  // const current = await repo.getById(id);
-  // const delRelation = await repo.getById(stakeholder.data.id);
-
-  // confirm there's permission to delete
-  // note: owners should have their own id as owner_id
-  // if (
-  //   relatedStakeholders.includes(delRelation.id) &&
-  //   (delRelation.owner_id === id ||
-  //     current.owner_id === delRelation.owner_id ||
-  //     id === null ||
-  //     delRelation.owner_id === null ||
-  //     current.owner_id === null)
-  // ) {
   const { type, data } = stakeholder;
   const removeObj = {};
 
@@ -441,36 +385,17 @@ const deleteRelation = (repo, current_id) => async (stakeholder) => {
   const stakeholderRelation = await repo.deleteRelation(removeObj);
 
   return stakeholderRelation;
-  // }
-  // throw new Error(
-  //   "Whoops! That stakeholder link can't be updated, no permission",
-  // );
 };
 
-const updateStakeholder =
-  (repo, org_id = null) =>
-  async (data) => {
-    // const id = await getUUID(repo, org_id);
-    const editedStakeholder = StakeholderTree({ ...data });
-    // const relatedStakeholders = await repo.getRelatedIds(id);
-    // const foundStakeholder = await repo.getById(editedStakeholder.id);
+const updateStakeholder = (repo) => async (data) => {
+  const editedStakeholder = StakeholderTree({ ...data });
 
-    // confirm they have right to edit
-    // if (
-    //   (id && relatedStakeholders.includes(editedStakeholder.id)) ||
-    //   foundStakeholder.owner_id === id ||
-    //   id === null
-    // ) {
-    // remove children and parents temporarily to update
-    const { children, parents, ...updateObj } = editedStakeholder;
-    const stakeholder = await repo.updateStakeholder(updateObj);
+  // remove children and parents temporarily to update
+  const { children, parents, ...updateObj } = editedStakeholder;
+  const stakeholder = await repo.updateStakeholder(updateObj);
 
-    return StakeholderTree({ ...stakeholder, children, parents });
-    // }
-    // throw new Error({
-    //   message: "Whoops! That stakeholder can't be edited, no permission",
-    // });
-  };
+  return StakeholderTree({ ...stakeholder, children, parents });
+};
 
 const createStakeholder =
   (repo, org_id = null) =>
@@ -478,8 +403,6 @@ const createStakeholder =
     const id = await getUUID(repo, org_id);
     const stakeholderObj = StakeholderPostObject({
       ...newStakeholder,
-      // organization_id: orgId || id, // to prevent it from being 0
-      // owner_id: id,
     });
 
     const stakeholder = await repo.createStakeholder(stakeholderObj, id);
@@ -487,14 +410,11 @@ const createStakeholder =
     return StakeholderTree({ ...stakeholder });
   };
 
-const deleteStakeholder =
-  (repo, org_id = null) =>
-  async (removeStakeholder) => {
-    const id = await getUUID(repo, org_id);
-    const stakeholder = await repo.deleteStakeholder(removeStakeholder);
+const deleteStakeholder = (repo) => async (removeStakeholder) => {
+  const stakeholder = await repo.deleteStakeholder(removeStakeholder);
 
-    return StakeholderTree({ ...stakeholder });
-  };
+  return StakeholderTree({ ...stakeholder });
+};
 
 module.exports = {
   getAllStakeholdersById,

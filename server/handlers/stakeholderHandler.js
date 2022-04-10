@@ -8,23 +8,16 @@ const {
   deleteStakeholder,
   updateStakeholder,
   getRelations,
-  // getNonRelations,
   createRelation,
   deleteRelation,
 } = require('../models/Stakeholder');
-// const { dispatch } = require('../models/DomainEvent');
 
 const Session = require('../models/Session');
-// const { publishMessage } = require('../infra/messaging/RabbitMQMessaging');
 
 const StakeholderRepository = require('../repositories/StakeholderRepository');
 
 const stakeholderGetQuerySchema = Joi.object({
   id: Joi.string().uuid(),
-  // organization_id: Joi.number().integer(),
-  // owner_id: Joi.string().uuid(),
-  // limit: Joi.number().integer().greater(0).less(101),
-  // offset: Joi.number().integer().greater(-1),
   type: Joi.string(),
   logo_url: Joi.string(),
   org_name: Joi.string(),
@@ -93,11 +86,9 @@ const stakeholderGetAllById = async function (req, res, next) {
 
 const stakeholderGetRelations = async function (req, res, next) {
   const { id } = req.params;
-  // const { isRelation = true, org_id = null } = req.query;
   const session = new Session(false);
   const repo = new StakeholderRepository(session);
 
-  // if (isRelation !== 'false') {
   const executeGetRelations = getRelations(repo, id);
   try {
     const result = await executeGetRelations();
@@ -106,16 +97,6 @@ const stakeholderGetRelations = async function (req, res, next) {
   } catch (e) {
     next(e);
   }
-  // } else {
-  //   const executeGetNonRelations = getNonRelations(repo, id);
-  //   try {
-  //     const result = await executeGetNonRelations(org_id);
-  //     res.send(result);
-  //     res.end();
-  //   } catch (e) {
-  //     next(e);
-  //   }
-  // }
 };
 
 const stakeholderCreateRelation = async function (req, res, next) {
