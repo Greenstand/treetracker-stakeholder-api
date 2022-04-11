@@ -1,6 +1,5 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable prefer-destructuring */
-const { v4: uuidv4 } = require('uuid');
 
 const StakeholderPostObject = ({
   type,
@@ -14,7 +13,6 @@ const StakeholderPostObject = ({
   map,
 }) => {
   return Object.freeze({
-    id: uuidv4(), // give it a uuid,
     type,
     org_name,
     first_name,
@@ -38,15 +36,6 @@ const StakeholderTree = ({
   website,
   logo_url,
   map,
-  // pwd_reset_required,
-  // password,
-  // wallet,
-  // salt,
-  // active_contract_id,
-  // offering_pay_to_plant,
-  // tree_validation_contract_id,
-  // organization_id,
-  // owner_id,
   children = [],
   parents = [],
 }) => {
@@ -61,15 +50,6 @@ const StakeholderTree = ({
     website,
     logo_url,
     map,
-    // pwd_reset_required,
-    // password,
-    // wallet,
-    // salt,
-    // active_contract_id,
-    // offering_pay_to_plant,
-    // tree_validation_contract_id,
-    // organization_id,
-    // owner_id,
     children,
     parents,
   });
@@ -110,36 +90,6 @@ const FilterCriteria = ({
       result[item[0]] = item[1];
       return result;
     }, {});
-};
-
-const QueryOptions = ({ limit = undefined, offset = undefined }) => {
-  return Object.entries({ limit, offset })
-    .filter((entry) => entry[1] !== undefined)
-    .reduce((result, item) => {
-      result[item[0]] = item[1];
-      return result;
-    }, {});
-};
-
-const makeNextPrevUrls = (url, filter, options) => {
-  const queryFilterObjects = { ...filter };
-  queryFilterObjects.limit = options.limit;
-  // remove offset property, as it is calculated later
-  delete queryFilterObjects.offset;
-
-  const query = Object.keys(queryFilterObjects)
-    .map((key) => `${key}=${encodeURIComponent(queryFilterObjects[key])}`)
-    .join('&');
-  const urlWithLimitAndOffset = `${url}?${query}&offset=`;
-
-  const next = `${urlWithLimitAndOffset}${+options.offset + +options.limit}`;
-
-  let prev = null;
-  if (options.offset - +options.limit >= 0) {
-    prev = `${urlWithLimitAndOffset}${+options.offset - +options.limit}`;
-  }
-
-  return { next, prev };
 };
 
 const createRelation = (repo, org_id) => async (stakeholder) => {
@@ -188,15 +138,6 @@ async function getUUIDbyId(repo, id, options = { limit: 100, offset: 0 }) {
           logo_url: entity.logo_url,
           map: entity.map_name,
           website: entity.website,
-          // pwd_reset_required: entity.pwd_reset_required,
-          // password: entity.password,
-          // wallet: entity.wallet,
-          // salt: entity.salt,
-          // active_contract_id: entity.active_contract_id,
-          // offering_pay_to_plant: entity.offering_pay_to_plant,
-          // tree_validation_contract_id: entity.tree_validation_contract_id,
-          // organization_id: id,
-          // owner_id,
         };
 
         const stakeholder = await repo.createStakeholder(stakeholderObj);
@@ -251,29 +192,18 @@ const getRelationTrees = async (stakeholders, repo) =>
 
 const getAllStakeholders =
   (repo) =>
-  async (
-    { filter: { where, order, limit, offset }, ...idFilters } = undefined,
-    url,
-  ) => {
+  async ({ filter: { where }, ...idFilters } = undefined) => {
     const filter = FilterCriteria({ ...idFilters, ...where });
-    const options = QueryOptions({ limit, offset, ...order });
-    const { next, prev } = makeNextPrevUrls(url, filter, options);
-
     let dbStakeholders;
     let count;
 
     if (Object.keys(filter).length > 0) {
-      const { stakeholders, count: dbCount } = await repo.getFilter(
-        filter,
-        options,
-      );
+      const { stakeholders, count: dbCount } = await repo.getFilter(filter);
 
       dbStakeholders = stakeholders;
       count = dbCount;
     } else {
-      const { stakeholders, count: dbCount } = await repo.getAllStakeholders(
-        options,
-      );
+      const { stakeholders, count: dbCount } = await repo.getAllStakeholders();
       dbStakeholders = stakeholders;
       count = dbCount;
     }
@@ -287,23 +217,13 @@ const getAllStakeholders =
           return StakeholderTree({ ...row });
         }),
       totalCount: count,
-      links: {
-        prev,
-        next,
-      },
     };
   };
 
 const getAllStakeholdersById =
   (repo, org_id) =>
-  async ({ filter: { where, order }, ...idFilters } = undefined, url) => {
+  async ({ filter: { where }, ...idFilters } = undefined) => {
     const filter = FilterCriteria({ ...idFilters, ...where });
-    const options = QueryOptions({ limit: 100, offset: 0, ...order });
-    const { next, prev } = makeNextPrevUrls(
-      `${url}/${org_id}`,
-      filter,
-      options,
-    );
     const id = await getUUID(repo, org_id);
 
     let dbStakeholders;
@@ -313,13 +233,12 @@ const getAllStakeholdersById =
       const { stakeholders, count: dbCount } = await repo.getFilterById(
         id,
         filter,
-        options,
       );
       dbStakeholders = stakeholders;
       count = dbCount;
     } else {
       const { stakeholders, count: dbCount } =
-        await repo.getAllStakeholdersById(id, options);
+        await repo.getAllStakeholdersById(id);
       dbStakeholders = stakeholders;
       count = dbCount;
     }
@@ -333,10 +252,6 @@ const getAllStakeholdersById =
           return StakeholderTree({ ...row });
         }),
       totalCount: count,
-      links: {
-        prev,
-        next,
-      },
     };
   };
 
@@ -401,9 +316,7 @@ const createStakeholder =
   (repo, org_id = null) =>
   async (newStakeholder) => {
     const id = await getUUID(repo, org_id);
-    const stakeholderObj = StakeholderPostObject({
-      ...newStakeholder,
-    });
+    const stakeholderObj = StakeholderPostObject({ ...newStakeholder });
 
     const stakeholder = await repo.createStakeholder(stakeholderObj, id);
 

@@ -27,13 +27,13 @@ class StakeholderRepository extends BaseRepository {
     return { stakeholders: result.rows, count: +count.rows[0].count };
   }
 
-  async getUUIDbyId(id) {
-    return this._session
-      .getDB()(this._tableName)
-      .select('id')
-      .where('organization_id', id)
-      .first();
-  }
+  // async getUUIDbyId(id) {
+  //   return this._session
+  //     .getDB()(this._tableName)
+  //     .select('id')
+  //     .where('organization_id', id)
+  //     .first();
+  // }
 
   async getById(id) {
     return this._session

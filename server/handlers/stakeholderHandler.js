@@ -7,7 +7,7 @@ const {
   createStakeholder,
   deleteStakeholder,
   updateStakeholder,
-  getRelations,
+  // getRelations,
   createRelation,
   deleteRelation,
 } = require('../models/Stakeholder');
@@ -29,7 +29,6 @@ const stakeholderGetQuerySchema = Joi.object({
   website: Joi.string(),
   children: Joi.array(),
   parents: Joi.array(),
-  users: Joi.array(),
   filter: Joi.object(),
 }).unknown(false);
 
@@ -40,9 +39,8 @@ const stakeholderPostSchema = Joi.object({
 }).unknown();
 
 const stakeholderDeleteSchema = Joi.object({
+  id: Joi.string().uuid(),
   type: Joi.string(),
-  email: Joi.string(),
-  phone: Joi.string(),
 }).unknown();
 
 const stakeholderGetAll = async (req, res, next) => {
@@ -53,10 +51,9 @@ const stakeholderGetAll = async (req, res, next) => {
   });
   const session = new Session();
   const repo = new StakeholderRepository(session);
-  const url = `${req.protocol}://${req.get('host')}/stakeholder`;
   const executeGetAll = getAllStakeholders(repo);
   try {
-    const result = await executeGetAll(query, url);
+    const result = await executeGetAll(query);
     res.send(result);
     res.end();
   } catch (e) {
@@ -73,10 +70,9 @@ const stakeholderGetAllById = async function (req, res, next) {
   const { id } = req.params;
   const session = new Session(false);
   const repo = new StakeholderRepository(session);
-  const url = `${req.protocol}://${req.get('host')}/stakeholder`;
   const executeGetById = getAllStakeholdersById(repo, id);
   try {
-    const result = await executeGetById(query, url);
+    const result = await executeGetById(query);
     res.send(result);
     res.end();
   } catch (e) {
@@ -84,74 +80,74 @@ const stakeholderGetAllById = async function (req, res, next) {
   }
 };
 
-const stakeholderGetRelations = async function (req, res, next) {
-  const { id } = req.params;
-  const session = new Session(false);
-  const repo = new StakeholderRepository(session);
+// const stakeholderGetRelations = async function (req, res, next) {
+//   const { id } = req.params;
+//   const session = new Session(false);
+//   const repo = new StakeholderRepository(session);
 
-  const executeGetRelations = getRelations(repo, id);
-  try {
-    const result = await executeGetRelations();
-    res.send(result);
-    res.end();
-  } catch (e) {
-    next(e);
-  }
-};
+//   const executeGetRelations = getRelations(repo, id);
+//   try {
+//     const result = await executeGetRelations();
+//     res.send(result);
+//     res.end();
+//   } catch (e) {
+//     next(e);
+//   }
+// };
 
-const stakeholderCreateRelation = async function (req, res, next) {
-  const { id } = req.params;
-  const session = new Session();
-  const repo = new StakeholderRepository(session);
-  const executeCreateRelation = createRelation(repo, id);
+// const stakeholderCreateRelation = async function (req, res, next) {
+//   const { id } = req.params;
+//   const session = new Session();
+//   const repo = new StakeholderRepository(session);
+//   const executeCreateRelation = createRelation(repo, id);
 
-  const createStakeholderSchema = Joi.object({
-    type: Joi.string().required(),
-    data: Joi.object().required(),
-  });
+//   const createStakeholderSchema = Joi.object({
+//     type: Joi.string().required(),
+//     data: Joi.object().required(),
+//   });
 
-  try {
-    const value = await createStakeholderSchema
-      .unknown(true)
-      .validateAsync(req.body, {
-        abortEarly: false,
-      });
+//   try {
+//     const value = await createStakeholderSchema
+//       .unknown(true)
+//       .validateAsync(req.body, {
+//         abortEarly: false,
+//       });
 
-    const result = await executeCreateRelation(value);
-    res.send(result);
-    res.end();
-  } catch (e) {
-    next(e);
-  }
-};
+//     const result = await executeCreateRelation(value);
+//     res.send(result);
+//     res.end();
+//   } catch (e) {
+//     next(e);
+//   }
+// };
 
-const stakeholderDeleteRelation = async function (req, res, next) {
-  const { id } = req.params;
-  const session = new Session();
-  const repo = new StakeholderRepository(session);
-  const executeDeleteRelation = deleteRelation(repo, id);
-  const executeDeleteStakeholder = deleteStakeholder(repo, id);
+// const stakeholderDeleteRelation = async function (req, res, next) {
+//   const { id } = req.params;
+//   const session = new Session();
+//   const repo = new StakeholderRepository(session);
+//   const executeDeleteRelation = deleteRelation(repo, id);
+//   const executeDeleteStakeholder = deleteStakeholder(repo, id);
 
-  const deleteStakeholderSchema = Joi.object({
-    type: Joi.string().required(),
-    data: Joi.object().required(),
-  });
+//   const deleteStakeholderSchema = Joi.object({
+//     type: Joi.string().required(),
+//     data: Joi.object().required(),
+//   });
 
-  try {
-    const value = await deleteStakeholderSchema
-      .unknown(true)
-      .validateAsync(req.body, {
-        abortEarly: false,
-      });
+//   try {
+//     const value = await deleteStakeholderSchema
+//       .unknown(true)
+//       .validateAsync(req.body, {
+//         abortEarly: false,
+//       });
 
-    await executeDeleteRelation(value);
-    const result = await executeDeleteStakeholder(value);
-    res.send(result);
-    res.end();
-  } catch (e) {
-    next(e);
-  }
-};
+//     await executeDeleteRelation(value);
+//     const result = await executeDeleteStakeholder(value);
+//     res.send(result);
+//     res.end();
+//   } catch (e) {
+//     next(e);
+//   }
+// };
 
 const stakeholderCreate = async function (req, res, next) {
   const { id } = req.params || req.body.relation_id;
@@ -248,9 +244,9 @@ const stakeholderUpdate = async function (req, res, next) {
 module.exports = {
   stakeholderGetAllById,
   stakeholderGetAll,
-  stakeholderGetRelations,
-  stakeholderCreateRelation,
-  stakeholderDeleteRelation,
+  // stakeholderGetRelations,
+  // stakeholderCreateRelation,
+  // stakeholderDeleteRelation,
   stakeholderCreate,
   stakeholderDelete,
   stakeholderUpdate,

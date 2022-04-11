@@ -17,25 +17,16 @@ describe('Stakeholder Model', () => {
       'last_name',
       'email',
       'phone',
-      'pwd_reset_required',
       'website',
-      'wallet',
-      'password',
-      'salt',
-      // 'active_contract_id',
-      // 'offering_pay_to_plant',
-      'tree_validation_contract_id',
       'logo_url',
       'map',
-      'owner_id',
-      'organization_id',
       'parents',
       'children',
     ]);
   });
 
   describe('FilterCriteria', () => {
-    it('filterCriteria should not return results other than id, owner_id, organization_id, type, orgName, firstName, lastName, imageUrl, email, phone, website, logoUrl, map', () => {
+    it('filterCriteria should not return results other than id, type, orgName, firstName, lastName, email, phone, website, logoUrl, map', () => {
       const filter = FilterCriteria({ check: true });
       // eslint-disable-next-line no-unused-expressions
       expect(filter).to.be.empty;
@@ -44,25 +35,14 @@ describe('Stakeholder Model', () => {
     it('filterCriteria should not return undefined fields', () => {
       const filter = FilterCriteria({
         id: undefined,
-        owner_id: undefined,
-        organization_id: undefined,
       });
       // eslint-disable-next-line no-unused-expressions
       expect(filter).to.be.empty;
     });
-
-    it('filterCriteria should return id, owner_id', () => {
-      const filter = FilterCriteria({
-        id: 'undefined',
-        owner_id: 'undefined',
-        organization_id: undefined,
-      });
-      expect(filter).to.have.keys(['id', 'owner_id']);
-    });
   });
 
   describe('getAllStakeholders', () => {
-    it('should get stakeholders with filter --id', async () => {
+    it('should get stakeholders with filter -- id (uuid)', async () => {
       const getFilter = sinon.mock();
       const getParents = sinon.mock();
       const getChildren = sinon.mock();
@@ -72,9 +52,58 @@ describe('Stakeholder Model', () => {
         getParents,
         getChildren,
       });
-      getFilter.resolves({ count: 1, stakeholders: [{ id: 1 }] });
+      getFilter.resolves({
+        count: 1,
+        stakeholders: [{ id: '792a4eee-8e18-4750-a56f-91bdec383aa6' }],
+      });
       getParents.resolves([]);
       getChildren.resolves([]);
+      const result = await executeGetStakeholders(
+        {
+          filter: {
+            where: { id: '792a4eee-8e18-4750-a56f-91bdec383aa6' },
+          },
+        },
+        '/stakeholder',
+      );
+
+      expect(
+        getFilter.calledWith(1, {
+          filter: 100,
+        }),
+      );
+
+      sinon.assert.notCalled(getStakeholderByOrganizationId);
+      expect(result.stakeholders).to.have.length(1);
+      expect(result.totalCount).to.eql(1);
+      expect(result.stakeholders[0])
+        .property('id')
+        .eq('792a4eee-8e18-4750-a56f-91bdec383aa6');
+    });
+
+    it('should get stakeholders with filter -- id (integer)', async () => {
+      const getFilter = sinon.mock();
+      const getParents = sinon.mock();
+      const getChildren = sinon.mock();
+      const getStakeholderByOrganizationId = sinon.mock();
+      const executeGetStakeholders = getAllStakeholders({
+        getFilter,
+        getParents,
+        getChildren,
+        getStakeholderByOrganizationId,
+      });
+
+      getFilter.resolves({
+        count: 1,
+        stakeholders: [{ id: 1 }],
+      });
+      getParents.resolves([]);
+      getChildren.resolves([]);
+      getStakeholderByOrganizationId.resolves({
+        totalCount: 1,
+        stakeholders: [{ id: 1 }],
+      });
+
       const result = await executeGetStakeholders(
         {
           filter: {
@@ -83,59 +112,15 @@ describe('Stakeholder Model', () => {
         },
         '/stakeholder',
       );
-      expect(
-        getFilter.calledWith(1, {
-          filter: 100,
-          offset: 0,
-        }),
-      );
-
-      sinon.assert.notCalled(getStakeholderByOrganizationId);
-      expect(result.stakeholders).to.have.length(1);
-      expect(result.totalCount).to.eql(1);
-      expect(result.stakeholders[0]).property('id').eq(1);
-    });
-
-    it('should get stakeholders with filter --organization_id', async () => {
-      const getStakeholderByOrganizationId = sinon.mock();
-      const getFilter = sinon.mock();
-      const getParents = sinon.mock();
-      const getChildren = sinon.mock();
-      const executeGetStakeholders = getAllStakeholders({
-        getFilter,
-        getParents,
-        getChildren,
-        getStakeholderByOrganizationId,
-      });
-
-      getFilter.resolves({ count: 1, stakeholders: [{ id: 1 }] });
-      getParents.resolves([]);
-      getChildren.resolves([]);
-      getStakeholderByOrganizationId.resolves({
-        totalCount: 1,
-        stakeholders: [{ id: 1 }],
-        links: {},
-      });
-
-      const result = await executeGetStakeholders(
-        {
-          filter: {
-            where: { organization_id: 1 },
-          },
-        },
-        '/stakeholder',
-      );
 
       expect(
         getStakeholderByOrganizationId.calledWith(1, {
           filter: 100,
-          offset: 0,
         }),
       );
       expect(
         getFilter.calledWith(1, {
           filter: 100,
-          offset: 0,
         }),
       );
       // sinon.assert.notCalled(getFilterById);
