@@ -53,6 +53,13 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@postgres/postgres
 
+      - name: run seed
+        run: npm run seed
+        working-directory: ${{ env.project-directory }}
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@postgres/postgres
+          DATABASE_URL_SEEDER: postgresql://postgres:postgres@postgres/postgres
+
       - name: run unit tests
         run: npm run test-unit-ci
         working-directory: ${{ env.project-directory }}
