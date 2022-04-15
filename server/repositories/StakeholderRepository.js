@@ -195,9 +195,7 @@ class StakeholderRepository extends BaseRepository {
       .getDB()(this._tableName)
       .select('*')
       .where((builder) => whereBuilder(filter, builder))
-      .orderBy('org_name', 'asc')
-      .limit(limitOptions.limit)
-      .offset(limitOptions.offset);
+      .orderBy('org_name', 'asc');
 
     if (limitOptions?.limit) {
       promise = promise.limit(limitOptions.limit);
@@ -224,9 +222,7 @@ class StakeholderRepository extends BaseRepository {
       .select('*')
       .where((builder) => builder.whereIn('id', relatedIds))
       .andWhere({ ...filter })
-      .orderBy('org_name', 'asc')
-      .limit(limitOptions.limit)
-      .offset(limitOptions.offset);
+      .orderBy('org_name', 'asc');
 
     if (limitOptions?.limit) {
       promise = promise.limit(limitOptions.limit);
