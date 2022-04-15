@@ -69,7 +69,7 @@ describe('Stakeholder API tests.', () => {
             'links',
             'query',
           ]);
-          expect(res.body.totalCount).to.eql(2);
+          expect(res.body.totalCount).to.greaterThanOrEqual(2);
           expect(res.body.stakeholders).to.have.length(res.body.totalCount);
           return done();
         });
