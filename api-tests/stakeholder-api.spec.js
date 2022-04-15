@@ -3,11 +3,15 @@ const request = require('supertest');
 const { expect } = require('chai');
 const server = require('../server/app');
 const stakeholderSeed = require('../database/seeds/11_story_stakeholder');
-const knex = require('../database/connection');
+const knex = require('../server/database/knex');
 
 describe('Stakeholder API tests.', () => {
   before(async () => {
     await stakeholderSeed.seed(knex);
+  });
+
+  after(async () => {
+    await knex('stakeholder').del();
   });
 
   describe('Stakeholder GET', () => {
@@ -34,7 +38,12 @@ describe('Stakeholder API tests.', () => {
         .expect(200)
         .end(function (err, res) {
           if (err) return done(err);
-          expect(res.body).to.have.keys(['stakeholders', 'totalCount']);
+          expect(res.body).to.have.keys([
+            'stakeholders',
+            'totalCount',
+            'links',
+            'query',
+          ]);
           expect(res.body.totalCount).to.eq(1);
           expect(res.body.stakeholders[0]).to.eql({
             ...stakeholderSeed.stakeholderOne,
@@ -54,8 +63,13 @@ describe('Stakeholder API tests.', () => {
         .expect(200)
         .end(function (err, res) {
           if (err) return done(err);
-          expect(res.body).to.have.keys(['stakeholders', 'totalCount']);
-          expect(res.body.totalCount).to.be.greaterThanOrEqual(2);
+          expect(res.body).to.have.keys([
+            'stakeholders',
+            'totalCount',
+            'links',
+            'query',
+          ]);
+          expect(res.body.totalCount).to.eql(2);
           expect(res.body.stakeholders).to.have.length(res.body.totalCount);
           return done();
         });

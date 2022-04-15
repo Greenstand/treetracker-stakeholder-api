@@ -40,7 +40,11 @@ const stakeholderThree = Object.freeze({
 });
 
 const seed = async function (knex) {
-  await knex('stakeholder').insert([stakeholderOne, stakeholderTwo]);
+  await knex('stakeholder').insert([
+    stakeholderOne,
+    stakeholderTwo,
+    stakeholderThree,
+  ]);
 };
 
 module.exports = {

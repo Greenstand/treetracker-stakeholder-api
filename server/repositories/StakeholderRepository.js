@@ -9,7 +9,10 @@ class StakeholderRepository extends BaseRepository {
   }
 
   // RETURNS A FLAT LIST OF RELATED ORGS FROM OLD TABLE
-  async getStakeholderByOrganizationId(organization_id, options) {
+  async getStakeholderByOrganizationId(
+    organization_id,
+    options = { limit: 100, offset: 0 },
+  ) {
     const result = await this._session
       .getDB()
       .raw(
@@ -43,14 +46,23 @@ class StakeholderRepository extends BaseRepository {
       .first();
   }
 
-  async getAllStakeholders() {
+  async getAllStakeholders(limitOptions) {
     // get only non-children to start building trees
-    const results = await this._session
+    let promise = this._session
       .getDB()('stakeholder as s')
       .select('s.*')
       .leftJoin('stakeholder_relation as sr', 's.id', 'sr.child_id')
       .whereNull('sr.child_id')
       .orderBy('s.org_name', 'asc');
+
+    if (limitOptions?.limit) {
+      promise = promise.limit(limitOptions.limit);
+    }
+    if (limitOptions?.offset) {
+      promise = promise.limit(limitOptions.offset);
+    }
+
+    const stakeholders = await promise;
 
     // count all the stakeholders, regardless of nesting
     const count = await this._session.getDB()('stakeholder as s').count('*');
@@ -59,17 +71,26 @@ class StakeholderRepository extends BaseRepository {
     // .leftJoin('stakeholder_relation as sr', 's.id', 'sr.child_id')
     // .whereNull('sr.child_id');
 
-    return { stakeholders: results, count: +count[0].count };
+    return { stakeholders, count: +count[0].count };
   }
 
-  async getAllStakeholdersById(id = null) {
+  async getAllStakeholdersById(id = null, limitOptions) {
     // get only non-children to start building trees
-    const results = await this._session
+    let promise = this._session
       .getDB()('stakeholder as s')
       .select('s.*')
       .leftJoin('stakeholder_relation as sr', 's.id', 'sr.child_id')
       .where('s.id', id)
       .orderBy('s.org_name', 'asc');
+
+    if (limitOptions?.limit) {
+      promise = promise.limit(limitOptions.limit);
+    }
+    if (limitOptions?.offset) {
+      promise = promise.limit(limitOptions.offset);
+    }
+
+    const stakeholders = await promise;
 
     // count all the stakeholders, regardless of nesting
     const count = await this._session
@@ -77,7 +98,7 @@ class StakeholderRepository extends BaseRepository {
       .count('*')
       .where('id', id);
 
-    return { stakeholders: results, count: +count[0].count };
+    return { stakeholders, count: +count[0].count };
   }
 
   // not currently being used but may be useful later
@@ -150,37 +171,12 @@ class StakeholderRepository extends BaseRepository {
     return [];
   }
 
-  async getFilter(filter) {
-    const { search = '', org_name = '', ...rest } = filter;
-
-    const stakeholders = await this._session
-      .getDB()(this._tableName)
-      .select('*')
-      .where(function () {
-        this.where({ ...rest });
-        this.andWhere('org_name', 'ilike', `%${org_name}%`);
-      })
-      .andWhere(function () {
-        if (search) {
-          this.where('org_name', 'ilike', `%${search}%`);
-          this.orWhere('first_name', 'ilike', `%${search}%`);
-          this.orWhere('last_name', 'ilike', `%${search}%`);
-          this.orWhere('email', 'ilike', `%${search}%`);
-          this.orWhere('phone', 'ilike', `%${search}%`);
-          this.orWhere('website', 'ilike', `%${search}%`);
-          this.orWhere('map', 'ilike', `%${search}%`);
-        }
-      })
-      .orderBy('org_name', 'asc');
-
-    const count = await this._session
-      .getDB()(this._tableName)
-      .count('*')
-      .where(function () {
-        this.where({ ...rest });
-        this.andWhere('org_name', 'ilike', `%${org_name}%`);
-      })
-      .andWhere(function () {
+  async getFilter(filter, limitOptions) {
+    const whereBuilder = (object, builder) => {
+      const { search = '', org_name = '', ...rest } = object;
+      const result = builder;
+      result.where({ ...rest }).andWhere('org_name', 'ilike', `%${org_name}%`);
+      result.andWhere(function () {
         if (search) {
           this.where('org_name', 'ilike', `%${search}%`);
           this.orWhere('first_name', 'ilike', `%${search}%`);
@@ -192,18 +188,54 @@ class StakeholderRepository extends BaseRepository {
         }
       });
 
+      return result;
+    };
+
+    let promise = this._session
+      .getDB()(this._tableName)
+      .select('*')
+      .where((builder) => whereBuilder(filter, builder))
+      .orderBy('org_name', 'asc')
+      .limit(limitOptions.limit)
+      .offset(limitOptions.offset);
+
+    if (limitOptions?.limit) {
+      promise = promise.limit(limitOptions.limit);
+    }
+    if (limitOptions?.offset) {
+      promise = promise.limit(limitOptions.offset);
+    }
+
+    const stakeholders = await promise;
+
+    const count = await this._session
+      .getDB()(this._tableName)
+      .count('*')
+      .where((builder) => whereBuilder(filter, builder));
+
     return { stakeholders, count: +count[0].count };
   }
 
-  async getFilterById(id, filter) {
+  async getFilterById(id, filter, limitOptions) {
     const relatedIds = await this.getRelatedIds(id);
 
-    const stakeholders = await this._session
+    let promise = this._session
       .getDB()(this._tableName)
       .select('*')
       .where((builder) => builder.whereIn('id', relatedIds))
       .andWhere({ ...filter })
-      .orderBy('org_name', 'asc');
+      .orderBy('org_name', 'asc')
+      .limit(limitOptions.limit)
+      .offset(limitOptions.offset);
+
+    if (limitOptions?.limit) {
+      promise = promise.limit(limitOptions.limit);
+    }
+    if (limitOptions?.offset) {
+      promise = promise.limit(limitOptions.offset);
+    }
+
+    const stakeholders = promise;
 
     const count = await this._session
       .getDB()(this._tableName)
