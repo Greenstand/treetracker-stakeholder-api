@@ -62,16 +62,5 @@ describe('Stakeholder Model', () => {
         .property('id')
         .eq('792a4eee-8e18-4750-a56f-91bdec383aa6');
     });
-
-    it('should get stakeholders with filter -- id (integer)', async () => {
-      const stakeholder = new Stakeholder();
-      const result = await stakeholder.getAllStakeholders({
-        id: 1,
-      });
-
-      expect(result.stakeholders).to.have.length(1);
-      expect(result.totalCount).to.eql(1);
-      expect(result.stakeholders[0]).property('id').eq(1);
-    });
   });
 });

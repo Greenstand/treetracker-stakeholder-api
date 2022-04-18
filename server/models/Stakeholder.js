@@ -267,7 +267,7 @@ class Stakeholder {
     return stakeholderRelation;
   }
 
-  async updateStakeholder(_id, data) {
+  async updateStakeholder(data) {
     const editedStakeholder = this.stakeholderTree({ ...data });
 
     // remove children and parents temporarily to update

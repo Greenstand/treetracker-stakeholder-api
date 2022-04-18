@@ -56,13 +56,10 @@ class StakeholderService {
     }
   }
 
-  async updateStakeholder(id, requestObject) {
+  async updateStakeholder(requestObject) {
     try {
       await this._session.beginTransaction();
-      const result = await this._stakeholder.updateStakeholder(
-        id,
-        requestObject,
-      );
+      const result = await this._stakeholder.updateStakeholder(requestObject);
       await this._session.commitTransaction();
 
       return result;
