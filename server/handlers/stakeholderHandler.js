@@ -32,9 +32,14 @@ const stakeholderDeleteSchema = Joi.object({
 
 const updateStakeholderSchema = Joi.object({
   id: Joi.string().uuid().required(),
-  type: Joi.string(),
-  email: Joi.string(),
+  email: Joi.string().email(),
+  first_name: Joi.string(),
+  last_name: Joi.string(),
+  logo_url: Joi.string(),
+  map: Joi.string(),
+  org_name: Joi.string(),
   phone: Joi.string(),
+  website: Joi.string().uri(),
 }).unknown(false);
 
 const stakeholderGetAll = async (req, res) => {
