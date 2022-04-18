@@ -172,7 +172,7 @@ class Stakeholder {
     let dbStakeholders;
     let count;
 
-    if (Object.keys(filter).length > 0) {
+    if (filter && Object.keys(filter).length > 0) {
       const { stakeholders, count: dbCount } =
         await this._stakeholderRepository.getFilter(filter, limitOptions);
 
@@ -203,7 +203,7 @@ class Stakeholder {
     let dbStakeholders;
     let count = 0;
 
-    if (Object.keys(filter).length > 0) {
+    if (filter && Object.keys(filter).length > 0) {
       const { stakeholders, count: dbCount } =
         await this._stakeholderRepository.getFilterById(
           id,
@@ -267,7 +267,7 @@ class Stakeholder {
     return stakeholderRelation;
   }
 
-  async updateStakeholder(data) {
+  async updateStakeholder(_id, data) {
     const editedStakeholder = this.stakeholderTree({ ...data });
 
     // remove children and parents temporarily to update

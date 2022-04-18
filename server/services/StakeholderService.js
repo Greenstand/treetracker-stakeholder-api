@@ -40,8 +40,7 @@ class StakeholderService {
   async deleteStakeholder(id, requestObject) {
     try {
       await this._session.beginTransaction();
-      //   remove id?? id not used in the model
-      await this._stakeholder.deleteStakeholder(id, requestObject.data);
+      await this._stakeholder.deleteStakeholder(requestObject.data);
       await this._stakeholder.deleteRelation(id, {
         type: requestObject.type,
         data: requestObject.data,
@@ -60,7 +59,6 @@ class StakeholderService {
   async updateStakeholder(id, requestObject) {
     try {
       await this._session.beginTransaction();
-      //   should it be {id, ...requestObject}???
       const result = await this._stakeholder.updateStakeholder(
         id,
         requestObject,

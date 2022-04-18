@@ -196,7 +196,7 @@ const stakeholderUpdate = async function (req, res) {
 
   const { id } = req.params;
   const stakeholderService = new StakeholderService();
-  const result = stakeholderService.updateStakeholder(id, requestObject);
+  const result = await stakeholderService.updateStakeholder(id, requestObject);
 
   res.status(200).json(result);
 };
