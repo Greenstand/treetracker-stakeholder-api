@@ -28,19 +28,47 @@ const stakeholderPostSchema = Joi.object({
 const stakeholderDeleteSchema = Joi.object({
   id: Joi.string().uuid(),
   type: Joi.string(),
+  linked: Joi.boolean(),
+  data: Joi.object({
+    id: Joi.string().uuid().required(),
+    email: Joi.string().email(),
+    first_name: Joi.string(),
+    last_name: Joi.string(),
+    org_name: Joi.string(),
+    logo_url: Joi.string(),
+    map: Joi.string(),
+    phone: Joi.string(),
+    website: Joi.string().uri(),
+    children: Joi.array().items(Joi.object()),
+    parents: Joi.array().items(Joi.object()),
+    image_url: Joi.string().allow(''),
+    type: Joi.string(),
+    created_at: Joi.string(),
+    updated_at: Joi.string(),
+  })
+    .unknown(false)
+    .xor('org_name', 'first_name')
+    .xor('org_name', 'last_name'),
 }).unknown(false);
 
 const updateStakeholderSchema = Joi.object({
   id: Joi.string().uuid().required(),
   email: Joi.string().email(),
+  org_name: Joi.string(),
   first_name: Joi.string(),
   last_name: Joi.string(),
   logo_url: Joi.string(),
   map: Joi.string(),
-  org_name: Joi.string(),
   phone: Joi.string(),
   website: Joi.string().uri(),
-}).unknown(false);
+  children: Joi.array().items(Joi.object()),
+  parents: Joi.array().items(Joi.object()),
+  image_url: Joi.string().allow(''),
+  type: Joi.string(),
+})
+  .unknown(false)
+  .xor('org_name', 'first_name')
+  .xor('org_name', 'last_name');
 
 const stakeholderGetAll = async (req, res) => {
   await stakeholderGetQuerySchema.validateAsync(req.query, {
