@@ -5,7 +5,7 @@ const {
   stakeholderGetAll,
   // stakeholderGetRelations,
   // stakeholderCreateRelation,
-  stakeholderDeleteRelation,
+  // stakeholderDeleteRelation,
   stakeholderUpdate,
   stakeholderCreate,
   stakeholderDelete,
@@ -13,7 +13,7 @@ const {
 const { handlerWrapper } = require('./utils/utils');
 
 // router
-//   .route('/stakeholders/relations/:id')
+//   .route('/stakeholders/relations/:id');
 //   .get(handlerWrapper(stakeholderGetRelations))
 //   .post(handlerWrapper(stakeholderCreateRelation))
 //   .delete(handlerWrapper(stakeholderDeleteRelation));
@@ -23,7 +23,6 @@ router
   .get(handlerWrapper(stakeholderGetAllById))
   .post(handlerWrapper(stakeholderCreate))
   .patch(handlerWrapper(stakeholderUpdate))
-  .put(handlerWrapper(stakeholderDeleteRelation))
   .delete(handlerWrapper(stakeholderDelete));
 
 router
@@ -31,7 +30,6 @@ router
   .get(handlerWrapper(stakeholderGetAll))
   .post(handlerWrapper(stakeholderCreate))
   .patch(handlerWrapper(stakeholderUpdate))
-  .put(handlerWrapper(stakeholderDeleteRelation))
   .delete(handlerWrapper(stakeholderDelete));
 
 module.exports = router;

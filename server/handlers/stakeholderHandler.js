@@ -17,6 +17,7 @@ const stakeholderGetQuerySchema = Joi.object({
   phone: Joi.string(),
   website: Joi.string(),
   search: Joi.string(),
+  active: Joi.boolean(),
 }).unknown(false);
 
 const stakeholderPostSchema = Joi.object({
@@ -58,6 +59,7 @@ const updateStakeholderSchema = Joi.object({
   type: Joi.string(),
   created_at: Joi.string(),
   updated_at: Joi.string(),
+  active: Joi.boolean(),
 })
   .unknown(false)
   .xor('org_name', 'first_name')
@@ -155,24 +157,24 @@ const stakeholderUpdate = async function (req, res) {
   res.status(200).json(result);
 };
 
-const stakeholderDeleteRelation = async function (req, res) {
-  const requestObject = await stakeholderDeleteSchema.validateAsync(req.body, {
-    abortEarly: false,
-  });
-  const { id } = req.params;
+// const stakeholderDeleteRelation = async function (req, res) {
+//   const requestObject = await stakeholderDeleteSchema.validateAsync(req.body, {
+//     abortEarly: false,
+//   });
+//   const { id } = req.params;
 
-  const stakeholderService = new StakeholderService();
-  const result = await stakeholderService.deleteRelation(id, requestObject);
+//   const stakeholderService = new StakeholderService();
+//   const result = await stakeholderService.deleteRelation(id, requestObject);
 
-  res.status(200).json(result);
-};
+//   res.status(200).json(result);
+// };
 
 module.exports = {
   stakeholderGetAllById,
   stakeholderGetAll,
   // stakeholderGetRelations,
   // stakeholderCreateRelation,
-  stakeholderDeleteRelation,
+  // stakeholderDeleteRelation,
   stakeholderCreate,
   stakeholderDelete,
   stakeholderUpdate,

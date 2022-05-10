@@ -53,6 +53,7 @@ class StakeholderRepository extends BaseRepository {
       .select('s.*')
       .leftJoin('stakeholder_relation as sr', 's.id', 'sr.child_id')
       .whereNull('sr.child_id')
+      .andWhere('active', true)
       .orderBy('s.org_name', 'asc');
 
     if (limitOptions?.limit) {
@@ -81,6 +82,7 @@ class StakeholderRepository extends BaseRepository {
       .select('s.*')
       .leftJoin('stakeholder_relation as sr', 's.id', 'sr.child_id')
       .where('s.id', id)
+      .andWhere('active', true)
       .orderBy('s.org_name', 'asc');
 
     if (limitOptions?.limit) {
@@ -96,7 +98,8 @@ class StakeholderRepository extends BaseRepository {
     const count = await this._session
       .getDB()(this._tableName)
       .count('*')
-      .where('id', id);
+      .where('id', id)
+      .andWhere('active', true);
 
     return { stakeholders, count: +count[0].count };
   }
@@ -107,6 +110,7 @@ class StakeholderRepository extends BaseRepository {
       .getDB()(this._tableName)
       .select('*')
       .where('id', id)
+      .andWhere('active', true)
       .first();
 
     // only get one step generation difference, no recursion
@@ -116,7 +120,8 @@ class StakeholderRepository extends BaseRepository {
     const count = await this._session
       .getDB()(this._tableName)
       .count('*')
-      .where('id', id);
+      .where('id', id)
+      .andWhere('active', true);
 
     return {
       stakeholders: [stakeholder],
@@ -142,6 +147,7 @@ class StakeholderRepository extends BaseRepository {
         .getDB()(this._tableName)
         .select('*')
         .whereIn('id', parentIds)
+        .andWhere('active', true)
         .orderBy('org_name', 'asc');
     }
     return [];
@@ -166,6 +172,7 @@ class StakeholderRepository extends BaseRepository {
         .getDB()(this._tableName)
         .select('*')
         .whereIn('id', childrenFound)
+        .andWhere('active', true)
         .orderBy('org_name', 'asc');
     }
     return [];
@@ -195,6 +202,7 @@ class StakeholderRepository extends BaseRepository {
       .getDB()(this._tableName)
       .select('*')
       .where((builder) => whereBuilder(filter, builder))
+      .andWhere('active', true)
       .orderBy('org_name', 'asc');
 
     if (limitOptions?.limit) {
@@ -209,7 +217,8 @@ class StakeholderRepository extends BaseRepository {
     const count = await this._session
       .getDB()(this._tableName)
       .count('*')
-      .where((builder) => whereBuilder(filter, builder));
+      .where((builder) => whereBuilder(filter, builder))
+      .andWhere('active', true);
 
     return { stakeholders, count: +count[0].count };
   }
@@ -222,6 +231,7 @@ class StakeholderRepository extends BaseRepository {
       .select('*')
       .where((builder) => builder.whereIn('id', relatedIds))
       .andWhere({ ...filter })
+      .andWhere('active', true)
       .orderBy('org_name', 'asc');
 
     if (limitOptions?.limit) {
@@ -237,7 +247,8 @@ class StakeholderRepository extends BaseRepository {
       .getDB()(this._tableName)
       .count('*')
       .where((builder) => builder.whereIn('id', relatedIds))
-      .andWhere({ ...filter });
+      .andWhere({ ...filter })
+      .andWhere('active', true);
 
     return { stakeholders, count: +count[0].count };
   }
@@ -261,7 +272,7 @@ class StakeholderRepository extends BaseRepository {
     const deleted = await this._session
       .getDB()(this._tableName)
       .where('id', id)
-      .del()
+      .update('active', false)
       .returning('*');
 
     expect(deleted).match([
@@ -318,13 +329,15 @@ class StakeholderRepository extends BaseRepository {
       .getDB()(this._tableName)
       .select('*')
       .whereIn('id', [...ids, id])
+      .andWhere('active', true)
       .orWhereNull('id')
       .orderBy('org_name', 'asc');
 
     const count = await this._session
       .getDB()(this._tableName)
       .count('*')
-      .whereIn('id', [...ids, id]);
+      .whereIn('id', [...ids, id])
+      .andWhere('active', true);
 
     return { stakeholders, count: +count[0].count };
   }

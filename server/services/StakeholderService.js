@@ -71,20 +71,20 @@ class StakeholderService {
     }
   }
 
-  async deleteRelation(id, requestObject) {
-    try {
-      await this._session.beginTransaction();
-      await this._stakeholder.deleteRelation(id, requestObject);
-      await this._session.commitTransaction();
+  // async deleteRelation(id, requestObject) {
+  //   try {
+  //     await this._session.beginTransaction();
+  //     await this._stakeholder.deleteRelation(id, requestObject);
+  //     await this._session.commitTransaction();
 
-      return id ? this.getAllStakeholdersById(id) : this.getAllStakeholders();
-    } catch (e) {
-      if (this._session.isTransactionInProgress()) {
-        await this._session.rollbackTransaction();
-      }
-      throw e;
-    }
-  }
+  //     return id ? this.getAllStakeholdersById(id) : this.getAllStakeholders();
+  //   } catch (e) {
+  //     if (this._session.isTransactionInProgress()) {
+  //       await this._session.rollbackTransaction();
+  //     }
+  //     throw e;
+  //   }
+  // }
 }
 
 module.exports = StakeholderService;
