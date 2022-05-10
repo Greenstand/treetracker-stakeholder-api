@@ -234,9 +234,9 @@ class Stakeholder {
     };
   }
 
-  async getRelations(current_id) {
+  async getRelations(id) {
     const { stakeholders, count } =
-      await this._stakeholderRepository.getRelations(current_id);
+      await this._stakeholderRepository.getRelations(id);
 
     return {
       stakeholders:
@@ -251,14 +251,14 @@ class Stakeholder {
     };
   }
 
-  async deleteRelation(current_id, stakeholder) {
+  async deleteRelation(current_id, data) {
     const id = await this.getUUID(current_id);
-    const { type, data } = stakeholder;
+    const { type, relation_id } = data;
     const removeObj = {};
 
     if (type === 'parents' || type === 'children') {
-      removeObj.parent_id = type === 'parents' ? data.id : id;
-      removeObj.child_id = type === 'children' ? data.id : id;
+      removeObj.parent_id = type === 'parents' ? relation_id : id;
+      removeObj.child_id = type === 'children' ? relation_id : id;
     }
 
     const stakeholderRelation =
@@ -279,25 +279,18 @@ class Stakeholder {
     return this.stakeholderTree({ ...stakeholder, children, parents });
   }
 
-  async createStakeholder(org_id = null, newStakeholder) {
-    const id = await this.getUUID(org_id);
-    const stakeholderObj = this.constructor.StakeholderPostObject({
-      ...newStakeholder,
-    });
+  async createStakeholder(data) {
+    const stakeholderObj = this.constructor.StakeholderPostObject(data);
 
-    // not sure what the id here is meant for but provision was not made for it in the repository
     const stakeholder = await this._stakeholderRepository.createStakeholder(
       stakeholderObj,
-      id,
     );
 
     return this.stakeholderTree({ ...stakeholder });
   }
 
-  async deleteStakeholder(removeStakeholder) {
-    const stakeholder = await this._stakeholderRepository.deleteStakeholder(
-      removeStakeholder,
-    );
+  async deleteStakeholder(id) {
+    const stakeholder = await this._stakeholderRepository.deleteStakeholder(id);
 
     return this.stakeholderTree({ ...stakeholder });
   }

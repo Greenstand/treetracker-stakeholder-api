@@ -102,7 +102,7 @@ class StakeholderRepository extends BaseRepository {
   }
 
   // not currently being used but may be useful later
-  async getStakeholderTreeById(id, options) {
+  async getStakeholderTreeById(id = null) {
     const stakeholder = await this._session
       .getDB()(this._tableName)
       .select('*')
@@ -110,8 +110,8 @@ class StakeholderRepository extends BaseRepository {
       .first();
 
     // only get one step generation difference, no recursion
-    stakeholder.parents = await this.getParents(stakeholder, options);
-    stakeholder.children = await this.getChildren(stakeholder, options);
+    stakeholder.parents = await this.getParents(stakeholder);
+    stakeholder.children = await this.getChildren(stakeholder);
 
     const count = await this._session
       .getDB()(this._tableName)
@@ -242,10 +242,10 @@ class StakeholderRepository extends BaseRepository {
     return { stakeholders, count: +count[0].count };
   }
 
-  async createStakeholder(object) {
+  async createStakeholder(stakeholder) {
     const created = await this._session
       .getDB()(this._tableName)
-      .insert(object)
+      .insert(stakeholder)
       .returning('*');
 
     expect(created).match([
@@ -257,10 +257,10 @@ class StakeholderRepository extends BaseRepository {
     return created[0];
   }
 
-  async deleteStakeholder(object) {
+  async deleteStakeholder(id) {
     const deleted = await this._session
       .getDB()(this._tableName)
-      .where('id', object.id)
+      .where('id', id)
       .del()
       .returning('*');
 
@@ -273,11 +273,11 @@ class StakeholderRepository extends BaseRepository {
     return deleted[0];
   }
 
-  async updateStakeholder(object) {
+  async updateStakeholder(stakeholder) {
     const updated = await this._session
       .getDB()(this._tableName)
-      .where('id', object.id)
-      .update(object, ['*']);
+      .where('id', stakeholder.id)
+      .update(stakeholder, ['*']);
 
     expect(updated).match([
       {
@@ -350,10 +350,10 @@ class StakeholderRepository extends BaseRepository {
   //   return { stakeholders, count: +count[0].count };
   // }
 
-  async createRelation(stakeholder) {
+  async createRelation(relationData) {
     const linkedStakeholders = await this._session
       .getDB()('stakeholder_relation')
-      .insert(stakeholder)
+      .insert(relationData)
       .returning('*');
 
     expect(linkedStakeholders[0]).to.have.property('parent_id');
@@ -361,10 +361,10 @@ class StakeholderRepository extends BaseRepository {
     return linkedStakeholders[0];
   }
 
-  async deleteRelation(stakeholder) {
+  async deleteRelation(relationData) {
     const linkedStakeholders = await this._session
       .getDB()('stakeholder_relation')
-      .where(stakeholder)
+      .where(relationData)
       .del()
       .returning('*');
 

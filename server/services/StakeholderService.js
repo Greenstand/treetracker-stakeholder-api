@@ -19,7 +19,6 @@ class StakeholderService {
     try {
       await this._session.beginTransaction();
       const createdStakeholder = await this._stakeholder.createStakeholder(
-        id,
         requestObject,
       );
       await this._stakeholder.createRelation(id, {
@@ -40,10 +39,11 @@ class StakeholderService {
   async deleteStakeholder(id, requestObject) {
     try {
       await this._session.beginTransaction();
-      await this._stakeholder.deleteStakeholder(requestObject.data);
+      await this._stakeholder.deleteStakeholder(requestObject.relation_id);
       await this._stakeholder.deleteRelation(id, {
         type: requestObject.type,
         data: requestObject.data,
+        relation_id: requestObject.relation_id,
       });
       await this._session.commitTransaction();
 
@@ -63,6 +63,21 @@ class StakeholderService {
       await this._session.commitTransaction();
 
       return result;
+    } catch (e) {
+      if (this._session.isTransactionInProgress()) {
+        await this._session.rollbackTransaction();
+      }
+      throw e;
+    }
+  }
+
+  async deleteRelation(id, requestObject) {
+    try {
+      await this._session.beginTransaction();
+      await this._stakeholder.deleteRelation(id, requestObject);
+      await this._session.commitTransaction();
+
+      return id ? this.getAllStakeholdersById(id) : this.getAllStakeholders();
     } catch (e) {
       if (this._session.isTransactionInProgress()) {
         await this._session.rollbackTransaction();

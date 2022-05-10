@@ -5,7 +5,7 @@ const {
   stakeholderGetAll,
   // stakeholderGetRelations,
   // stakeholderCreateRelation,
-  // stakeholderDeleteRelation,
+  stakeholderDeleteRelation,
   stakeholderUpdate,
   stakeholderCreate,
   stakeholderDelete,
@@ -23,6 +23,7 @@ router
   .get(handlerWrapper(stakeholderGetAllById))
   .post(handlerWrapper(stakeholderCreate))
   .patch(handlerWrapper(stakeholderUpdate))
+  .put(handlerWrapper(stakeholderDeleteRelation))
   .delete(handlerWrapper(stakeholderDelete));
 
 router
@@ -30,6 +31,7 @@ router
   .get(handlerWrapper(stakeholderGetAll))
   .post(handlerWrapper(stakeholderCreate))
   .patch(handlerWrapper(stakeholderUpdate))
+  .put(handlerWrapper(stakeholderDeleteRelation))
   .delete(handlerWrapper(stakeholderDelete));
 
 module.exports = router;
