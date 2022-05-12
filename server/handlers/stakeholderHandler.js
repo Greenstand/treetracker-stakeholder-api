@@ -17,7 +17,6 @@ const stakeholderGetQuerySchema = Joi.object({
   phone: Joi.string(),
   website: Joi.string(),
   search: Joi.string(),
-  active: Joi.boolean(),
 }).unknown(false);
 
 const stakeholderPostSchema = Joi.object({
@@ -59,7 +58,6 @@ const updateStakeholderSchema = Joi.object({
   type: Joi.string(),
   created_at: Joi.string(),
   updated_at: Joi.string(),
-  active: Joi.boolean(),
 })
   .unknown(false)
   .xor('org_name', 'first_name')

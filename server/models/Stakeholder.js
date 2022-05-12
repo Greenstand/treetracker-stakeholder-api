@@ -140,27 +140,21 @@ class Stakeholder {
       stakeholders.map(async (stakeholder) => {
         const stakeholderCopy = { ...stakeholder };
         const parents = await this._stakeholderRepository.getParents(
-          stakeholderCopy,
+          stakeholder,
         );
         // don't want to keep getting all of the parents and children recursively, but do want to
         // include the current stakeholder as parent/child
 
         stakeholderCopy.parents = parents.map((parent) => {
-          const parentCopy = { ...parent };
-          parentCopy.parents = [];
-          parentCopy.children = [{ ...stakeholderCopy }];
-          return parentCopy;
+          return { ...parent, parents: [], children: [{ ...stakeholderCopy }] };
         });
 
         const children = await this._stakeholderRepository.getChildren(
-          stakeholderCopy,
+          stakeholder,
         );
 
         stakeholderCopy.children = children.map((child) => {
-          const childCopy = { ...child };
-          childCopy.parents = [{ ...stakeholderCopy }];
-          childCopy.children = [];
-          return childCopy;
+          return { ...child, parents: [{ ...stakeholderCopy }], children: [] };
         });
 
         return stakeholderCopy;
@@ -189,10 +183,7 @@ class Stakeholder {
 
     return {
       stakeholders:
-        stakeholders &&
-        stakeholders.map((row) => {
-          return this.stakeholderTree({ ...row });
-        }),
+        stakeholders && stakeholders.map((row) => this.stakeholderTree(row)),
       totalCount: count,
     };
   }
@@ -226,10 +217,7 @@ class Stakeholder {
 
     return {
       stakeholders:
-        stakeholders &&
-        stakeholders.map((row) => {
-          return this.stakeholderTree({ ...row });
-        }),
+        stakeholders && stakeholders.map((row) => this.stakeholderTree(row)),
       totalCount: count,
     };
   }
@@ -241,12 +229,9 @@ class Stakeholder {
     return {
       stakeholders:
         stakeholders &&
-        stakeholders.map((row) => {
-          const rowCopy = { ...row };
-          rowCopy.children = [];
-          rowCopy.parents = [];
-          return this.stakeholderTree({ ...rowCopy });
-        }),
+        stakeholders.map((row) =>
+          this.stakeholderTree({ ...row, children: [], parents: [] }),
+        ),
       totalCount: count,
     };
   }
@@ -268,7 +253,7 @@ class Stakeholder {
   }
 
   async updateStakeholder(data) {
-    const editedStakeholder = this.stakeholderTree({ ...data });
+    const editedStakeholder = this.stakeholderTree(data);
 
     // remove children and parents temporarily to update
     const { children, parents, ...updateObj } = editedStakeholder;
@@ -286,13 +271,13 @@ class Stakeholder {
       stakeholderObj,
     );
 
-    return this.stakeholderTree({ ...stakeholder });
+    return this.stakeholderTree(stakeholder);
   }
 
   async deleteStakeholder(id) {
     const stakeholder = await this._stakeholderRepository.deleteStakeholder(id);
 
-    return this.stakeholderTree({ ...stakeholder });
+    return this.stakeholderTree(stakeholder);
   }
 
   // SAVE IN CASE WE NEED TO ADD AGAIN

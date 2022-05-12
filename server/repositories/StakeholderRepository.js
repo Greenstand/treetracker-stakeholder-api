@@ -50,7 +50,18 @@ class StakeholderRepository extends BaseRepository {
     // get only non-children to start building trees
     let promise = this._session
       .getDB()('stakeholder as s')
-      .select('s.*')
+      .select(
+        's.id',
+        's.type',
+        's.org_name',
+        's.first_name',
+        's.last_name',
+        's.email',
+        's.phone',
+        's.website',
+        's.logo_url',
+        's.map',
+      )
       .leftJoin('stakeholder_relation as sr', 's.id', 'sr.child_id')
       .whereNull('sr.child_id')
       .andWhere('active', true)
@@ -79,7 +90,18 @@ class StakeholderRepository extends BaseRepository {
     // get only non-children to start building trees
     let promise = this._session
       .getDB()('stakeholder as s')
-      .select('s.*')
+      .select(
+        's.id',
+        's.type',
+        's.org_name',
+        's.first_name',
+        's.last_name',
+        's.email',
+        's.phone',
+        's.website',
+        's.logo_url',
+        's.map',
+      )
       .leftJoin('stakeholder_relation as sr', 's.id', 'sr.child_id')
       .where('s.id', id)
       .andWhere('active', true)
@@ -108,7 +130,18 @@ class StakeholderRepository extends BaseRepository {
   async getStakeholderTreeById(id = null) {
     const stakeholder = await this._session
       .getDB()(this._tableName)
-      .select('*')
+      .select(
+        'id',
+        'type',
+        'org_name',
+        'first_name',
+        'last_name',
+        'email',
+        'phone',
+        'website',
+        'logo_url',
+        'map',
+      )
       .where('id', id)
       .andWhere('active', true)
       .first();
@@ -145,7 +178,18 @@ class StakeholderRepository extends BaseRepository {
     if (parentIds.length) {
       return this._session
         .getDB()(this._tableName)
-        .select('*')
+        .select(
+          'id',
+          'type',
+          'org_name',
+          'first_name',
+          'last_name',
+          'email',
+          'phone',
+          'website',
+          'logo_url',
+          'map',
+        )
         .whereIn('id', parentIds)
         .andWhere('active', true)
         .orderBy('org_name', 'asc');
@@ -170,7 +214,18 @@ class StakeholderRepository extends BaseRepository {
     if (childrenIds.length) {
       return this._session
         .getDB()(this._tableName)
-        .select('*')
+        .select(
+          'id',
+          'type',
+          'org_name',
+          'first_name',
+          'last_name',
+          'email',
+          'phone',
+          'website',
+          'logo_url',
+          'map',
+        )
         .whereIn('id', childrenFound)
         .andWhere('active', true)
         .orderBy('org_name', 'asc');
@@ -200,7 +255,18 @@ class StakeholderRepository extends BaseRepository {
 
     let promise = this._session
       .getDB()(this._tableName)
-      .select('*')
+      .select(
+        'id',
+        'type',
+        'org_name',
+        'first_name',
+        'last_name',
+        'email',
+        'phone',
+        'website',
+        'logo_url',
+        'map',
+      )
       .where((builder) => whereBuilder(filter, builder))
       .andWhere('active', true)
       .orderBy('org_name', 'asc');
@@ -228,7 +294,18 @@ class StakeholderRepository extends BaseRepository {
 
     let promise = this._session
       .getDB()(this._tableName)
-      .select('*')
+      .select(
+        'id',
+        'type',
+        'org_name',
+        'first_name',
+        'last_name',
+        'email',
+        'phone',
+        'website',
+        'logo_url',
+        'map',
+      )
       .where((builder) => builder.whereIn('id', relatedIds))
       .andWhere({ ...filter })
       .andWhere('active', true)
@@ -327,7 +404,18 @@ class StakeholderRepository extends BaseRepository {
 
     const stakeholders = await this._session
       .getDB()(this._tableName)
-      .select('*')
+      .select(
+        'id',
+        'type',
+        'org_name',
+        'first_name',
+        'last_name',
+        'email',
+        'phone',
+        'website',
+        'logo_url',
+        'map',
+      )
       .whereIn('id', [...ids, id])
       .andWhere('active', true)
       .orWhereNull('id')
