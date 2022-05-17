@@ -1,3 +1,29 @@
+# [1.3.0](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.2.4...v1.3.0) (2022-05-17)
+
+
+### Bug Fixes
+
+* add DATABASE_URL_SEEDER to CI ([9ea1f77](https://github.com/Greenstand/treetracker-stakeholder-api/commit/9ea1f776f148f2e05e9716a35518a230da0cc005))
+* add seeding as a step for CI ([91117c1](https://github.com/Greenstand/treetracker-stakeholder-api/commit/91117c1a9caad80b375aacca99838878251cb645))
+* data for seeds ([f779d2b](https://github.com/Greenstand/treetracker-stakeholder-api/commit/f779d2b30fc7f67c262dbb329927a3e161d53e37))
+* lint errors and remove commented code ([ffb193b](https://github.com/Greenstand/treetracker-stakeholder-api/commit/ffb193bc060dcf2031651a2c47f684a6c6a1c84c))
+* minor review updates ([73d13da](https://github.com/Greenstand/treetracker-stakeholder-api/commit/73d13daa671f5652854a2fba4c26ca37032f7bc4))
+* minor updates ([740a390](https://github.com/Greenstand/treetracker-stakeholder-api/commit/740a390d2afbd748aca85e12c1f23dd6d6e4c650))
+* modify update stakeholder schema ([02007b1](https://github.com/Greenstand/treetracker-stakeholder-api/commit/02007b1fe9110b6dfdedf765b96da0968a545423))
+* refactor stakeholder ([d46c7ec](https://github.com/Greenstand/treetracker-stakeholder-api/commit/d46c7ec6e68786166cfecedebc80370de4b0cf9c))
+* tests ([90d3d53](https://github.com/Greenstand/treetracker-stakeholder-api/commit/90d3d532f0bbe1ac180b3df3096e5efdabceffa6))
+* tests ([f4dc14d](https://github.com/Greenstand/treetracker-stakeholder-api/commit/f4dc14dcd3743e11c0a7b771b1fbc95ec1436d74))
+* update tests and yaml to match api w/o offset, limit, owner_id, etc ([3d52c7d](https://github.com/Greenstand/treetracker-stakeholder-api/commit/3d52c7dc8da923542d5e54df40d54e1f875d6d87))
+
+
+### Features
+
+* add active column to stakeholder, remove deleteRelation endpoint ([11ac043](https://github.com/Greenstand/treetracker-stakeholder-api/commit/11ac043ebd53f30a3aeb3b9ca23f0d6b0101e6e9))
+* add active column to stakeholder, remove deleteRelation endpoint ([9515d89](https://github.com/Greenstand/treetracker-stakeholder-api/commit/9515d896487350fbef36a95f4d556aa92ea08222))
+* add relation when creating, remove when deleting, allow partial search, improve filter ([f4d91a4](https://github.com/Greenstand/treetracker-stakeholder-api/commit/f4d91a40e587f30a04d8a1001d3da69dbe9a2151))
+* fix errors with validation, don't delete stakeholder just relation ([5327637](https://github.com/Greenstand/treetracker-stakeholder-api/commit/5327637ff69bb5737fc293303baf973c27a396b3))
+* only respond with cols that client needs, not 'active' col ([06b2f01](https://github.com/Greenstand/treetracker-stakeholder-api/commit/06b2f01ad3ee19e5f8c729f5e615a475f2897588))
+
 ## [1.2.4](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.2.3...v1.2.4) (2022-03-28)
 
 
