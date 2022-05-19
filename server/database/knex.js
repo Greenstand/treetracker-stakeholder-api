@@ -5,7 +5,7 @@ const connection = process.env.DATABASE_URL;
 const postgresPattern = /^postgresql:\//;
 
 if (!postgresPattern.test(connection)) {
-  throw new Error('invalid databases connection url received');
+  throw new Error('invalid database connection url received');
 }
 
 const knexConfig = {
