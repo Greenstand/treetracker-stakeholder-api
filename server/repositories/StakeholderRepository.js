@@ -71,7 +71,7 @@ class StakeholderRepository extends BaseRepository {
       promise = promise.limit(limitOptions.limit);
     }
     if (limitOptions?.offset) {
-      promise = promise.limit(limitOptions.offset);
+      promise = promise.offset(limitOptions.offset);
     }
 
     const stakeholders = await promise;
@@ -111,7 +111,7 @@ class StakeholderRepository extends BaseRepository {
       promise = promise.limit(limitOptions.limit);
     }
     if (limitOptions?.offset) {
-      promise = promise.limit(limitOptions.offset);
+      promise = promise.offset(limitOptions.offset);
     }
 
     const stakeholders = await promise;
@@ -275,7 +275,7 @@ class StakeholderRepository extends BaseRepository {
       promise = promise.limit(limitOptions.limit);
     }
     if (limitOptions?.offset) {
-      promise = promise.limit(limitOptions.offset);
+      promise = promise.offset(limitOptions.offset);
     }
 
     const stakeholders = await promise;
@@ -315,7 +315,7 @@ class StakeholderRepository extends BaseRepository {
       promise = promise.limit(limitOptions.limit);
     }
     if (limitOptions?.offset) {
-      promise = promise.limit(limitOptions.offset);
+      promise = promise.offset(limitOptions.offset);
     }
 
     const stakeholders = promise;
