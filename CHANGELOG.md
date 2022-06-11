@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.3.0...v1.3.1) (2022-06-11)
+
+
+### Bug Fixes
+
+* typo for applying offset to queries ([d2ff280](https://github.com/Greenstand/treetracker-stakeholder-api/commit/d2ff280688fe90152d385c611d315a18393a2c77))
+
 # [1.3.0](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.2.4...v1.3.0) (2022-05-17)
 
 
