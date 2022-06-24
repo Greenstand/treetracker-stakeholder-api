@@ -1,3 +1,11 @@
+## [1.3.2](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.3.1...v1.3.2) (2022-06-22)
+
+
+### Bug Fixes
+
+* db url check ([cb3cda2](https://github.com/Greenstand/treetracker-stakeholder-api/commit/cb3cda27240aa85c19051ef758bf4b1b84b1d590))
+* remove extra db connection file ([12642c8](https://github.com/Greenstand/treetracker-stakeholder-api/commit/12642c8757074842a7552849bc81179e224ced30))
+
 ## [1.3.1](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.3.0...v1.3.1) (2022-06-11)
 
 
