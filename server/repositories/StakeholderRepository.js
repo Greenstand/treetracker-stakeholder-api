@@ -46,194 +46,7 @@ class StakeholderRepository extends BaseRepository {
       .first();
   }
 
-  async getAllStakeholders(limitOptions) {
-    // get only non-children to start building trees
-    let promise = this._session
-      .getDB()('stakeholder as s')
-      .select(
-        's.id',
-        's.type',
-        's.org_name',
-        's.first_name',
-        's.last_name',
-        's.email',
-        's.phone',
-        's.website',
-        's.logo_url',
-        's.map',
-      )
-      .leftJoin('stakeholder_relation as sr', 's.id', 'sr.child_id')
-      .whereNull('sr.child_id')
-      .andWhere('active', true)
-      .orderBy('s.org_name', 'asc');
-
-    if (limitOptions?.limit) {
-      promise = promise.limit(limitOptions.limit);
-    }
-    if (limitOptions?.offset) {
-      promise = promise.offset(limitOptions.offset);
-    }
-
-    const stakeholders = await promise;
-
-    // count all the stakeholders, regardless of nesting
-    const count = await this._session.getDB()('stakeholder as s').count('*');
-
-    // // add these lines to count only the parents and not the children:
-    // .leftJoin('stakeholder_relation as sr', 's.id', 'sr.child_id')
-    // .whereNull('sr.child_id');
-
-    return { stakeholders, count: +count[0].count };
-  }
-
-  async getAllStakeholdersById(id = null, limitOptions) {
-    // get only non-children to start building trees
-    let promise = this._session
-      .getDB()('stakeholder as s')
-      .select(
-        's.id',
-        's.type',
-        's.org_name',
-        's.first_name',
-        's.last_name',
-        's.email',
-        's.phone',
-        's.website',
-        's.logo_url',
-        's.map',
-      )
-      .leftJoin('stakeholder_relation as sr', 's.id', 'sr.child_id')
-      .where('s.id', id)
-      .andWhere('active', true)
-      .orderBy('s.org_name', 'asc');
-
-    if (limitOptions?.limit) {
-      promise = promise.limit(limitOptions.limit);
-    }
-    if (limitOptions?.offset) {
-      promise = promise.offset(limitOptions.offset);
-    }
-
-    const stakeholders = await promise;
-
-    // count all the stakeholders, regardless of nesting
-    const count = await this._session
-      .getDB()(this._tableName)
-      .count('*')
-      .where('id', id)
-      .andWhere('active', true);
-
-    return { stakeholders, count: +count[0].count };
-  }
-
-  // not currently being used but may be useful later
-  async getStakeholderTreeById(id = null) {
-    const stakeholder = await this._session
-      .getDB()(this._tableName)
-      .select(
-        'id',
-        'type',
-        'org_name',
-        'first_name',
-        'last_name',
-        'email',
-        'phone',
-        'website',
-        'logo_url',
-        'map',
-      )
-      .where('id', id)
-      .andWhere('active', true)
-      .first();
-
-    // only get one step generation difference, no recursion
-    stakeholder.parents = await this.getParents(stakeholder);
-    stakeholder.children = await this.getChildren(stakeholder);
-
-    const count = await this._session
-      .getDB()(this._tableName)
-      .count('*')
-      .where('id', id)
-      .andWhere('active', true);
-
-    return {
-      stakeholders: [stakeholder],
-      count: count ? +count[0].count : 0,
-    };
-  }
-
-  async getParentIds(id) {
-    const parents = await this._session
-      .getDB()('stakeholder as s')
-      .select('sr.parent_id')
-      .join('stakeholder_relation as sr', 's.id', 'sr.child_id')
-      .where('s.id', id);
-
-    return parents.length ? parents.map((parent) => parent.parent_id) : [];
-  }
-
-  async getParents(child) {
-    const parentIds = await this.getParentIds(child.id);
-
-    if (parentIds.length) {
-      return this._session
-        .getDB()(this._tableName)
-        .select(
-          'id',
-          'type',
-          'org_name',
-          'first_name',
-          'last_name',
-          'email',
-          'phone',
-          'website',
-          'logo_url',
-          'map',
-        )
-        .whereIn('id', parentIds)
-        .andWhere('active', true)
-        .orderBy('org_name', 'asc');
-    }
-    return [];
-  }
-
-  async getChildrenIds(id) {
-    const children = await this._session
-      .getDB()('stakeholder as s')
-      .select('sr.child_id')
-      .join('stakeholder_relation as sr', 's.id', 'sr.parent_id')
-      .where('s.id', id);
-
-    return children.length ? children.map((child) => child.child_id) : [];
-  }
-
-  async getChildren(parent) {
-    const childrenIds = await this.getChildrenIds(parent.id);
-    const childrenFound = [...new Set(childrenIds)];
-
-    if (childrenIds.length) {
-      return this._session
-        .getDB()(this._tableName)
-        .select(
-          'id',
-          'type',
-          'org_name',
-          'first_name',
-          'last_name',
-          'email',
-          'phone',
-          'website',
-          'logo_url',
-          'map',
-        )
-        .whereIn('id', childrenFound)
-        .andWhere('active', true)
-        .orderBy('org_name', 'asc');
-    }
-    return [];
-  }
-
-  async getFilter(filter, limitOptions) {
+  async getByFilter(filter, limitOptions, id) {
     const whereBuilder = (object, builder) => {
       const { search = '', org_name = '', ...rest } = object;
       const result = builder;
@@ -253,79 +66,103 @@ class StakeholderRepository extends BaseRepository {
       return result;
     };
 
-    let promise = this._session
-      .getDB()(this._tableName)
-      .select(
-        'id',
-        'type',
-        'org_name',
-        'first_name',
-        'last_name',
-        'email',
-        'phone',
-        'website',
-        'logo_url',
-        'map',
-      )
-      .where((builder) => whereBuilder(filter, builder))
-      .andWhere('active', true)
-      .orderBy('org_name', 'asc');
+    let query = this._session
+      .getDB()
+      .from(`${this._tableName} as s`)
+      .where('active', true);
+
+    if (filter && Object.keys(filter).length) {
+      // getStakeholders with filter
+      query.andWhere((builder) => whereBuilder(filter, builder));
+      // getStakeholders with filter and id
+      if (id) {
+        const relatedIds = await this.getRelatedIds(id);
+        query.andWhere((builder) => builder.whereIn('id', relatedIds));
+      }
+    } else if (id) {
+      // getAllStakeholdersById without filters
+      query
+        .leftJoin('stakeholder_relation as sr', 's.id', 'sr.child_id')
+        .andWhere('s.id', id);
+    } else {
+      // getAllStakeholders without filters
+      query
+        .leftJoin('stakeholder_relation as sr', 's.id', 'sr.child_id')
+        .whereNull('sr.child_id');
+    }
 
     if (limitOptions?.limit) {
-      promise = promise.limit(limitOptions.limit);
+      query = query.limit(limitOptions.limit);
     }
     if (limitOptions?.offset) {
-      promise = promise.offset(limitOptions.offset);
+      query = query.offset(limitOptions.offset);
     }
 
-    const stakeholders = await promise;
-
-    const count = await this._session
-      .getDB()(this._tableName)
-      .count('*')
-      .where((builder) => whereBuilder(filter, builder))
-      .andWhere('active', true);
-
-    return { stakeholders, count: +count[0].count };
-  }
-
-  async getFilterById(id, filter, limitOptions) {
-    const relatedIds = await this.getRelatedIds(id);
-
-    let promise = this._session
-      .getDB()(this._tableName)
+    const stakeholders = await query
+      .clone()
       .select(
-        'id',
-        'type',
-        'org_name',
-        'first_name',
-        'last_name',
-        'email',
-        'phone',
-        'website',
-        'logo_url',
-        'map',
+        this._session.getDB().raw(`
+              s.id,
+              s.type,
+              s.org_name,
+              s.first_name,
+              s.last_name,
+              s.email,
+              s.phone,
+              s.website,
+              s.logo_url,
+              s.map,
+              (
+                select coalesce(json_agg(
+                  json_build_object(
+                    'id', id, 
+                    'type', type,
+                    'org_name', org_name,
+                    'first_name', first_name,
+                    'last_name', last_name,
+                    'email', email,
+                    'phone', phone,
+                    'website', website,
+                    'logo_url', logo_url,
+                    'map', map
+                  )
+                ), '[]'::json)
+                from stakeholder st
+                where st.id in (
+                  select sr.parent_id
+                  from stakeholder st2
+                  join stakeholder_relation sr on st2.id = sr.child_id
+                  where st2.id = s.id
+                ) and active = true
+              ) parents,
+              (
+                select coalesce(json_agg(
+                  json_build_object(
+                    'id', id, 
+                    'type', type,
+                    'org_name', org_name,
+                    'first_name', first_name,
+                    'last_name', last_name,
+                    'email', email,
+                    'phone', phone,
+                    'website', website,
+                    'logo_url', logo_url,
+                    'map', map
+                  )
+                ), '[]'::json)
+                from stakeholder st
+                where st.id in (
+                  select distinct sr.child_id
+                  from stakeholder st2
+                  join stakeholder_relation sr on st2.id = sr.parent_id
+                  where st2.id = s.id
+                ) and active = true
+              ) children
+          `),
       )
-      .where((builder) => builder.whereIn('id', relatedIds))
-      .andWhere({ ...filter })
-      .andWhere('active', true)
-      .orderBy('org_name', 'asc');
+      .orderBy('s.org_name', 'asc');
 
-    if (limitOptions?.limit) {
-      promise = promise.limit(limitOptions.limit);
-    }
-    if (limitOptions?.offset) {
-      promise = promise.offset(limitOptions.offset);
-    }
-
-    const stakeholders = promise;
-
-    const count = await this._session
-      .getDB()(this._tableName)
-      .count('*')
-      .where((builder) => builder.whereIn('id', relatedIds))
-      .andWhere({ ...filter })
-      .andWhere('active', true);
+    const count = await query.clone().count();
 
     return { stakeholders, count: +count[0].count };
   }
