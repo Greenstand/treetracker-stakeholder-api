@@ -1,3 +1,11 @@
+## [1.3.3](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.3.2...v1.3.3) (2022-06-27)
+
+
+### Bug Fixes
+
+* refactor sql for get stakeholders request ([f9810e0](https://github.com/Greenstand/treetracker-stakeholder-api/commit/f9810e0ae3989bac4716bbd06e8a4a0bc5062956))
+* remove extra test ([6ae7886](https://github.com/Greenstand/treetracker-stakeholder-api/commit/6ae788612dc018831557e5f2195ec196119e6d20))
+
 ## [1.3.2](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.3.1...v1.3.2) (2022-06-22)
 
 
