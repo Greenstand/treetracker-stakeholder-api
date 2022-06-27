@@ -25,29 +25,19 @@ describe('Stakeholder Model', () => {
 
   describe('getAllStakeholders', () => {
     let getFilterStub;
-    let getParentsStub;
-    let getChildrenStub;
     before(() => {
       getFilterStub = sinon
-        .stub(StakeholderRepository.prototype, 'getFilter')
+        .stub(StakeholderRepository.prototype, 'getByFilter')
         .callsFake(async (filter) => {
           return {
             count: 1,
             stakeholders: [{ id: filter.id }],
           };
         });
-      getParentsStub = sinon
-        .stub(StakeholderRepository.prototype, 'getParents')
-        .resolves([]);
-      getChildrenStub = sinon
-        .stub(StakeholderRepository.prototype, 'getChildren')
-        .resolves([]);
     });
 
     after(() => {
       getFilterStub.restore();
-      getParentsStub.restore();
-      getChildrenStub.restore();
     });
 
     it('should get stakeholders with filter -- id (uuid)', async () => {

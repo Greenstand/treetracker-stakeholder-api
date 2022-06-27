@@ -33,7 +33,7 @@ exports.handlerWrapper = (fn) =>
   };
 
 exports.errorHandler = (err, req, res, _next) => {
-  log.debug('errorHandler error:', err);
+  log.error('errorHandler error:', err);
   if (err instanceof HttpError) {
     res.status(err.code).send({
       code: err.code,

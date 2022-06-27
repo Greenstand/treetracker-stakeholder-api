@@ -135,51 +135,9 @@ class Stakeholder {
     return orgId ? this.getUUIDbyId(orgId) : org_id;
   }
 
-  async getRelationTrees(stakeholders) {
-    return Promise.all(
-      stakeholders.map(async (stakeholder) => {
-        const stakeholderCopy = { ...stakeholder };
-        const parents = await this._stakeholderRepository.getParents(
-          stakeholder,
-        );
-        // don't want to keep getting all of the parents and children recursively, but do want to
-        // include the current stakeholder as parent/child
-
-        stakeholderCopy.parents = parents.map((parent) => {
-          return { ...parent, parents: [], children: [{ ...stakeholderCopy }] };
-        });
-
-        const children = await this._stakeholderRepository.getChildren(
-          stakeholder,
-        );
-
-        stakeholderCopy.children = children.map((child) => {
-          return { ...child, parents: [{ ...stakeholderCopy }], children: [] };
-        });
-
-        return stakeholderCopy;
-      }),
-    );
-  }
-
-  async getAllStakeholders(filter, limitOptions) {
-    let dbStakeholders;
-    let count;
-
-    if (filter && Object.keys(filter).length > 0) {
-      const { stakeholders, count: dbCount } =
-        await this._stakeholderRepository.getFilter(filter, limitOptions);
-
-      dbStakeholders = stakeholders;
-      count = dbCount;
-    } else {
-      const { stakeholders, count: dbCount } =
-        await this._stakeholderRepository.getAllStakeholders(limitOptions);
-      dbStakeholders = stakeholders;
-      count = dbCount;
-    }
-
-    const stakeholders = await this.getRelationTrees(dbStakeholders);
+  async getAllStakeholders(filter = {}, limitOptions) {
+    const { stakeholders, count } =
+      await this._stakeholderRepository.getByFilter(filter, limitOptions);
 
     return {
       stakeholders:
@@ -188,32 +146,11 @@ class Stakeholder {
     };
   }
 
-  async getAllStakeholdersById(org_id, filter, limitOptions) {
+  async getAllStakeholdersById(org_id, filter = {}, limitOptions) {
     const id = await this.getUUID(org_id);
 
-    let dbStakeholders;
-    let count = 0;
-
-    if (filter && Object.keys(filter).length > 0) {
-      const { stakeholders, count: dbCount } =
-        await this._stakeholderRepository.getFilterById(
-          id,
-          filter,
-          limitOptions,
-        );
-      dbStakeholders = stakeholders;
-      count = dbCount;
-    } else {
-      const { stakeholders, count: dbCount } =
-        await this._stakeholderRepository.getAllStakeholdersById(
-          id,
-          limitOptions,
-        );
-      dbStakeholders = stakeholders;
-      count = dbCount;
-    }
-
-    const stakeholders = await this.getRelationTrees(dbStakeholders);
+    const { stakeholders, count } =
+      await this._stakeholderRepository.getByFilter(filter, limitOptions, id);
 
     return {
       stakeholders:
