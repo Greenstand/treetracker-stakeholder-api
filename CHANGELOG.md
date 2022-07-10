@@ -1,3 +1,10 @@
+## [1.3.6](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.3.5...v1.3.6) (2022-07-10)
+
+
+### Bug Fixes
+
+* seeds ([b7e203b](https://github.com/Greenstand/treetracker-stakeholder-api/commit/b7e203bbb18f280d72664c6a2142914804dba018))
+
 ## [1.3.5](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.3.4...v1.3.5) (2022-07-10)
 
 
