@@ -10,6 +10,7 @@ describe('', () => {
 
   it('Test header: content-type: application/json', async () => {
     const res = await request(server).post('/');
+
     expect(res.statusCode).eq(415);
     expect(res.body)
       .property('message')
