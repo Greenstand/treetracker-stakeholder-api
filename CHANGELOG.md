@@ -1,3 +1,10 @@
+## [1.3.7](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.3.6...v1.3.7) (2022-07-10)
+
+
+### Bug Fixes
+
+* reduce knexfile max pool ([7575b51](https://github.com/Greenstand/treetracker-stakeholder-api/commit/7575b514b4ba4f4d8aa421e10b01f1c96db808e0))
+
 ## [1.3.6](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.3.5...v1.3.6) (2022-07-10)
 
 
