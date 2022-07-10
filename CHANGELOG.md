@@ -1,3 +1,10 @@
+## [1.3.5](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.3.4...v1.3.5) (2022-07-10)
+
+
+### Bug Fixes
+
+* update max connection ([f7abc7c](https://github.com/Greenstand/treetracker-stakeholder-api/commit/f7abc7cddeb14a5f4efd8d63b1dc66d33b3c4cd1))
+
 ## [1.3.4](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.3.3...v1.3.4) (2022-06-29)
 
 
