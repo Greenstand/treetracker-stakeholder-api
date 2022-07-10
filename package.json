@@ -25,7 +25,8 @@
     "seed": "knex seed:run",
     "proxy": "http://localhost:3001/",
     "prepare": "husky install",
-    "seed-dev": "NODE_ENV=development knex seed:run"
+    "seed-dev": "NODE_ENV=development knex seed:run",
+    "db-pool-test": "NODE_ENV=development node ./api-tests/db-max-connection-test.js"
   },
   "keywords": [
     "ecology"
