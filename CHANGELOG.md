@@ -1,3 +1,10 @@
+## [1.3.4](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.3.3...v1.3.4) (2022-06-29)
+
+
+### Bug Fixes
+
+* reduce max pool connections ([fbb686c](https://github.com/Greenstand/treetracker-stakeholder-api/commit/fbb686c40f96028db90f2f3ff59357207a16d5cc))
+
 ## [1.3.3](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.3.2...v1.3.3) (2022-06-27)
 
 
