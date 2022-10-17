@@ -1,7 +1,8 @@
 require('dotenv').config({ path: `.env.${process.env.NODE_ENV}` });
 const path = require('path');
 
-const connection = process.env.DATABASE_URL_SEEDER;
+const connection =
+  'postgresql://postgres:password@localhost:5432/treetracker_db';
 
 const postgresPattern = /^postgresql:\//;
 
