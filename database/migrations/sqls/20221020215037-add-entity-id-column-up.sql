@@ -1,0 +1,1 @@
+ALTER TABLE stakeholder ADD COLUMN entity_id int;
