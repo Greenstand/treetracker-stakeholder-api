@@ -1,3 +1,10 @@
+## [1.3.8](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.3.7...v1.3.8) (2022-10-20)
+
+
+### Bug Fixes
+
+* add entity id migration ([1439f8b](https://github.com/Greenstand/treetracker-stakeholder-api/commit/1439f8b45a4041fb82b0ab19775e7045d3ac2615))
+
 ## [1.3.7](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.3.6...v1.3.7) (2022-07-10)
 
 
