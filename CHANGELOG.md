@@ -1,3 +1,12 @@
+## [1.3.9](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.3.8...v1.3.9) (2023-05-01)
+
+
+### Bug Fixes
+
+* semantic release fix ([33e0cdf](https://github.com/Greenstand/treetracker-stakeholder-api/commit/33e0cdf721a74e183f51ede96ed8f9133f3c68ee))
+* semantic release fix ([66949ad](https://github.com/Greenstand/treetracker-stakeholder-api/commit/66949ad057ba4b3a2b343a0c953d4f813f71c4e9))
+* stakeholder relation ([c704092](https://github.com/Greenstand/treetracker-stakeholder-api/commit/c704092a7ba9e2fe8ebac7f6bb7325aacb9c2978))
+
 ## [1.3.8](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.3.7...v1.3.8) (2022-10-20)
 
 
