@@ -20,18 +20,18 @@ const stakeholderGetQuerySchema = Joi.object({
 }).unknown(false);
 
 const stakeholderPostSchema = Joi.object({
-  email: Joi.string(),
+  email: Joi.string().email(),
   first_name: Joi.string(),
   last_name: Joi.string(),
   org_name: Joi.string(),
-  logo_url: Joi.string(),
+  logo_url: Joi.string().uri(),
   map: Joi.string(),
   phone: Joi.string(),
   website: Joi.string().uri(),
-  image_url: Joi.string().allow(''),
-  type: Joi.string(),
+  image_url: Joi.string().allow('').uri(),
+  type: Joi.string().valid('Organization', 'Person'),
   offering_pay_to_plant: Joi.boolean(),
-  relation: Joi.string(),
+  relation: Joi.string().valid('parents', 'children'),
   relation_id: Joi.string().uuid(),
 }).unknown(false);
 

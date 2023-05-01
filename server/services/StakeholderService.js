@@ -21,10 +21,15 @@ class StakeholderService {
       const createdStakeholder = await this._stakeholder.createStakeholder(
         requestObject,
       );
-      await this._stakeholder.createRelation(id, {
-        type: requestObject.relation,
-        data: { ...createdStakeholder, relation_id: requestObject.relation_id },
-      });
+      if (requestObject.relation && requestObject.relation_id) {
+        await this._stakeholder.createRelation(id, {
+          type: requestObject.relation,
+          data: {
+            ...createdStakeholder,
+            relation_id: requestObject.relation_id,
+          },
+        });
+      }
       await this._session.commitTransaction();
 
       return id ? this.getAllStakeholdersById(id) : this.getAllStakeholders();
