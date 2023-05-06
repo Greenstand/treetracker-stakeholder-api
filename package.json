@@ -46,9 +46,11 @@
     "express-async-handler": "^1.1.4",
     "express-validator": "^6.4.0",
     "joi": "^17.4.2",
+    "joi-to-swagger": "^6.2.0",
     "knex": "^0.95.13",
     "loglevel": "^1.6.8",
     "pg": "^8.7.1",
+    "swagger-ui-express": "^4.6.3",
     "uuid": "^8.2.0"
   },
   "devDependencies": {
