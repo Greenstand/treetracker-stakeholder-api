@@ -2,11 +2,17 @@ const {
   stakeholderSwagger,
   stakeholderComponent,
 } = require('./stakeholderHandler/docs');
+const {
+  appConfigSwagger,
+  appConfigComponent,
+  appInstallationComponent,
+} = require('./appConfigHandler/docs');
 
 const { version } = require('../../package.json');
 
 const paths = {
   ...stakeholderSwagger,
+  ...appConfigSwagger,
 };
 
 const swaggerDefinition = {
@@ -18,7 +24,9 @@ const swaggerDefinition = {
   paths,
   components: {
     schemas: {
+      AppConfig: { ...appConfigComponent },
       Stakeholder: { ...stakeholderComponent },
+      AppInstallation: { ...appInstallationComponent },
     },
   },
 };

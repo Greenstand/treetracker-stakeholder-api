@@ -9,8 +9,8 @@ const {
   stakeholderUpdate,
   stakeholderCreate,
   stakeholderDelete,
-} = require('./handlers/stakeholderHandler');
-const { handlerWrapper } = require('./utils/utils');
+} = require('../handlers/stakeholderHandler');
+const { handlerWrapper } = require('../utils/utils');
 
 // router
 //   .route('/stakeholders/relations/:id');

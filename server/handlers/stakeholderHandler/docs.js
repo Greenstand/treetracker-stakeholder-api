@@ -17,7 +17,7 @@ const stakeholderResponses = {
       schema: {
         type: 'object',
         properties: {
-          tags: {
+          stakeholders: {
             type: 'array',
             items: {
               $ref: '#/components/schemas/Stakeholder',
