@@ -1,3 +1,17 @@
+# [1.4.0](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.3.9...v1.4.0) (2023-05-18)
+
+
+### Bug Fixes
+
+* add app config tests ([8cb6d5c](https://github.com/Greenstand/treetracker-stakeholder-api/commit/8cb6d5ccb77284045367beb40575430d68912acb))
+* github workflow ([15df808](https://github.com/Greenstand/treetracker-stakeholder-api/commit/15df808b7046e5d07833bc37fe86edb3c51d0fab))
+* integrate swagger ([b766460](https://github.com/Greenstand/treetracker-stakeholder-api/commit/b766460cac901576dae76581413431d2396c840c))
+
+
+### Features
+
+* app config ([5bd85e7](https://github.com/Greenstand/treetracker-stakeholder-api/commit/5bd85e79207eca29c64ebd9c0480c2727f1261e9))
+
 ## [1.3.9](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.3.8...v1.3.9) (2023-05-01)
 
 
