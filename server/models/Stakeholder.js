@@ -5,30 +5,6 @@ class Stakeholder {
     this._stakeholderRepository = new StakeholderRepository(session);
   }
 
-  static StakeholderPostObject({
-    type,
-    org_name,
-    first_name,
-    last_name,
-    email,
-    phone,
-    website,
-    logo_url,
-    map,
-  }) {
-    return Object.freeze({
-      type,
-      org_name,
-      first_name,
-      last_name,
-      email,
-      phone,
-      website,
-      logo_url,
-      map,
-    });
-  }
-
   static StakeholderTree({
     id,
     type,
@@ -202,10 +178,8 @@ class Stakeholder {
   }
 
   async createStakeholder(data) {
-    const stakeholderObj = this.constructor.StakeholderPostObject(data);
-
     const stakeholder = await this._stakeholderRepository.createStakeholder(
-      stakeholderObj,
+      data,
     );
 
     return this.stakeholderTree(stakeholder);
