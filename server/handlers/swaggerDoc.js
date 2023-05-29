@@ -18,7 +18,7 @@ const paths = {
 const swaggerDefinition = {
   openapi: '3.0.0',
   info: {
-    title: 'Treetracker API',
+    title: 'Treetracker Stakeholder API',
     version,
   },
   paths,
