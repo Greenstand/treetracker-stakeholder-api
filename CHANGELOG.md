@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.4.0...v1.4.1) (2023-05-29)
+
+
+### Bug Fixes
+
+* swagger doc ([2fb8052](https://github.com/Greenstand/treetracker-stakeholder-api/commit/2fb805245f968b8d21c0ac551e3b50039043c564))
+
 # [1.4.0](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.3.9...v1.4.0) (2023-05-18)
 
 
