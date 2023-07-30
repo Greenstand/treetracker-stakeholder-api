@@ -7,6 +7,7 @@ class Stakeholder {
 
   static StakeholderTree({
     id,
+    entity_id,
     type,
     org_name,
     first_name,
@@ -21,6 +22,7 @@ class Stakeholder {
   }) {
     return Object.freeze({
       id,
+      entity_id,
       type,
       org_name,
       first_name,

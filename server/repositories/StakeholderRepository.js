@@ -103,6 +103,7 @@ class StakeholderRepository extends BaseRepository {
       .select(
         this._session.getDB().raw(`
               s.id,
+              s.entity_id,
               s.type,
               s.org_name,
               s.first_name,
@@ -115,7 +116,8 @@ class StakeholderRepository extends BaseRepository {
               (
                 select coalesce(json_agg(
                   json_build_object(
-                    'id', id, 
+                    'id', id,
+                    'entity_id', entity_id,
                     'type', type,
                     'org_name', org_name,
                     'first_name', first_name,
@@ -138,7 +140,8 @@ class StakeholderRepository extends BaseRepository {
               (
                 select coalesce(json_agg(
                   json_build_object(
-                    'id', id, 
+                    'id', id,
+                    'entity_id' , entity_id, 
                     'type', type,
                     'org_name', org_name,
                     'first_name', first_name,
