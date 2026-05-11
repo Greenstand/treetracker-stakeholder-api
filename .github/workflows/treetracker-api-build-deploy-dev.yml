@@ -117,17 +117,19 @@ jobs:
       - name: Run kustomize
         run: (cd deployment/overlays/development && ../../../kustomize edit set image greenstand/${{ github.event.repository.name }}:${{ steps.export_bumped_version.outputs.bumped_version }} )
 
-      - name: Commit dev kustomization file with new app version
-        if: |
-          !contains(github.event.head_commit.message, 'chore')
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git commit -am "chore: bump docker image tag ${{ steps.export_bumped_version.outputs.bumped_version }} [skip ci]"
-
-      - name: Push changes
-        uses: ad-m/github-push-action@master
+      - name: Install doctl for kubernetes
+        uses: digitalocean/action-doctl@v2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.DIGITALOCEAN_TOKEN }}
+
+      - name: Save DigitalOcean kubeconfig
+        run: doctl kubernetes cluster kubeconfig save ${{ secrets.DEV_CLUSTER_NAME }}
+
+      - name: Deploy to dev cluster
+        run: |
+          kustomize build deployment/overlays/development \
+            | kubectl apply --wait -f -
+        working-directory: ${{ env.project-directory }}
+
     outputs:
       bumped_version: ${{ steps.export_bumped_version.outputs.bumped_version }}
