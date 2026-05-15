@@ -1,3 +1,11 @@
+## [1.4.2](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.4.1...v1.4.2) (2026-05-15)
+
+
+### Bug Fixes
+
+* **ci:** update container to node18 bullseye for compatibility ([262e235](https://github.com/Greenstand/treetracker-stakeholder-api/commit/262e235ae7f429859ce71a7f6a0a8848a58351ab))
+* update all checkout actions to v4 for compatibility ([4c9618c](https://github.com/Greenstand/treetracker-stakeholder-api/commit/4c9618cfa6d8d7b3f82765bcab6ed13fb7d128dc))
+
 ## [1.4.1](https://github.com/Greenstand/treetracker-stakeholder-api/compare/v1.4.0...v1.4.1) (2023-05-29)
 
 
