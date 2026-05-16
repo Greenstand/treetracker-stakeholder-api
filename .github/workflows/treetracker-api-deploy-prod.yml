@@ -1,5 +1,4 @@
 name: Deploy Service to Prod Env
-
 on:
   workflow_dispatch:
     inputs:
@@ -17,17 +16,30 @@ jobs:
     if: |
       github.repository_owner == 'Greenstand'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.environment }}
+
+      - name: get-npm-version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@master
+
       - name: Install kustomize
         run: curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+        working-directory: ${{ env.project-directory }}
+
       - name: Run kustomize
-        run: (cd deployment/overlays/production && ../../../kustomize edit set image greenstand/${{ github.event.repository.name }}:${{ github.event.inputs.environment }})
-      - name: Commit prod kustomization file with new app version
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git commit -am "chore: bump docker image tag ${{ github.event.inputs.environment }})} [skip ci]"
-      - name: Push changes
-        uses: ad-m/github-push-action@master
+        run: (cd deployment/overlays/production && ../../../kustomize edit set image greenstand/${{ github.event.repository.name }}:${{ steps.package-version.outputs.current-version }})
+        working-directory: ${{ env.project-directory }}
+
+      - name: Install doctl for kubernetes
+        uses: digitalocean/action-doctl@v2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.DIGITALOCEAN_PRODUCTION_TOKEN }}
+
+      - name: Save DigitalOcean kubeconfig
+        run: doctl kubernetes cluster kubeconfig save ${{ secrets.PRODUCTION_CLUSTER_NAME }}
+
+      - name: Update kubernetes resources
+        run: kustomize build deployment/overlays/production | kubectl apply -n stakeholder-api --wait -f -
+        working-directory: ${{ env.project-directory }}
