@@ -16,6 +16,8 @@ class Stakeholder {
     website,
     logo_url,
     map,
+    status,
+    rejection_reason,
     children = [],
     parents = [],
   }) {
@@ -30,6 +32,8 @@ class Stakeholder {
       website,
       logo_url,
       map,
+      status,
+      rejection_reason,
       children,
       parents,
     });

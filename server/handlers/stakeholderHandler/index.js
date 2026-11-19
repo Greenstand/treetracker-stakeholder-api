@@ -1,4 +1,5 @@
 const StakeholderService = require('../../services/StakeholderService');
+const HttpError = require('../../utils/HttpError');
 const {
   getFilterAndLimitOptions,
   generatePrevAndNext,
@@ -96,8 +97,22 @@ const stakeholderUpdate = async function (req, res) {
     abortEarly: false,
   });
 
+  // PATCH /stakeholders/:id takes the id from the path; PATCH /stakeholders
+  // still reads it from the body
+  const { id: pathId } = req.params;
+  if (pathId && requestObject.id && requestObject.id !== pathId) {
+    throw new HttpError(400, 'id in the body does not match the id in the path');
+  }
+  const id = pathId || requestObject.id;
+  if (!id) {
+    throw new HttpError(422, '"id" is required');
+  }
+
   const stakeholderService = new StakeholderService();
-  const result = await stakeholderService.updateStakeholder(requestObject);
+  const result = await stakeholderService.updateStakeholder({
+    ...requestObject,
+    id,
+  });
 
   res.status(200).json(result);
 };

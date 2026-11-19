@@ -38,7 +38,7 @@ const stakeholderDeleteSchema = Joi.object({
 }).unknown(false);
 
 const updateStakeholderSchema = Joi.object({
-  id: Joi.string().uuid().required(),
+  id: Joi.string().uuid(),
   email: Joi.string().email(),
   org_name: Joi.string(),
   first_name: Joi.string(),
@@ -51,12 +51,17 @@ const updateStakeholderSchema = Joi.object({
   parents: Joi.array().items(Joi.object()),
   image_url: Joi.string().allow(''),
   type: Joi.string(),
+  status: Joi.string().valid('pending', 'active', 'suspended', 'rejected'),
+  rejection_reason: Joi.string().when('status', {
+    is: 'rejected',
+    then: Joi.required(),
+  }),
   created_at: Joi.string(),
   updated_at: Joi.string(),
 })
   .unknown(false)
-  .xor('org_name', 'first_name')
-  .xor('org_name', 'last_name');
+  .oxor('org_name', 'first_name')
+  .oxor('org_name', 'last_name');
 
 module.exports = {
   stakeholderGetQuerySchema,
