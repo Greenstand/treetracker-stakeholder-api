@@ -112,6 +112,8 @@ class StakeholderRepository extends BaseRepository {
               s.website,
               s.logo_url,
               s.map,
+              s.status,
+              s.rejection_reason,
               (
                 select coalesce(json_agg(
                   json_build_object(

@@ -18,6 +18,8 @@ describe('Stakeholder Model', () => {
       'website',
       'logo_url',
       'map',
+      'status',
+      'rejection_reason',
       'parents',
       'children',
     ]);
